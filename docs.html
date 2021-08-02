@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" type="text/css" href="style_1.css" media="screen"/>
+        <script type="text/javascript" src="parsers.js"></script>
+        <script type="text/javascript" src="utils.js"></script>
+        <script type="text/javascript" src="prudens.js"></script>
+        <title>
+            Prudens JS
+        </title>
+    </head>
+    <body onload="toc()">
+        <div class="header">
+            <div class="header-left">
+                <div class="header-title">
+                    <a href="index.html"><span class="header-link">Prudens JS</span></a>
+                </div>
+                <div class="header-menu">
+                    <div class="header-menu-item">
+                        <a href="docs.html"><span class="header-link">Docs</span></a>
+                    </div>
+                    <div class="header-menu-item">
+                        <a href="contact.html"><span class="header-link">Contact</span></a>
+                    </div>
+                    <div class="header-menu-item">
+                        <a href="changelog.html"><span class="header-link">Changelog</span></a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="body-container docs">
+            <div class="docs-body">
+                <div class="item-21">
+                    <h3>Table of Contents</h3>
+                    <div id="toc" class="toc"></div>
+                </div>
+                <div id="main-body" class="item-22">
+                    <h1>Documentation</h1>
+                    <p><em>The documentation of Prudens JS is under constant revisions and extensions! :)</em></p>
+                    <p>For more details regarding the theory behind Prudens JS (i.e., Machine Coaching), consult 
+                        <a href="https://cognition.ouc.ac.cy/loizos/papers/Michael_2019_MachineCoaching.pdf" target="_blank" rel="noopener noreferrer"><span class="text-link">this paper</span></a>.
+                    </p>
+                    <h2>Introduction</h2>
+                    <p>Suppose you own one of these robot vacuum cleaners and also suppose that you can interact with it in order to train it to behave as per your commands.
+                        Now, suppose that once you charge your robot vacuum cleaner, you give it the following command:
+                    </p>
+                    <p class="center-text">"Clean all the house every day at 7 PM!"
+                    </p>
+                    <p>Now, let us suppose that it is Sunday afternoon, 6:59 PM and that you are relaxing. Suddenly, you hear an annoying sound coming from the living room:
+                        it is the robot vacuum cleaner that has just started cleaning. At this time you realise that you should make some adjustments to your cleaner's settings.
+                        Namely, you get up, go to your living room and give the following command to your cleaner:
+                    </p>
+                    <p class="center-text">"Do not clean the house at 7 PM on Sundays! Instead, wait for me to tell you when to start cleaning on Sundays!"
+                    </p>
+                    <p>In the above, you have just provided your automated cleaner with an exception, in the sense that while its general cleaning policy will be to clean every day at 7 PM,
+                        on Sundays it should deviate from it and wait for your order to do so. 
+                        Proceeding in this way, you may find more circumstances in which you would like your cleaner to deviate from its previous policy and temporarily
+                        adopt some other behaviour.
+                    </p>
+                    <p>
+                        Situations like the one described above, where a human coaches a machine in order to accomplish some certain task as per their desire are captured by 
+                        <a href="https://cognition.ouc.ac.cy/loizos/papers/Michael_2019_MachineCoaching.pdf" target="_blank" rel="noopener noreferrer"><span class="text-link">Machine Coaching (MC)</span></a>.
+                        In short, MC is an iterative human-machine interaction through which a human can transfer knowledge to an agent who, in turn, acts based on it and returns explanations in 
+                        the forms of arguments constructed from the knowledge it has accumulated. 
+                        Upon each such argument the user may provide some input in the form of some counter-argument, in order to update the agent's knowledge.
+                    </p>
+                    <h2>The language of Prudens</h2>
+                    <p>Since MC offers a means of communication between humans and machines, it is natural that there should exist some common language through which knowledge is transferred
+                        from the human end-user to the machine agent and vice-versa. In this section we will describe the syntax and semantics of this declarative language.</p>
+                    <h3>Predicates, variables and constants</h3>
+                    <p>At some extent, Prudens's language shares several common features with prolog. To begin with, Prudens's language allows for <em>predicates</em> to be used to 
+                        denote relations between entities of the universe. Syntactically, each predicate consists of two parts:</p>
+                        <ul>
+                            <li>its <em>name</em>, which starts with a lower-case letter of the Latin alphabet (a-z) which may be followed by any finite sequence of letters
+                                (a-z, A-Z), digits (0-9) and underscores (_), and;</li>
+                            <li>its <em>list of arguments</em>, which follows its name separated by no other character and consists of a comma-separated list of
+                                arguments enclosed in left and right parentheses.</li>
+                        </ul>
+                    <p>So, the syntactical form of a predicate is the following:</p>
+                    <p class="center-text"><span class="code">name(arg1,arg2,...,argn)</span>.</p>
+                    <p>
+                        We will refer to the (fixed) number, <span class="code">n</span>, of arguments appearing in a predicate's arguments list as the predicate's <em>arity</em> and we 
+                        will also refer to a predicate of arity n as an <em>n-ary predicate</em>.
+                    </p>
+                    <p>
+                        Regarding a predicate's arguments, they are restricted to be either <em>constants</em> or <em>variables</em>. Constants are intended to be interpreted as specific
+                        entities of our universe while variables serve as placeholders for constants. In Prudens's language, constants are represented by strings which start with a
+                        lower-case letter (a-z) which may be followed by any finite sequence of letters (a-z, A-Z), digits (0-9) and underscores (_) - exactly as with a
+                        predicate's name. On the other hand, variables are represented by string which start with
+                        an upper-case letter (A-Z) which may again be followed by any finite sequence of letters (a-z, A-Z), digits (0-9) and underscores (_).
+                        So, for instance, the following:
+                    </p>
+                    <p class="center-text"><span class="code">fatherOf(X,bob)</span></p>
+                    <p>is a binary predicate symbol, <span class="code">fatherOf(&#183,&#183)</span>, with an arguments list consisting of a variable, <span class="code">X</span>,
+                        and a constant, <span class="code">bob</span>. In case we interpret <span class="code">fatherOf(X,Y)</span> as "X is the father of Y"
+                        and assume that there exists some entity named Bob in our universe, then the above may be interpreted as "Someone (<span class="code">X</span>) is the father
+                        of Bob".</p>
+                    <p>
+                        The only exception to the above are two built-in predicates, namely <span class="code">?=(&#183,&#183)</span> and <span class="code">?<(&#183,&#183)</span>.
+                        As their name suggests, they denote equality and inequality in terms of math constants. That is, <span class="code">?=(X,Y)</span> is
+                        always interpreted as "<span class="code">X</span> equals <span class="code">Y</span>" as well as <span class="code">?<(X,Y)</span> is always interpreted as "<span class="code">X</span> is
+                        less than <span class="code">Y</span>". Moreover, <span class="code">?=(&#183,&#183)</span> also serves as a
+                        predicate that allows an ungrounded variable to be unified with a constant under certain circumstances.
+                    </p>
+                    <p>
+                        Note that Prudens's language <em>does not allow for function symbols</em>, in general.
+                        That is, in case one needs to express a relation such as "2 is the successor of 1" then, instead of a typical functional notation such as:
+                    </p>
+                    <p class="center-text"><span class="code">2 = successor(1)</span></p>
+                    <p>where <span class="code">successor(&#183)</span> denotes the successor function on natural numbers, one should use a predicate-oriented notation such as:</p>
+                    <p class="center-text"><span class="code">successor(2,1)</span></p>
+                    <p>where <span class="code">successor(&#183,&#183)</span> is a binary predicate which is interpreted as "The first argument is the successor of the second one".</p>
+                    <p>The only exception to the above occurs in the case of maths or other native Javascript functions which may be called within the scope of <span class="code">?=(&#183,&#183)</span>
+                        and <span class="code">?<(&#183,&#183)</span> or any custom Javascript predicate.</p>
+                    <h3>Literals, Rules, Knowledge Bases and Contexts</h3>
+                    <p>Predicates, variables and constants are the building blocks with which one can construct rules that capture desired behaviours or define new relations between entities of
+                        our universe. The first thing one may build with predicates is a <em>literal</em>. A literal in the context of Prudens's language is
+                        either a predicate itself or a negated predicate, where negation is denoted by
+                        the minus symbol (<span class="code">-</span>) preceding the predicate's name - no spaces are allowed between the predicate's name and the negation symbol.
+                        So, for instance, the following are both literals:</p>
+                    <p class="center-text"><span class="code">fatherOf(X,bob), -fatherOf(Y,alice)</span></p>
+                    <p>At this point we should highlight that negation within the context of Prudens's language is treated as <em>classical negation</em> which is not what
+                        happens e.g. with prolog. To shed more light on this subtle difference let us consider the following two literals:</p>
+                    <p class="center-text"><span class="code">fatherOf(george,bob); fatherOf(alice,george);</span></p>
+                    <p>Under the Closed World Assumption (CWA) - i.e. by treating negation as failure - we can infer from the above
+                        that <span class="code">-fatherOf(george,jim)</span> since the literal <span class="code">fatherOf(george,jim)</span> is not included in our knowledge and,
+                        due to the CWA, it is not true. However, in the setting of Prudens's language,
+                        we cannot infer from the above that <span class="code">-fatherOf(george,jim)</span>, since we have not accepted any form of CWA.</p>
+                    <p>Having clarified the status of negation in the context of Prudens's language, we proceed with rules. Rules in the context of Prudens's language consist of the following:</p>
+                    <ul>
+                        <li>a <em>name</em>, which is separated by <span class="code">::</span> from the rule's main part;</li>
+                        <li>a <em>body</em>, which is a comma-separated list of literals and;</li>
+                        <li>a <em>head</em>, which is a single literal.</li>
+                    </ul>
+                    <p>For instance, the following string is a rule:</p>
+                    <p class="center-text"><span class="code">Rule_1 :: fatherOf(X, Y), fatherOf(X, Z) implies siblings(Y, Z)</span>.</p>
+                    <p>It is important to note at this point that all three attributes of a rule - i.e. its name, its body and its head - should not be empty. So, a rule cannot be 
+                        nameless, and one may not infer anything having no hypotheses.
+                    </p>
+                    <p>Using rules, one may construct knowledge bases, which are order lists of rules. For instance, the following list of two rules is considered a knowledge base:</p>
+                    <div class="code-container"><div class="code-block">Rule_1 :: f(X), g(X, Y) implies h(X);<br>Rule_2 :: f(X) implies -h(X);</div></div>
+                    <p>The same applies for the following one:</p>
+                    <div class="code-container"><div class="code-block">Rule_2 :: f(X) implies -h(X);<br>Rule_1 :: f(X), g(X, Y) implies h(X);</div></div>
+                    <p>Observe that, as we have mentioned above, knowledge bases are <em>ordered</em> lists of rules. So, the above two knowledge bases are different. For more on
+                    how the order of rules affects inference, see the <a href="#Inference"><span class="text-link">corresponding section</span></a>.</p>
+                    <p>As one may observe, knowledge bases encode knowledge in the form of prioritized if-then rules. Another structure that encodes knowledge within Prudens's language
+                        are <em>contexts</em>. A context is a set of pairwise non-conflicting variable-free literals. That is, any literal that is included in a context has all its variables substituted with
+                        some constants. So, while e.g. <span class="code">f(a,b)</span> may be included in some context, <span class="code">f(X,b)</span> may not be part of any
+                        context, due to <span class="code">X</span> being not substituted with some constant. So, an example of a context is the following one:
+                    </p>
+                    <p class="center-text"><span class="code">f(a); f(b); g(a, b); h(a, b, c);</span></p>
+                    <p>Observe that, as with knowledge bases, the different entries of a context are separated from each other with a semicolon (<span class="code">;</span>).</p>
+                    <h2>Inference</h2>
+                    <p><em>To be continued...</em></p>
+                </div>
+                <div class="item-23">
+                    <h3>Known bugs</h3>
+                    <div id="bugs">
+                        <ul>
+                            <li>#001: Ctrl+A does not function properly inside the "Knowledge Base" and "Context" code editors. Namely, the text is selected and un-selected within less
+                                than 200ms.
+                            </li>
+                            <li>#002: The "_" shortcut for dummy variables - i.e. variables that are of no significance in some certain predicate - is not properly supported yet.</li>
+                            <li>#003: Custom Javascript predicates as well as <span class="code">?=</span> and <span class="code">?<</span> predicates are not fully supported yet.</li>
+                            <li>#004: Syntax highlighting is not fully supported yet in none of the two editors.</li>
+                            <li>#005: Syntax error codes regarding Prudens's language are still under development. Thus, all errors as for now fall into the same category - namely,
+                                <span class="code">KnowledgeBaseSyntaxError</span>.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </body>
+</html> 

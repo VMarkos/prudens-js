@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" type="text/css" href="style_1.css" media="screen"/>
+        <script type="text/javascript" src="parsers.js"></script>
+        <script type="text/javascript" src="utils.js"></script>
+        <script type="text/javascript" src="prudens.js"></script>
+        <!-- <script type="text/javascript" src="eventHandling.js"></script> -->
+        <title>
+            Prudens JS
+        </title>
+    </head>
+    <body>
+        <div class="header">
+            <div class="header-left">
+                <div class="header-title">
+                    <a href="index.html"><span class="header-link">Prudens JS</span></a>
+                </div>
+                <div class="header-menu">
+                    <div class="header-menu-item">
+                        <a href="docs.html"><span class="header-link">Docs</span></a>
+                    </div>
+                    <div class="header-menu-item">
+                        <a href="contact.html"><span class="header-link">Contact</span></a>
+                    </div>
+                    <div class="header-menu-item">
+                        <a href="changelog.html"><span class="header-link">Changelog</span></a>
+                    </div>
+                </div>
+            </div>
+            <div class="execute-button" onclick="consoleOutput()">Deduce!</div>
+        </div>
+        <div class="body-container">
+            <div class="main-body">
+                <div class="item-21">
+                    <div class="label-container">
+                        <div class="label">Knowledge Base</div>
+                    </div>
+                    <div id="kb-container" class="code-editor-container">
+                        <div class="line-numbers">
+                            <textarea id="kb-lines" class="line-numbers-textarea" readonly>1</textarea>
+                        </div>
+                        <textarea id="kb" placeholder="Enter your knowledge base here..."></textarea>
+                    </div>
+                </div>
+                <div class="sub-grid">
+                    <div class="flex-container">
+                        <div class="label-container">
+                            <div class="label">Context</div>
+                        </div>
+                        <div class="code-editor-container">
+                            <div class="line-numbers">
+                                <textarea id="context-lines" class="line-numbers-textarea" readonly>1</textarea>
+                            </div>
+                            <textarea id="context" placeholder="Enter your context here..."></textarea>
+                        </div>
+                    </div>
+                    <div class="flex-container">
+                        <div class="label-container">
+                            <div class="console-header">
+                                <div class="label">Console</div>
+                                <div class="clear-button" onclick="clearConsole()">Clear</div>
+                            </div>
+                        </div>
+                        <textarea id="console" class="textarea console" readonly>~$ </textarea>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script type="text/javascript" src="eventHandling.js"></script>
+    </body>
+</html>
