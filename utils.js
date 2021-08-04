@@ -11,7 +11,9 @@ function infer() {
     }
     // console.log(kb);
     // console.log(context);
-    const inferences = forwardChaining(kbObject["kb"], contextObject["context"]);
+    const output = forwardChaining(kbObject["kb"], contextObject["context"]);
+    const inferences = output["facts"];
+    const graph = output["graph"];
     // console.log("Inferences:");
     // console.log(inferences);
     const outputString = "";
@@ -21,7 +23,8 @@ function infer() {
     for (const warning of warnings) {
         outputString += warning["name"] + ": " + warning["message"] + "\n";
     }
-    return outputString + "Inferences: " +  contextToString(inferences);
+    // console.log(graph);
+    return outputString + "Inferences: " +  contextToString(inferences) + "\nGraph: " + graphToString(graph);
 }
 
 function consoleOutput() {
