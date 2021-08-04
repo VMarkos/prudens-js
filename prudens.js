@@ -206,9 +206,24 @@ function applyToLiteral(sub, literal) {
     return subLiteral;
 }
 
+function applyToRule(sub, rule) {
+    const subRule = {
+        name: rule["name"],
+    }
+    const newBody = [];
+    for (const literal of rule["body"]) {
+        console.log(literal);
+        newBody.push(applyToLiteral(sub, literal));
+    }
+    subRule["body"] = newBody;
+    subRule["head"] = applyToLiteral(sub, rule["head"]);
+    return subRule;
+}
+
 function forwardChaining(kb, context) {
     const facts = context;
     let inferred = false;
+    const graph = {};
     let i = 0;
     do {
         inferred = false;
@@ -227,6 +242,12 @@ function forwardChaining(kb, context) {
                     // console.log(inferredHead);
                     if (!deepIncludes(inferredHead, facts)) {
                         facts.push(inferredHead);
+                        const literalString = literalToString(inferredHead);
+                        if (Object.keys(graph).includes(literalString)) {
+                            graph[literalString].push(applyToRule(sub, rule));
+                        } else {
+                            graph[literalString] = [applyToRule(sub, rule)];
+                        }
                         // console.log("Head:");
                         // console.log(inferredHead);
                         inferred = true;
@@ -236,7 +257,10 @@ function forwardChaining(kb, context) {
         }
         i++;
     } while (inferred);
-    return facts;
+    return {
+        facts: facts,
+        graph: graph,
+    }
 }
 
 function isConfictingWithList(x, facts) { // x is literal, facts is a list of literals.
