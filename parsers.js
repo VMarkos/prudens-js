@@ -205,9 +205,11 @@ function literalToString(literal) {
 function ruleToString(rule) {
     let ruleString = rule["name"] + " :: ";
     const body = rule["body"];
-    for (let i=0; i<body,length; i++) {
+    // console.log(body);
+    for (let i=0; i<body.length; i++) {
         const literal = body[i];
         ruleString += literalToString(literal);
+        // console.log(ruleString);
         if (i < body.length - 1) {
             ruleString += ", ";
         }
@@ -238,4 +240,20 @@ function contextToString(context) {
         }
     }
     return contextString;
+}
+
+function graphToString(graph) {
+    let graphString = "";
+    for (const key of Object.keys(graph)) {
+        graphString += key + ": [";
+        for (let i=0; i<graph[key].length; i++) {
+            const rule = graph[key][i];
+            graphString += ruleToString(rule);
+            if (i < graph[key].length - 1) {
+                graphString += ", ";
+            }
+        }
+        graphString += "]\n";
+    }
+    return graphString;
 }
