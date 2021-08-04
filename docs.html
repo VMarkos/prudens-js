@@ -152,20 +152,63 @@
                     <p class="center-text"><span class="code">f(a); f(b); g(a, b); h(a, b, c);</span></p>
                     <p>Observe that, as with knowledge bases, the different entries of a context are separated from each other with a semicolon (<span class="code">;</span>).</p>
                     <h2>Inference</h2>
+                    <p>As we have mentioned above, Prudens's language allows for two separate structures to encode knowledge:</p>
+                    <ul>
+                        <li>Knowledge bases, which are ordered collections of rules and;</li>
+                        <li>contexts, which ara (unordered) lists of instantiated and pairwise non-conflicting literals.</li>
+                    </ul>
+                    <p>As far as the first are concerned, knowledge bases are intended to represent knowledge in the form of general rules that describe some certain behaviour
+                        <em>across several possible situations.</em> On the other hand, contexts encode knowledge in the form of <em>facts</em> describing a <em>specific situation</em>.
+                        So, within the context of Prudens's language, contexts contain <em>idisputable facts</em> that hold at some certain occasion while a knowledge base contains 
+                        <em>general rules</em> that are triggered by a contextual facts.
+                    </p>
+                    <h3>Rules and Priorities</h3>
+                    <p>To clarify things a little more, consider the following knowledge base, let KB1:</p>
+                    <div class="code-container"><div class="code-block">Rule_3 :: isSunday(X), isRaining(X) implies action(atHome);<br>Rule_2 :: isSunday(X), isRaining(X) implies -action(playOutside);<br>
+                        Rule_1 :: isSunday(X) implies action(playOutside);</div></div>
+                    <p>KB1 encodes a simple policy regarding what to do (or not to do) on Sundays. Namely, <span class="code">Rule_1</span> informs us that we are willing to go and play
+                    outside on Sundays. However, <span class="code">Rule_2</span> adds an exception to the above general behaviour. Namely, on rainy Sundays, we are not willing to
+                    play outside but, instead, as <span class="code">Rule_3</span> informs us, we prefer staying at home. So, KB1 encodes our behaviour across two possible scenarios:</p>
+                    <ul>
+                        <li>on a casual sunny Sunday we prefer to play outside but;</li>
+                        <li>on a rainy Sunday we prefer staying at home.</li>
+                    </ul>
+                    <p>The two above scenarios can be encoded using two contexts, namely, context C1:</p>
+                    <div class="code-container"><div class="code-block">isSunday(today)</div></div>
+                    <p>which encodes the first scenario - a casual (non-rainy) Sunday and context C2:</p>
+                    <div class="code-container"><div class="code-block">isSunday(today); isRaining(today);</div></div>
+                    <p>which encodes the second scenario - a rainy Sunday.</p>
+                    <p>Observe in the above how the order of the rules plays an important role. As we have said, a knowledge base is an <em>ordered</em> list of rules. The order of appearance
+                    of rules in a knowledge base determines what happens when two conflicting rules have been triggered at the same time. Namely, in the above case where under C2 both
+                    <span class="code">Rule_1</span> and <span class="code">Rule_2</span> are triggered, since <span class="code">Rule_2</span> appears higher than
+                    <span class="code">Rule_1</span> in KB1, we infer that <span class="code">Rule_2</span> is <em>of higher priority</em> than <span class="code">Rule_1</span> and,
+                    hence, we ignore the latter in favour of <span class="code">Rule_2</span>.</p>
+                    <p>
+                        In case we had the following knowledge base, let KB2, instead of KB1, things would be different:
+                    </p>
+                    <div class="code-container"><div class="code-block">Rule_1 :: isSunday(X) implies action(playOutside);<br>
+                        Rule_3 :: isSunday(X), isRaining(X) implies action(atHome);<br>Rule_2 :: isSunday(X), isRaining(X) implies -action(playOutside);</div></div>
+                    <p>In the above situation, <span class="code">Rule_1</span> is considered of higher priority over any other rule and, consequently, in both C1 and C2 our action would be to go
+                        outside and play - since rules <span class="code">Rule_2</span> and <span class="code">Rule_3</span> are either not triggered - in C1 - or triggered but dismissed due to
+                        being of lower priority than <span class="code">Rule_1</span> - in C2.</p>
+                    <h3>Rule Chaining</h3>
                     <p><em>To be continued...</em></p>
                 </div>
                 <div class="item-23">
                     <h3>Known bugs</h3>
                     <div id="bugs">
                         <ul>
-                            <li>#001: Ctrl+A does not function properly inside the "Knowledge Base" and "Context" code editors. Namely, the text is selected and un-selected within less
-                                than 200ms.
+                            <li><s>#001: Ctrl+A does not function properly inside the "Knowledge Base" and "Context" code editors. Namely, the text is selected and un-selected within less
+                                than 200ms.</s>
                             </li>
                             <li>#002: The "_" shortcut for dummy variables - i.e. variables that are of no significance in some certain predicate - is not properly supported yet.</li>
                             <li>#003: Custom Javascript predicates as well as <span class="code">?=</span> and <span class="code">?<</span> predicates are not fully supported yet.</li>
                             <li>#004: Syntax highlighting is not fully supported yet in none of the two editors.</li>
                             <li>#005: Syntax error codes regarding Prudens's language are still under development. Thus, all errors as for now fall into the same category - namely,
                                 <span class="code">KnowledgeBaseSyntaxError</span>.</li>
+                            <li>#006: Ctrl+Z keyboard shortcut does not work properly - neither does the Right click > Undo/Redo functionality in both "Knowledge Base" and "Context"
+                                code editors.
+                            </li>
                         </ul>
                     </div>
                 </div>
