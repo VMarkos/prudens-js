@@ -1,3 +1,8 @@
+function initialize() {
+    document.getElementById("exec-button").value = "Deduce!";
+    document.getElementById("context-label").value = "Context";
+}
+
 function infer() {
     "use strict";
     const kbObject = kbParser();
@@ -29,9 +34,17 @@ function infer() {
 
 function consoleOutput() {
     "use strict";
-    const newText = infer();
+    let newText;
+    if (document.getElementById("exec-button").innerHTML != "Deduce!") {
+        newText = "I am currently not working - wait for some next update!\n\nThanks for your patience! :)"
+    } else {
+        newText = infer();
+    }
     const previous = document.getElementById("console").value;
     document.getElementById("console").value = previous + newText + "\n~$ ";
+    if (document.getElementById("download-checkbox").checked) {
+        download("output.txt", newText);
+    }
 }
 
 function clearConsole() {
@@ -166,4 +179,46 @@ function updateLineNumber(id) {
     // console.log(numLines);
     // console.log(newLines);
     document.getElementById(id + "-lines").value = newLines;
+}
+
+function tabChanger(event, tabName) {
+    "use strict";
+    const tabsLeft = document.getElementsByClassName("tab-left");
+    const tabsRight = document.getElementsByClassName("tab-right");
+    for (let i=0; i<tabsLeft.length; i++) {
+        tabsLeft[i].style.display = "none";
+        tabsRight[i].style.display = "none";
+    }
+    const tabLinks = document.getElementsByClassName("tablink");
+    for (let i=0; i<tabsLeft.length; i++) {
+        tabLinks[i].className = tabLinks[i].className.replace(" selected", "");
+    }
+    // console.log(tabName);
+    tabName = tabName.replace("-tab", "");
+    // console.log(tabName);
+    document.getElementById(tabName + "-left").style.display = "block";
+    document.getElementById(tabName + "-right").style.display = "grid";
+    document.getElementById(tabName + "-tab").className += " selected";
+    // event.currentTarget.firstElementChild.className += " selected";
+    // if (tabName === "Deduce") {
+    //     document.getElementById("context-label").innerHTML = "Context";
+    //     document.getElementById("exec-button").innerHTML = "Deduce!";
+    //     document.getElementById("deduce-tab").className += " selected";
+    //     document.getElementById("abduce-tab").className = "tab-button";
+    // } else {
+    //     document.getElementById("context-label").innerHTML = "Targets";
+    //     document.getElementById("exec-button").innerHTML = "Abduce!";
+    //     document.getElementById("abduce-tab").className += " selected";
+    //     document.getElementById("deduce-tab").className = "tab-button";
+    // }
+}
+
+function download(filename, content) {
+    let element = document.createElement("a");
+    element.setAttribute("href", "data:text/plain;charset=utf-8," + encodeURIComponent(content));
+    element.setAttribute("download", filename);
+    element.style.display = "none";
+    document.body.appendChild(element);
+    element.click();
+    document.body.removeChild(element);
 }
