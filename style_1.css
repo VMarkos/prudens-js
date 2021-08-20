@@ -14,6 +14,12 @@ a {
     max-height: fit-content;
 }
 
+label {
+    font-family: Ubuntu, Arial, Helvetica, sans-serif;
+    font-weight: 600;
+    max-height: fit-content;
+}
+
 h1, h2, h3 {
     font-family: Ubuntu, Arial, Helvetica, sans-serif;
     font-weight: 800;
@@ -160,7 +166,8 @@ textarea:focus {
 }
 
 .body-container {
-    background-color:  whitesmoke;
+    display: flex;
+    background-color: blueviolet;
     width: 100%;
     height: 90%;
 }
@@ -169,15 +176,20 @@ textarea:focus {
     background-color: white;
 }
 
+.body-container.contact {
+    justify-content: center;
+    background-color: white;
+    justify-content: start;
+}
+
 .main-body {
     display: grid;
-    background-color: inherit;
+    background-color: whitesmoke;
     width: fit-content;
-    height: 90%;
-    row-gap: 10px;
+    height: 100%;
+    width: 100%;
     column-gap: 25px;
-    grid-template-columns: 1fr 1fr;
-    padding-left: 10px;
+    grid-template-columns: 0.1fr 1fr 1fr;
     padding-right: 10px;
 }
 
@@ -185,7 +197,64 @@ textarea:focus {
     margin: 10px;
 }
 
+.tab-menu {
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    display: flex;
+    flex-direction: column;
+    background-color: blueviolet;
+    justify-content: top;
+    align-items: center;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.tab-button {
+    background-color: inherit;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: large;
+    font-weight: 800;
+    margin-left: 5px;
+    margin-right: 5px;
+    transition-duration: 0.4s;
+    text-align: center;
+    width: 100%;
+    cursor: pointer;
+}
+
+.tab-button.selected {
+    background-color: whitesmoke;
+    color: blueviolet;
+}
+
+.tab-button:hover {
+    opacity: 0.5;
+    background-color: whitesmoke;
+    color: blueviolet
+}
+
+.tab-button:active {
+    opacity: 1;
+    background-color: whitesmoke;
+    color: blueviolet
+}
+
+.tab-button:focus {
+    opacity: 1;
+    background-color: whitesmoke;
+    color: blueviolet
+}
+
 .item-21 {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+    margin: 10px;
+}
+
+.toc-column {
     grid-column: 1 / 2;
     grid-row: 1 / 2;
     margin: 10px;
@@ -207,15 +276,25 @@ textarea:focus {
 }
 
 .sub-grid {
+    grid-column: 3 / 4;
+    grid-row: 1 / 2;
     display: grid;
-    background-color: inherit;
+    background-color: whitesmoke;
     width: fit-content;
-    height: 100%;
+    height: 90%;
     row-gap: 28px;
     column-gap: 25px;
     grid-template-rows: 1fr 1fr;
     grid-template-columns: 1fr;
     padding-right: 10px;
+}
+
+.sub-grid.abduce {
+    grid-template-rows: 1fr 1fr 2fr;
+}
+
+.hidden {
+    display: none;
 }
 
 .label-container {
@@ -227,6 +306,16 @@ textarea:focus {
     display: flex;
     flex-direction: row;
     justify-content: space-between;
+}
+
+.console-options {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.console-option {
+    margin-left: 10px;
 }
 
 .clear-button {
@@ -284,7 +373,7 @@ textarea:focus {
     display: flex;
     flex-direction: row;
     width: 100%;
-    height: 100%;
+    height: 90%;
 }
 
 .line-numbers {
@@ -306,7 +395,7 @@ textarea:focus {
     border-bottom-right-radius: 0px;
     border-top-right-radius: 0px;
     box-sizing: border-box;
-    font-family: 'Courier New', Courier, monospace;
+    font-family: 'Ubuntu mono', 'Courier New', Courier, monospace;
     background-color: rgba(0,0,0,.05);
     overflow: hidden;
 }
