@@ -35,11 +35,8 @@ function infer() {
 function consoleOutput() {
     "use strict";
     let newText;
-    if (document.getElementById("exec-button").innerHTML != "Deduce!") {
-        newText = "I am currently not working - wait for some next update!\n\nThanks for your patience! :)"
-    } else {
-        newText = infer();
-    }
+    newText = "I am currently not working - wait for some next update!\n\nThanks for your patience! :)"
+    newText = infer();
     const previous = document.getElementById("console").value;
     document.getElementById("console").value = previous + newText + "\n~$ ";
     if (document.getElementById("download-checkbox").checked) {
