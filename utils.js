@@ -14,16 +14,16 @@ function infer() {
     if (contextObject["type"] === "error") {
         return "ERROR: " + contextObject["name"] + ":\n" + contextObject["message"];
     }
-    // console.log(kb);
-    // console.log(context);
+    // console.log(kbObject);
+    console.log(contextObject); // TODO fix some context parsing issue (in propositional cases it includes the semicolon into the name of the prop)
     const output = forwardChaining(kbObject["kb"], contextObject["context"]);
     const inferences = output["facts"];
     const graph = output["graph"];
-    // console.log("Inferences:");
-    // console.log(inferences);
+    console.log("Inferences:");
+    console.log(inferences);
     const outputString = "";
     if (warnings.length > 0) {
-        outputString += "Warnings:\n"
+        outputString += "Warnings:\n";
     }
     for (const warning of warnings) {
         outputString += warning["name"] + ": " + warning["message"] + "\n";
@@ -35,8 +35,11 @@ function infer() {
 function consoleOutput() {
     "use strict";
     let newText;
-    newText = "I am currently not working - wait for some next update!\n\nThanks for your patience! :)"
+    // if (document.getElementById("exec-button").innerHTML != "Deduce!") {
+    newText = "I am currently not working - wait for some next update!\n\nThanks for your patience! :)";
+    // } else {
     newText = infer();
+    // }
     const previous = document.getElementById("console").value;
     document.getElementById("console").value = previous + newText + "\n~$ ";
     if (document.getElementById("download-checkbox").checked) {
