@@ -34,7 +34,17 @@
             <div class="changelog">
                 <div class="changelog-body">
                     <h1>Changelog</h1>
-                    <p>Current version: 0.7.2</p>
+                    <p>Current version: 0.7.3</p>
+                    <h3>v. 0.7.3</h3>
+                    <ul>
+                        <li>Now the engine allows for propositional rules - i.e. rules whose literals may not include any argument. Note that a rule from 
+                            this version on may contain any combination of propositional and first-order literals.
+                        </li>
+                        <li>The special propositional literal <span class="code">true</span> is assumed to be part of any context. This literal is assumed to 
+                            be always true and may be used as a casual literal in any rule's body.
+                        </li>
+                        <li>The background reasoning algorithm has been slightly altered in order to speed-up computations in the case of propositional literals.</li>
+                    </ul>
                     <h3>v. 0.7.2</h3>
                     <ul>
                         <li>Extended Prudens's language with a dummy variable symbol, <span class="code">_</span>, which is inteded to be used in cases when the value of the variable of
