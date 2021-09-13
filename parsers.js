@@ -46,15 +46,15 @@ function getLiteralArguments(argumentsString) {
         const isVar = /[A-Z_]/;
         const isAssigned = !isVar.test(argument.charAt(0));
         if (isAssigned) {
-            name = null;
+            name = undefined;
             value = argument;
         } else if (name === "_") {
-            name = null;
-            value = null;
+            name = undefined;
+            value = undefined;
             muted = true;
         } else {
             name = argument;
-            value = null;
+            value = undefined;
         }
         args.push({
             index: i,
@@ -69,7 +69,8 @@ function getLiteralArguments(argumentsString) {
 
 function getRuleBody(bodyString) {
     "use strict";
-    const delim = /((?<=(?:\)\s*))(?:,))|((?<!(?:\([a-zA-Z0-9_,\s]*\)))(?:,))|(?:;)/; //This is added for the context. Originally, only /,/ is needed!
+    // const delim = /((?<=(?:\)\s*))(?:,))|((?<!(?:\([a-zA-Z0-9_,\s]+\)))(?:,))|(?:;)/; //This is added for the context. Originally, only /,/ is needed!
+    const delim = /(?:;)|((?<=(?:\)\s*))(?:,))/;
     const bodyArray = bodyString.trim().split(delim);
     if (bodyArray[bodyArray.length-1] == "") {
         bodyArray.pop();
@@ -114,7 +115,8 @@ function getRuleBody(bodyString) {
             arity: arity,
         });
     }
-    // console.log(body);
+    console.log("Body:");
+    console.log(body);
     return body;
 }
 
@@ -201,7 +203,7 @@ function kbParser() {
         }
     } else {
         kb = kbWithCode;
-        code = null;
+        code = undefined;
     }
     const spacingRe = /(\t|\r|\n|\v|\f|\s)*/; // CHECKED!
     const predicateNameRe = /(-?\??[a-z]\w*)/; // CHECKED!
