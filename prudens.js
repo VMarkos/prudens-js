@@ -15,7 +15,7 @@ kb = [
                         index: 0,
                         name: "Var1",
                         isAssigned: false,
-                        value: null,
+                        value: undefined,
                         muted: false,
                     },
                     {
@@ -55,20 +55,27 @@ Get all substitutions:
 
 function getSubstitutions(body, facts) {
     "use strict";
+    // console.log(body);
     let substitutions = extendByFacts(body[0], facts);
-    console.log(substitutions);
-    // substitutions = substitutions.filter((element) => {return element !== null});
+    // console.log(substitutions);
+    // substitutions = substitutions.filter((element) => {return element !== undefined});
     // console.log("Subs Init:");
     // console.log(substitutions);
+    // debugger;
     const jsLiterals = [];
     const propositionalLiterals = [];
     for (let i=1; i<body.length; i++) {
         if (body[i]["isJS"]) {
             jsLiterals.push(body[i]);
+            // console.log("JS Literals:");
+            // console.log(jsLiterals);
             continue;
         }
-        if (body[i].arity == 0) {
+        // console.log(i);
+        if (body[i]["arity"] === 0) {
             propositionalLiterals.push(body[i]);
+            // console.log("Props:");
+            // console.log(propositionalLiterals);
             continue;
         }
         const toBeRemoved = [];
@@ -95,9 +102,9 @@ function getSubstitutions(body, facts) {
                 const unifier = unify(literal, fact);
                 // console.log("Unifier:");
                 // console.log(unifier);
-                if (unifier != null) {
+                if (unifier != undefined) {
                     const extension = extend(sub, unifier);
-                    if (unifier != null && extension != null) {
+                    if (unifier != undefined && extension != undefined) {
                         toBePushed.push(extension);
                         extended = true;
                         if (!toBeRemoved.includes(sub)) {
@@ -112,10 +119,13 @@ function getSubstitutions(body, facts) {
         }
         substitutions = removeAll(substitutions, toBeRemoved);
         substitutions.push(...toBePushed);
-        if (substitutions.length == 0) {
+        if (substitutions.length === 0) {
+            // console.log("Zero length");
             return [];
         }
     }
+    // console.log("subs:");
+    // console.log(substitutions);
     return {
         "subs": substitutions,
         "propositions": propositionalLiterals,
@@ -125,9 +135,25 @@ function getSubstitutions(body, facts) {
 function extendByFacts(literal, facts) {
     "use strict";
     const subs = [];
+    // console.log("Facts");
+    // console.log(facts);
     for (const fact of facts) {
-        const unifier = unify(literal, fact);
-        (unifier != null) && subs.push(unifier);
+        if (fact["arity"] !== 0) {
+            let unifier = {};
+            if (literal["isJS"]) {
+                const equality = equalityCheck(literal, unifier);
+                unifier = equality["unifier"];
+                // console.log("Unifier:");
+                // console.log(unifier);
+            } else {
+                unifier = unify(literal, fact);
+                // console.log("Unifier:");
+                // console.log(unifier);
+            }
+            (unifier != undefined) && subs.push(unifier);
+            // console.log(subs);
+            // debugger;
+        }
     }
     // console.log("Ext by Facts:");
     // console.log(subs.filter(Boolean));
@@ -135,9 +161,9 @@ function extendByFacts(literal, facts) {
     // console.log(facts);
     // console.log("Un-Filtered");
     // console.log(subs);
-    // const substitutions = subs.filter((element) => {return element !== null});
+    // const substitutions = subs.filter((element) => {return element !== undefined});
     // console.log("Subs in extendByFacts:");
-    // console.log(subs.filter((element) => {return element !== null}));
+    // console.log(subs.filter((element) => {return element !== undefined}));
     return subs;
 }
 
@@ -168,7 +194,7 @@ function apply(sub, args) {
 function unify(x, y) { // x, y are literals. Assymetric unification since y is assumed variable-free!
     "use strict";
     if (x["name"] != y["name"] || x["arity"] != y["arity"] || x["sign"] != y["sign"]) {
-        return null;
+        return undefined;
     }
     const xArgs = x["arguments"];
     const yArgs = y["arguments"];
@@ -180,10 +206,10 @@ function unify(x, y) { // x, y are literals. Assymetric unification since y is a
             continue;
         }
         if (xArg["isAssigned"] && xArg["value"] != yArg["value"]) {
-            return null;
+            return undefined;
         }
         if (Object.keys(unifier).length > 0 && Object.keys(unifier).includes(xArg["name"]) && unifier[xArg["name"]] != yArg["value"]) {
-            return null;
+            return undefined;
         }
         unifier[xArg["name"]] = yArg["value"];
     }
@@ -197,7 +223,7 @@ function extend(sub, unifier) {
     const extendedSub = deepCopy(sub);
     for (const key of Object.keys(unifier)) {
         if (Object.keys(extendedSub).includes(key) && extendedSub[key] != unifier[key]) {
-            return null;
+            return undefined;
         } else if (!Object.keys(extendedSub).includes(key)) {
             extendedSub[key] = unifier[key];
         }
@@ -267,12 +293,12 @@ function forwardChaining(kb, context) {
             const rule = kb[i];
             // console.log(rule);
             const filteredBody = filterBody(rule["body"]);
-            console.log(filteredBody);
+            // console.log(filteredBody);
             if (filteredBody["fols"].length === 0) {
                 let satisfied = true;
                 for (const prop of filteredBody["propositions"]) {
                     if (!deepIncludes(prop, facts)) {
-                        console.log(prop);
+                        // console.log(prop);
                         satisfied = false;
                     }
                 }
@@ -286,10 +312,10 @@ function forwardChaining(kb, context) {
                         graph[inferredHead["name"]] = [rule];
                     }
                     if (!deepIncludes(rule["head"], facts)) {
-                        console.log("Head:");
-                        console.log(rule["head"]);
+                        // console.log("Head:");
+                        // console.log(rule["head"]);
                         facts.push(rule["head"]);
-                        console.log(facts);
+                        // console.log(facts);
                         inferred = true;
                     }
                 }
@@ -300,7 +326,7 @@ function forwardChaining(kb, context) {
                 // console.log("FOL");
                 // console.log(props);
                 if (props !== undefined) {
-                    for (const prop of props) { // TODO here you need to take into account mixed rules (you have) as well as purely propositional rules (you haven't).
+                    for (const prop of props) {
                         if (!deepIncludes(prop, facts)) {
                             continue;
                         }
@@ -313,13 +339,16 @@ function forwardChaining(kb, context) {
                 }
                 for (const sub of subs) {
                     // console.log(sub);
-                    console.log("Rule head:");
-                    console.log(rule["head"]);
+                    if (!jsEvaluation(rule["body"], sub)) {
+                        continue;
+                    }
+                    // console.log("Rule head:");
+                    // console.log(rule["head"]);
                     const inferredHead = applyToLiteral(sub, rule["head"]);
                     if (!isConfictingWithList(inferredHead, facts)) {
-                        console.log("Facts:");
-                        console.log(facts);
-                        console.log(inferredHead);
+                        // console.log("Facts:");
+                        // console.log(facts);
+                        // console.log(inferredHead);
                         const literalString = literalToString(inferredHead);
                         if (Object.keys(graph).includes(literalString)) {
                             if (!deepIncludes(applyToRule(sub, rule), graph[literalString])) {
@@ -369,47 +398,109 @@ function isConflicting(x, y) { // x and y are literals.
     return true;
 }
 
-function jsEvaluation(body, sub) { // Check whether, given a substitution, the 
+function jsEvaluation(body, sub) { // Check whether, given a substitution, the corresponding JS predicates hold.
     let isValid = true;
+    // console.log("Body:");
+    // console.log(body);
     for (const literal of body) {
         if (literal["isEquality"]) {
-            isValid = isValid && equalityCheck(literal, sub);
+            const equality = equalityCheck(literal, sub);
+            console.log("Equality:");
+            console.log(equality);
+            if (equality["unifier"]) {
+                sub = extend(sub, equality["unifier"]);
+            }
+            isValid = isValid && equality["isValid"];
         } else if (literal["isInequality"]) {
             isValid = isValid && inequalityCheck(literal, sub);
-        } else {
+        } else if (literal["isJS"]){
             isValid = isValid && jsCheck(literal, sub);
         }
     }
     return isValid;
 }
 
-// TODO Refine parsing regex to catch mathematical expressions and add one more field in variables indicating whether it is a mathematical or, in general, JS expression.
-
 function equalityCheck(literal, sub) {
-    const leftArg = literal["arguments"][0];
-    const rightArg = literal["arguments"][1];
+    let leftArg = literal["arguments"][0];
+    let rightArg = literal["arguments"][1];
+    // console.log("Args:");
+    // console.log(leftArg);
+    // console.log(rightArg);
+    if (!leftArg["isAssigned"] && Object.keys(sub).includes(leftArg["name"])) {
+        leftArg = {
+            index: leftArg["index"],
+            name: leftArg["name"],
+            isAssigned: true,
+            value: sub[leftArg["name"]],
+            muted: leftArg["muted"],
+        };
+    }
+    if (!rightArg["isAssigned"] && Object.keys(sub).includes(rightArg["name"])) {
+        rightArg = {
+            index: rightArg["index"],
+            name: rightArg["name"],
+            isAssigned: true,
+            value: sub[rightArg["name"]],
+            muted: rightArg["muted"],
+        };
+    }
     if (!leftArg["isAssigned"] && !rightArg["isAssigned"]) {
-        return null;
+        return {
+            isValid: false,
+            unifier: undefined,
+        };
     }
     if (leftArg["isAssigned"] && rightArg["isAssigned"]) {
-        const leftSub = applyToString(leftArg, sub);
-        const rightSub = applyToString(rightArg, sub);
-        return numParser(leftSub + " === " + rightSub);
+        // const parser = ;
+        // console.log(leftArg["value"] + " === " + rightArg["value"]);
+        return {
+            isValid: numParser(leftArg["value"] + " === " + rightArg["value"]).call(),
+            unifier: undefined,
+        };
     }
     if (leftArg["isAssigned"]) {
         const unifier = {};
-        unifier[rightArg["name"]] = numParser(applyToString(leftArg, sub));
-        return extend(sub, unifier);
+        unifier[rightArg["name"]] = leftArg["value"];
+        return {
+            isValid: true,
+            unifier: unifier,
+        };
     }
     const unifier = {};
-    unifier[leftArg["name"]] = numParser(applyToString(rightArg, sub));
-    return extend(sub, unifier);
+    unifier[leftArg["name"]] = rightArg["value"];
+    // console.log("Equality sub:"); // TODO update equality so as to allow for operations with variables.
+    // console.log(sub);
+    return {
+        isValid: true,
+        unifier: unifier,
+    };
 }
 
 function inequalityCheck(literal, sub) {
-    const leftArg = literal["arguments"][0];
-    const rightArg = literal["arguments"][1];
-    return numParser(applyToString(leftArg, sub) + " < " + applyToString(rightArg, sub));
+    let leftArg = literal["arguments"][0];
+    let rightArg = literal["arguments"][1];
+    if (!leftArg["isAssigned"] && Object.keys(sub).includes(leftArg["name"])) {
+        leftArg = {
+            index: leftArg["index"],
+            name: leftArg["name"],
+            isAssigned: true,
+            value: sub[leftArg["name"]],
+            muted: leftArg["muted"],
+        };
+    }
+    if (!rightArg["isAssigned"] && Object.keys(sub).includes(rightArg["name"])) {
+        rightArg = {
+            index: rightArg["index"],
+            name: rightArg["name"],
+            isAssigned: true,
+            value: sub[rightArg["name"]],
+            muted: rightArg["muted"],
+        };
+    }
+    if (!leftArg["isAssigned"] || !rightArg["isAssigned"]) {
+        return false;
+    }
+    return numParser(leftArg["value"] + " < " + rightArg["value"]).call();
 }
 
 function jsCheck(literal, sub) {
@@ -422,47 +513,15 @@ function numParser(string) {
 
 function applyToString(string, sub) {
     // const delimiter = /[\s*+\-\*\/\(\)\%]/;
+    // console.log("string");
+    // console.log(string);
     string = string.trim();
     for (let variable of Object.keys(sub)) {
-        let varRE = RegExp("((?<!\w)(" + variable + "))(?!\w)");
+        let varRE = RegExp("((?<!\w)(" + variable + "))(?!\w)", "g");
         string.replaceAll(varRE, sub[variable]);
     }
     return string;
 }
-
-function numEval(literal, sub, isEquality) {
-    let comparator = "<";
-    if (isEquality) {
-        comparator = "=";
-    }
-    if (literal["arguments"].length != 2) {
-        return false; // TODO This should be caught during compilation!
-    }
-    const args = apply(sub, literal["arguments"]);
-    if (!args[0]["isAssigned"] || !args[1]["isAssigned"]) {
-        return false; //TODO proper error message here!
-    }
-    const leftArg = args[0].trim();
-    const rightArg = args[1].trim();
-    const numRE = /\d*\.?\d+/;
-    let leftNum;
-    let rightNum;
-    if (numRE.test(leftArg) && numRE.test(rightArg)) {
-        leftNum = parseFloat(leftArg);
-        rightNum = parseFloat(rightArg);
-        return leftNum < rightNum;
-    }
-    leftNum = numParser(leftArg);
-    if (leftNum === "undefined" || leftNum === leftArg) {
-        return false;
-    }
-    rightNum = numParser(rightArg);
-    if (rightNum === "undefined" || rightNum === rightArg) {
-        return false;
-    }
-    return leftNum < rightNum;
-}
-
 /*
 Explanation detection algorithm:
 1. For each literal in inferences:
