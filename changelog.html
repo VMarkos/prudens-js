@@ -34,7 +34,18 @@
             <div class="changelog">
                 <div class="changelog-body">
                     <h1>Changelog</h1>
-                    <p>Current version: 0.7.3</p>
+                    <p>Current version: 0.7.4</p>
+                    <h3>v. 0.7.4</h3>
+                    <ul>
+                        <li>Prudens's language supports the equality predicate <span class="code">?=</span> which takes two arguments and checks whether 
+                            they are equal or not. The arguments may be either constants or variables or Javascript mathematical expressions - or any other 
+                            expressions that make sense to be compared such as, but not restricted to, strings. Also, the <span class="code">?=</span> predicate 
+                            allows for a variable to be unified with another variable/constant in case the former is not already assigned.
+                        </li>
+                        <li>Prudens's language supports an inequality predicate, namely <span class="code">?</span> as well which compares - inheriting any
+                            underlying Javascript semantics - two expressions - be it variables, constant or, in general, valid Javascript expressions.
+                        </li>
+                    </ul>
                     <h3>v. 0.7.3</h3>
                     <ul>
                         <li>Now the engine allows for propositional rules - i.e. rules whose literals may not include any argument. Note that a rule from 
