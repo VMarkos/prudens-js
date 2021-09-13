@@ -77,6 +77,9 @@ function removeAll(list, toBeRemoved) {
 
 function deepEquals(x, y) { // x, y are objects --- possibly restricted version of deep equality for our purposes only!
     "use strict";
+    // console.log("Equals?");
+    // console.log(x);
+    // console.log(y);
     if (typeof x != typeof y) {
         return false;
     }
