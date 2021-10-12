@@ -86,7 +86,7 @@ In case `kb` failse some syntcatical check, the following object is returned:
 ```
 The field `name` corresponds to the error's name and `message` contains a (usually) more detailed description of what has gone wrong.
 
-### Warnings {#warnings}
+### Warnings
 There are occasions when a knowledge base may pass successfully all syntactical checks, yet there might be non fatal errors - e.g., that no code/imports is included. In this case, a warning is returned along with the corresponding knowledge base object. Each warning has the following form:
 ```javascript
 {
@@ -108,7 +108,7 @@ Here we describe all the rest functions of `parsers.js` which support the functi
 7. `contextToString(context)`: This function accepts as argument a list of literals as JSON objects and and returns a string representation of them. While its name is clearly related to contexts, it may be safely used with arbirtary lists of literals.
 8. `graphToString(graph)`: This function accepts as argument a graph JSON object - for more see [here](#deduction) - and returns a string representation of the graph as a dictionary with literals as keys and lists of rules that infer each literal
 
-# Deduction {#deduction}
+# Deduction
 Regarding deduction, Prudens JS fully supports the reasoning mechanism as described [here](https://www.internetofus.eu/wp-content/uploads/sites/38/2021/05/Michael_2019_MachineCoaching.pdf). Below we present the functions of Prudens JS related to deduction.
 
 # Abduction
