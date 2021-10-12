@@ -3,7 +3,7 @@ A full implementation of Prudens in Javascript alongside a simple UI and the cor
 
 For the corresponding UI: @ https://vmarkos.github.io/prudens-js/index.html
 
-# Data Structure {#data-structure}
+# Data Structure
 All interaction within the scope of Prudens JS is conducted based on JSON representations of knowledge bases, rules, literals and variables. In this section we present in detail the properties of each of these separately.
 
 # Parsing
@@ -58,7 +58,7 @@ In case `targets` fails to pass some syntactical check, the following object is 
 The field `name` corresponds to the error's name and `message` contains a (usually) more detailed description of what has gone wrong.
 
 ## `parseKB(kb)`
-This function allows parsing a string, namely `kb`, which corresponds to a list of rules as described [here](#data-structure), and returns the corresponding knowledge base, in case `kb` passess successfully all syntactical checks.
+This function allows parsing a string, namely `kb`, which corresponds to a list of rules as described [here](#Data-Structure), and returns the corresponding knowledge base, in case `kb` passess successfully all syntactical checks.
 
 ### Valid knowledge bases
 In case `kb` passes all syntactical checks then an object like the following one is returned:
