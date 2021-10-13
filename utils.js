@@ -1,9 +1,48 @@
+let tab = "deduce-tab";
+
 function initialize() {
     document.getElementById("exec-button").value = "Deduce!";
     document.getElementById("context-label").value = "Context";
 }
 
 function infer() {
+    "use strict";
+    if (tab === "deduce-tab") {
+        return deduce();
+    }
+    else if (tab === "abduce-tab") {
+        return abduce();
+    }
+}
+
+function abduce() {
+    "use strict";
+    const kbObject = kbParser();
+    if (kbObject["type"] === "error") {
+        return "ERROR: " + kbObject["name"] + ":\n" + kbObject["message"];
+    }
+    const warnings = kbObject["warnings"];
+    const contextObject = contextParser();
+    if (contextObject["type"] === "error") {
+        return "ERROR: " + contextObject["name"] + ":\n" + contextObject["message"];
+    }
+    const targetsObject = targetParser();
+    if (targetsObject["type"] === "error") {
+        return "ERROR: " + targetsObject["name"] + ":\n" + targetsObject["message"];
+    }
+    const output = propositionalAbduction(kbObject["kb"], contextObject["context"], targetsObject["targets"][0]); // TODO This version of abduction handles only one target --- a simple loop could fix this.
+    const outputString = "";
+    if (warnings.length > 0) {
+        outputString += "Warnings:\n";
+    }
+    for (const warning of warnings) {
+        outputString += warning["name"] + ": " + warning["message"] + "\n";
+    }
+    // console.log(graph);
+    return outputString + "Missing Facts: " +  contextToString(output);
+}
+
+function deduce() {
     "use strict";
     const kbObject = kbParser();
     if (kbObject["type"] === "error") {
@@ -40,8 +79,8 @@ function consoleOutput() {
     // } else {
     newText = infer();
     // }
-    const previous = document.getElementById("console").value;
-    document.getElementById("console").value = previous + newText + "\n~$ ";
+    const previous = document.getElementById(tab + "-console").value;
+    document.getElementById(tab + "-console").value = previous + newText + "\n~$ ";
     if (document.getElementById("download-checkbox").checked) {
         download("output.txt", newText);
     }
@@ -49,7 +88,7 @@ function consoleOutput() {
 
 function clearConsole() {
     "use strict";
-    document.getElementById("console").value = "~$ ";
+    document.getElementById(tab + "-console").value = "~$ ";
 }
 
 function deepCopy(object) { // This is a level 1 deep copy --- i.e. if some value is itself another JS-object, it will be copied in a shallow manner.
@@ -186,6 +225,7 @@ function updateLineNumber(id) {
 
 function tabChanger(event, tabName) {
     "use strict";
+    tab = tabName;
     const tabsLeft = document.getElementsByClassName("tab-left");
     const tabsRight = document.getElementsByClassName("tab-right");
     for (let i=0; i<tabsLeft.length; i++) {

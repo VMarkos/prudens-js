@@ -1,37 +1,62 @@
 // Update KB lines
 
+// FIXME This doesn't work for abduction tab!
+
+const tabs = ["deduce-tab", "abduce-tab"]
+
+
 function kbKeyListener(event) {
     "use strict";
     if (event.key.length === 1 ||  event.key === "Enter" || event.key === "Backspace" || event.key === "Delete") {
-        setTimeout(() => {updateLineNumber("kb")});
+        setTimeout(() => {updateLineNumber(tab + "-kb")});
     }
 }
 
-document.getElementById("kb").addEventListener("keyup", kbKeyListener, false);
-document.getElementById("kb").addEventListener("paste", (event) => {setTimeout(() => {updateLineNumber("kb")}, 0);}, false);
-document.getElementById("kb").addEventListener("cut", (event) => {setTimeout(() => {updateLineNumber("kb")}, 0);}, false);
-
-function kbScrollListener(event) {
-    document.getElementById("kb-lines").scrollTop = document.getElementById("kb").scrollTop;
+for (const tab of tabs) {
+    document.getElementById(tab + "-kb").addEventListener("keyup", kbKeyListener, false);
+    document.getElementById(tab + "-kb").addEventListener("paste", (event) => {setTimeout(() => {updateLineNumber(tab + "-kb")}, 0);}, false);
+    document.getElementById(tab + "-kb").addEventListener("cut", (event) => {setTimeout(() => {updateLineNumber(tab + "-kb")}, 0);}, false);
+    document.getElementById(tab + "-kb").addEventListener("scroll", kbScrollListener, false);
 }
 
-document.getElementById("kb").addEventListener("scroll", kbScrollListener, false);
+function kbScrollListener(event) {
+    document.getElementById(tab + "-kb-lines").scrollTop = document.getElementById(tab + "-kb").scrollTop;
+}
 
 // Update Context lines
 
 function contextKeyListener(event) {
     "use strict";
     if (event.key.length === 1 || event.key === "Enter" || event.key === "Backspace" || event.key === "Delete") {
-        updateLineNumber("context");
+        updateLineNumber(tab + "-context");
     }
 }
 
-document.getElementById("context").addEventListener("keyup", contextKeyListener, false);
-document.getElementById("context").addEventListener("paste", (event) => {setTimeout(() => {updateLineNumber("context")}, 0);}, false);
-document.getElementById("context").addEventListener("cut", (event) => {setTimeout(() => {updateLineNumber("context")}, 0);}, false);
-
-function contextScrollListener(event) {
-    document.getElementById("context-lines").scrollTop = document.getElementById("context").scrollTop;
+for (const tab of tabs) {
+    document.getElementById(tab + "-context").addEventListener("keyup", contextKeyListener, false);
+    document.getElementById(tab + "-context").addEventListener("paste", (event) => {setTimeout(() => {updateLineNumber(tab + "-context")}, 0);}, false);
+    document.getElementById(tab + "-context").addEventListener("cut", (event) => {setTimeout(() => {updateLineNumber(tab + "-context")}, 0);}, false);
+    document.getElementById(tab + "-context").addEventListener("scroll", contextScrollListener, false);
 }
 
-document.getElementById("context").addEventListener("scroll", contextScrollListener, false);
+function contextScrollListener(event) {
+    document.getElementById(tab + "-context-lines").scrollTop = document.getElementById(tab + "-context").scrollTop;
+}
+
+// Update Target lines
+
+function targetKeyListener(event) {
+    "use strict";
+    if (event.key.length === 1 || event.key === "Enter" || event.key === "Backspace" || event.key === "Delete") {
+        updateLineNumber(tab + "-targets");
+    }
+}
+
+document.getElementById("abduce-tab-targets").addEventListener("keyup", targetKeyListener, false);
+document.getElementById("abduce-tab-targets").addEventListener("paste", (event) => {setTimeout(() => {updateLineNumber("abduce-tab-targets")}, 0);}, false);
+document.getElementById("abduce-tab-targets").addEventListener("cut", (event) => {setTimeout(() => {updateLineNumber("abduce-tab-targets")}, 0);}, false);
+document.getElementById("abduce-tab-targets").addEventListener("scroll", contextScrollListener, false);
+
+function contextScrollListener(event) {
+    document.getElementById(tab + "-targets-lines").scrollTop = document.getElementById(tab + "-targets").scrollTop;
+}

@@ -1,6 +1,37 @@
 function contextParser() {
+    const context = document.getElementById(tab + "-context").value;
+    const contextList = parseContext(context);
+    console.log(contextList);
+    contextList["context"].push({
+        name: "true",
+        sign: true,
+        isJS: false,
+        isEquality: false,
+        isInequality: false,
+        args: undefined,
+        arity: 0,
+    });
+    return contextList;
+}
+
+function targetParser() {
+    const targets = document.getElementById(tab + "-targets").value;
+    return parseTarget(targets);
+}
+
+function kbParser() {
+    const kbAll = document.getElementById(tab + "-kb").value;
+    return parseKB(kbAll);
+}
+
+function parseContext(context) {
     "use strict";
-    const context = document.getElementById("context").value;
+    if (context === undefined || context === "") {
+        return {
+            type: "output", // TODO You may add some warning here?
+            context: [],
+        }
+    }
     const spacingRe = /(\t|\r|\n|\v|\f|\s)*/;
     const varNameRe = /(([a-z0-9]\w*)|(\d+[.]?\d*))/;
     const predicateNameRe = /-?[a-z]\w*/;
@@ -17,20 +48,37 @@ function contextParser() {
         };
     }
     // console.log(context);
-    let contextList = getRuleBody(context.trim());
-    contextList.push({
-        name: "true",
-        sign: true,
-        isJS: false,
-        isEquality: false,
-        isInequality: false,
-        args: undefined,
-        arity: 0,
-    });
+    const contextList = getRuleBody(context.trim());
     // console.log(contextList);
     return {
         type: "output",
         context: contextList,
+    };
+}
+
+function parseTarget(targets) {
+    "use strict";
+    const spacingRe = /(\t|\r|\n|\v|\f|\s)*/;
+    const varNameRe = /(([a-z0-9]\w*)|(\d+[.]?\d*))/;
+    const predicateNameRe = /-?\!?[a-z]\w*/; // In targets you may also allow for actions to be included --- which is not true for contexts.
+    const casualPredicateRe = RegExp(predicateNameRe.source + String.raw`\((\s*` + varNameRe.source + String.raw`\s*,)*\s*` + varNameRe.source + String.raw`\s*\)`);
+    const propositionalPredicateRe = /-?[a-z]\w*/;
+    const predicateRe = RegExp(String.raw`((` + casualPredicateRe.source + String.raw`)|(` + propositionalPredicateRe.source + String.raw`))`);
+    const targetRE = RegExp(String.raw`(` + spacingRe.source + predicateRe.source + String.raw`\s*;\s*)+` + spacingRe.source);
+    // const contextRE = /(\t|\r|\n|\v|\f|\s)*(-?[a-z]\w*\((\s*(([a-z0-9]\w*)|(\d+[.]?\d*))\s*,)*\s*(([a-z0-9]\w*)|(\d+[.]?\d*))\s*\)\s*;\s*)+(\t|\r|\n|\v|\f|\s)*/;
+    if (!targetRE.test(targets)) {
+        return {
+            type: "error",
+            name: "TargetSyntaxError",
+            message: "I found some syntax error in your targets. Remember that only predicates with **all** their arguments instantiated (i.e. constants) should appear. Also, all predicates should be separated by a semicolon (;), including the last one.",
+        };
+    }
+    // console.log(context);
+    let targetList = getRuleBody(targets.trim());
+    // console.log(contextList);
+    return {
+        type: "output",
+        targets: targetList,
     };
 }
 
@@ -70,7 +118,7 @@ function getLiteralArguments(argumentsString) {
 function getRuleBody(bodyString) {
     "use strict";
     // const delim = /((?<=(?:\)\s*))(?:,))|((?<!(?:\([a-zA-Z0-9_,\s]+\)))(?:,))|(?:;)/; //This is added for the context. Originally, only /,/ is needed!
-    const delim = /(?:;)|((?<=(?:\)\s*))(?:,))/;
+    const delim = /(?:;)|((?<=(?:\)\s*))(?:,))|((?<!(?:\(.*))(?:,))/;
     const bodyArray = bodyString.trim().split(delim);
     if (bodyArray[bodyArray.length-1] == "") {
         bodyArray.pop();
@@ -115,8 +163,8 @@ function getRuleBody(bodyString) {
             arity: arity,
         });
     }
-    console.log("Body:");
-    console.log(body);
+    // console.log("Body:");
+    // console.log(body);
     return body;
 }
 
@@ -167,10 +215,9 @@ function kbToObject(kb) {
     return kbObject;
 }
 
-function kbParser() {
+function parseKB(kbAll) {
     "use strict";
     const warnings = [];
-    const kbAll = document.getElementById("kb").value
     if (!kbAll.includes("@KnowledgeBase")){
         return {
             type: "error",
@@ -178,7 +225,7 @@ function kbParser() {
             message: "I found no @KnowledgeBase decorator. Enter a single @KnowledgeBase below your imports (if any) and prior to your knowledge base's rules.",
         };
     }
-    const kbNoCode = document.getElementById("kb").value.split("@KnowledgeBase");
+    const kbNoCode = kbAll.split("@KnowledgeBase");
     if (kbNoCode.length > 2){
         return {
             type: "error",
@@ -239,6 +286,9 @@ function kbParser() {
 // Object-to-string related methods
 
 function literalToString(literal) {
+    if (literal === undefined) {
+        return undefined;
+    }
     let literalString = literal["name"];
     if (!literal["sign"]) {
         literalString = "-" + literalString;
@@ -264,6 +314,9 @@ function literalToString(literal) {
 }
 
 function ruleToString(rule) {
+    if (rule === undefined) {
+        return undefined;
+    }
     let ruleString = rule["name"] + " :: ";
     const body = rule["body"];
     // console.log(body);
@@ -280,6 +333,9 @@ function ruleToString(rule) {
 }
 
 function kbToString(kb) {
+    if (kb === undefined) {
+        return undefined;
+    }
     let kbString = "";
     for (let i =0; i<kb.length; i++) {
         const rule = kb[i];
@@ -292,6 +348,9 @@ function kbToString(kb) {
 }
 
 function contextToString(context) {
+    if (context === undefined) {
+        return undefined;
+    }
     let contextString = "";
     for (let i=0; i<context.length; i++) {
         const literal = context[i];
@@ -304,6 +363,9 @@ function contextToString(context) {
 }
 
 function graphToString(graph) {
+    if (graph === undefined) {
+        return undefined;
+    }
     let graphString = "{\n";
     for (const key of Object.keys(graph)) {
         graphString += key + ": [";

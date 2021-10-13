@@ -6,6 +6,7 @@
         <script type="text/javascript" src="parsers.js"></script>
         <script type="text/javascript" src="utils.js"></script>
         <script type="text/javascript" src="prudens.js"></script>
+        <script type="text/javascript" src="abduction.js"></script>
         <title>
             Prudens JS
         </title>
@@ -42,9 +43,9 @@
                     </div>
                     <div id="kb-container" class="code-editor-container">
                         <div class="line-numbers">
-                            <textarea id="kb-lines" class="line-numbers-textarea" readonly>1</textarea>
+                            <textarea id="deduce-tab-kb-lines" class="line-numbers-textarea" readonly>1</textarea>
                         </div>
-                        <textarea id="kb" placeholder="Enter your knowledge base here..."></textarea>
+                        <textarea id="deduce-tab-kb" placeholder="Enter your knowledge base here..."></textarea>
                     </div>
                 </div>
                 <div id="deduce-right" class="sub-grid tab-right">
@@ -54,9 +55,9 @@
                         </div>
                         <div class="code-editor-container">
                             <div class="line-numbers">
-                                <textarea id="context-lines" class="line-numbers-textarea" readonly>1</textarea>
+                                <textarea id="deduce-tab-context-lines" class="line-numbers-textarea" readonly>1</textarea>
                             </div>
-                            <textarea id="context" placeholder="Enter your context here..."></textarea>
+                            <textarea id="deduce-tab-context" placeholder="Enter your context here..."></textarea>
                         </div>
                     </div>
                     <div class="flex-container">
@@ -74,7 +75,7 @@
                                 </div>
                             </div>
                         </div>
-                        <textarea id="console" class="textarea console" readonly>~$ </textarea>
+                        <textarea id="deduce-tab-console" class="textarea console" readonly>~$ </textarea>
                     </div>
                 </div>
                 <div id="abduce-left" class="item-21 tab-left hidden">
@@ -83,9 +84,9 @@
                     </div>
                     <div id="kb-container" class="code-editor-container">
                         <div class="line-numbers">
-                            <textarea id="kb-lines" class="line-numbers-textarea" readonly>1</textarea>
+                            <textarea id="abduce-tab-kb-lines" class="line-numbers-textarea" readonly>1</textarea>
                         </div>
-                        <textarea id="kb" placeholder="Enter your knowledge base here..."></textarea>
+                        <textarea id="abduce-tab-kb" placeholder="Enter your knowledge base here..."></textarea>
                     </div>
                 </div>
                 <div id="abduce-right" class="sub-grid abduce tab-right hidden">
@@ -95,20 +96,20 @@
                         </div>
                         <div class="code-editor-container">
                             <div class="line-numbers">
-                                <textarea id="context-lines" class="line-numbers-textarea" readonly>1</textarea>
+                                <textarea id="abduce-tab-context-lines" class="line-numbers-textarea" readonly>1</textarea>
                             </div>
-                            <textarea id="context" placeholder="Enter your context here..."></textarea>
+                            <textarea id="abduce-tab-context" placeholder="Enter your context here..."></textarea>
                         </div>
                     </div>
                     <div class="flex-container">
                         <div class="label-container">
-                            <div class="label">Targets</div>
+                            <div class="label">Target</div>
                         </div>
                         <div class="code-editor-container">
                             <div class="line-numbers">
-                                <textarea id="targets-lines" class="line-numbers-textarea" readonly>1</textarea>
+                                <textarea id="abduce-tab-targets-lines" class="line-numbers-textarea" readonly>1</textarea>
                             </div>
-                            <textarea id="targets" placeholder="Enter your target inference here..."></textarea>
+                            <textarea id="abduce-tab-targets" placeholder="Enter your target inference here..."></textarea>
                         </div>
                     </div>
                     <div class="flex-container">
@@ -126,7 +127,7 @@
                                 </div>
                             </div>
                         </div>
-                        <textarea id="console" class="textarea console" readonly>~$ </textarea>
+                        <textarea id="abduce-tab-console" class="textarea console" readonly>~$ </textarea>
                     </div>
                 </div>
             </div>
