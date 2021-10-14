@@ -120,10 +120,10 @@ function propositionalAbduction(kb, context, finalTarget) {
 Iteratively remove an element from missing facts and if target is inferred, then remove another one. Repeat until target is not inferred from a set of missing facts.
 */
 
-function prioritizedPropositionalAbduction(kb, context, finalTarget) {
+function prioritizedPropositionalAbduction(kb, context, finalTarget) { //FIXME Something went wrong when returning back to JSONObjects from strings.
     const missingFacts = propositionalAbduction(kb, context, finalTarget);
     // console.log(missingFacts);
-    // debugger;
+    // debugger; 
     const toBeRemoved = [[]]; // Stack --- DFS
     // console.log(toBeRemoved);
     // debugger;
@@ -144,7 +144,7 @@ function prioritizedPropositionalAbduction(kb, context, finalTarget) {
         console.log("Targets");
         console.log(graph["facts"]);
         console.log(finalTarget);
-        debugger;
+        // debugger;
         if (deepIncludes(finalTarget, graph["facts"])) {
             console.log("pass");
             successfulProofs.push(candidateProof);

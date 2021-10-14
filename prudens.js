@@ -10,7 +10,7 @@ kb = [
                 isJS: false,
                 isEquality: false,
                 isInequality: false,
-                arguments: [
+                args: [
                     {
                         index: 0,
                         name: "Var1",
@@ -34,7 +34,7 @@ kb = [
             name: "head",
             sign: false,
             isAction: false,
-            arguments: [ list of arguments ],
+            args: [ list of arguments ],
             arity: 1,
         },
     },
@@ -89,7 +89,7 @@ function getSubstitutions(body, facts) {
                 isJS: body[i]["isJS"],
                 isEquality: body[i]["isEquality"],
                 isInequality: body[i]["isInequality"],
-                arguments: apply(sub, body[i]["arguments"]),
+                args: apply(sub, body[i]["args"]),
                 arity: body[i]["arity"],
             }
             // console.log("Substituted literal:");
@@ -196,8 +196,8 @@ function unify(x, y) { // x, y are literals. Assymetric unification since y is a
     if (x["name"] != y["name"] || x["arity"] != y["arity"] || x["sign"] != y["sign"]) {
         return undefined;
     }
-    const xArgs = x["arguments"];
-    const yArgs = y["arguments"];
+    const xArgs = x["args"];
+    const yArgs = y["args"];
     const unifier = {};
     for (let i=0; i<x["arity"]; i++) {
         let xArg = xArgs[i];
@@ -247,7 +247,7 @@ function applyToLiteral(sub, literal) {
     const subLiteral = deepCopy(literal);
     // console.log("Sub-Literal:");
     // console.log(subLiteral);
-    subLiteral["arguments"] = apply(sub, literal["arguments"])
+    subLiteral["args"] = apply(sub, literal["args"])
     return subLiteral;
 }
 
@@ -281,45 +281,91 @@ function filterBody(body) {
     };
 }
 
+function getPriorities(kb) { // Linear order induced priorities.
+    priorities = {};
+    for (let i=0; i<kb.length; i++) {
+        // console.log(kb);
+        priorities[ruleToString(kb[i])] = i
+    }
+    return priorities;
+}
+
+function updateGraph(newLiteralString, newLiteralRule, oldLiteralString, graph, priorities) {
+    const toBeRemoved = [];
+    // console.log(priorities);
+    for (const rule of graph[oldLiteralString]) { // rule here is already stringified!
+        // console.log(rule);
+        // console.log(ruleToString(newLiteralRule));
+        if (priorities[rule] > priorities[ruleToString(newLiteralRule)]) {
+            toBeRemoved.push(rule);
+        }
+    }
+    // console.log(toBeRemoved);
+    // debugger;
+    for (let i=0; i<graph[oldLiteralString].length; i++) {
+        if (toBeRemoved.includes(graph[oldLiteralString][i])) {
+            graph[oldLiteralString].splice(i, 1);
+            i--;
+        }
+    }
+    let isPrior = false;
+    if (graph[oldLiteralString].length === 0) {
+        graph[newLiteralString] = [ruleToString(newLiteralRule)];
+        isPrior = true;
+        delete graph[oldLiteralString];
+        // console.log(graph);
+    }
+    return {
+        graph: graph,
+        isPrior: isPrior,
+    };
+}
+
 function forwardChaining(kb, context) {
-    const facts = context;
+    let facts = context;
     let inferred = false;
-    const graph = {};
+    let graph = {};
+    const priorities = getPriorities(kb);
     // let i = 0;
     do {
         inferred = false;
-        // console.log(kb);
         for (let i=0; i<kb.length; i++) {
             const rule = kb[i];
-            // console.log(rule);
             const filteredBody = filterBody(rule["body"]);
-            // console.log(filteredBody);
             if (filteredBody["fols"].length === 0) {
                 let satisfied = true;
                 for (const prop of filteredBody["propositions"]) {
-                    if (!deepIncludes(prop, facts)) {
-                        // console.log(prop);
+                    if (!facts.includes(literalToString(prop))) {
                         satisfied = false;
                     }
                 }
                 const inferredHead = rule["head"];
-                if (satisfied && !isConfictingWithList(inferredHead, facts)) {
-                    if (Object.keys(graph).includes(inferredHead["name"])) {
-                        if (!deepIncludes(rule, graph[inferredHead["name"]])) {
-                            graph[literalString].push(rule);
+                if (satisfied) {
+                    if (Object.keys(graph).includes(literalToString(inferredHead))) {
+                        if (!graph[literalToString(inferredHead)].includes(ruleToString(rule))) {
+                            graph[literalToString(inferredHead)].push(ruleToString(rule));
                         }
                     } else {
-                        graph[inferredHead["name"]] = [rule];
+                        graph[literalToString(inferredHead)] = [ruleToString(rule)];
                     }
-                    if (!deepIncludes(rule["head"], facts)) {
-                        // console.log("Head:");
-                        // console.log(rule["head"]);
-                        facts.push(rule["head"]);
-                        // console.log(facts);
+                    if (!deepIncludes(inferredHead, facts)) {
+                        facts.push(inferredHead);
                         inferred = true;
                     }
+                    const oppositeHead = {}
+                    for (const key of Object.keys(inferredHead)) {
+                        oppositeHead[key] = inferredHead[key];
+                    }
+                    oppositeHead["sign"] = !oppositeHead["sign"];
+                    if (deepIncludes(oppositeHead, facts)) {
+                        const updatedGraph = updateGraph(literalToString(inferredHead), rule, literalToString(oppositeHead), graph, priorities);
+                        graph = updatedGraph["graph"];
+                        if (updatedGraph["isPrior"]) {
+                            facts = parseListOfLiterals(Object.keys(graph));
+                        }
+                    }
                 }
-            } else {
+            } else { // FIXME You have to fix the relational version in the same manner as the propositional!
                 const subsObject = getSubstitutions(rule["body"], facts);
                 const subs = subsObject["subs"];
                 const props = subsObject["propositions"];
@@ -388,8 +434,8 @@ function isConflicting(x, y) { // x and y are literals.
     if (x["name"] != y["name"] || x["arity"] != y["arity"] || x["sign"] === y["sign"]) {
         return false;
     }
-    const xArgs = x["arguments"];
-    const yArgs = y["arguments"];
+    const xArgs = x["args"];
+    const yArgs = y["args"];
     for (let i=0; i<x["arity"]; i++) {
         if (!xArgs[i]["isAssigned"] || !yArgs[i]["isAssigned"] || xArgs[i]["value"] != yArgs[i]["value"]) {
             return false;
@@ -405,8 +451,8 @@ function jsEvaluation(body, sub) { // Check whether, given a substitution, the c
     for (const literal of body) {
         if (literal["isEquality"]) {
             const equality = equalityCheck(literal, sub);
-            console.log("Equality:");
-            console.log(equality);
+            // console.log("Equality:");
+            // console.log(equality);
             if (equality["unifier"]) {
                 sub = extend(sub, equality["unifier"]);
             }
@@ -421,8 +467,8 @@ function jsEvaluation(body, sub) { // Check whether, given a substitution, the c
 }
 
 function equalityCheck(literal, sub) {
-    let leftArg = literal["arguments"][0];
-    let rightArg = literal["arguments"][1];
+    let leftArg = literal["args"][0];
+    let rightArg = literal["args"][1];
     // console.log("Args:");
     // console.log(leftArg);
     // console.log(rightArg);
@@ -477,8 +523,8 @@ function equalityCheck(literal, sub) {
 }
 
 function inequalityCheck(literal, sub) {
-    let leftArg = literal["arguments"][0];
-    let rightArg = literal["arguments"][1];
+    let leftArg = literal["args"][0];
+    let rightArg = literal["args"][1];
     if (!leftArg["isAssigned"] && Object.keys(sub).includes(leftArg["name"])) {
         leftArg = {
             index: leftArg["index"],

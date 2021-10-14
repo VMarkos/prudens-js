@@ -1,7 +1,9 @@
+// TODO add to all items a 'string' field which will correspond to its string representation, so as to avoid all these conversion functions (is this useful?)
+
 function contextParser() {
     const context = document.getElementById(tab + "-context").value;
     const contextList = parseContext(context);
-    console.log(contextList);
+    // console.log(contextList);
     contextList["context"].push({
         name: "true",
         sign: true,
@@ -136,38 +138,50 @@ function getRuleBody(bodyString) {
     // console.log(bodyArray);
     const body = [];
     for (const literal of bodyArray) {
-        let name;
-        let sign;
-        const delimiter = /\(|\)/;
-        const literalSplit = literal.trim().split(delimiter); // 0 - name, 1 - arguments.
-        if (literalSplit[0].charAt(0) === "-") {
-            name = literalSplit[0].substring(1);
-            sign = false;
-        } else {
-            name = literalSplit[0];
-            sign = true;
-        }
-        let args = undefined;
-        let arity = 0;
-        if (literalSplit.length > 1) {
-            args = getLiteralArguments(literalSplit[1]);
-            arity = args.length;
-        }
         // console.log(name);
-        body.push({
-            name: name,
-            sign: sign,
-            isJS: (name.charAt(0) === "?"),
-            isEquality: (name === "?="),
-            isInequality: (name === "?<"),
-            isAction: false,
-            arguments: args,
-            arity: arity,
-        });
+        body.push(parseLiteral(literal));
     }
     // console.log("Body:");
     // console.log(body);
     return body;
+}
+
+function parseListOfLiterals(stringList) {
+    const list = [];
+    for (const item of stringList) {
+        list.push(parseLiteral(item));
+    }
+    return list;
+}
+
+function parseLiteral(literal) {
+    let name;
+    let sign;
+    const delimiter = /\(|\)/;
+    const literalSplit = literal.trim().split(delimiter); // 0 - name, 1 - arguments.
+    if (literalSplit[0].charAt(0) === "-") {
+        name = literalSplit[0].substring(1);
+        sign = false;
+    } else {
+        name = literalSplit[0];
+        sign = true;
+    }
+    let args = undefined;
+    let arity = 0;
+    if (literalSplit.length > 1) {
+        args = getLiteralArguments(literalSplit[1]);
+        arity = args.length;
+    }
+    return {
+        name: name,
+        sign: sign,
+        isJS: (name.charAt(0) === "?"),
+        isEquality: (name === "?="),
+        isInequality: (name === "?<"),
+        isAction: false, // FIXME Actions!
+        args: args,
+        arity: arity,
+    }
 }
 
 function getRuleHead(headString) {
@@ -196,7 +210,7 @@ function getRuleHead(headString) {
         isEquality: false,
         isInequality: false,
         isAction: (name.charAt(0) === "!"),
-        arguments: args,
+        args: args,
         arity: arity,
     };
 }
@@ -298,7 +312,7 @@ function literalToString(literal) {
     if (!literal["sign"]) {
         literalString = "-" + literalString;
     }
-    const args = literal["arguments"];
+    const args = literal["args"];
     if (args === undefined) {
         return literalString;
     }
@@ -324,7 +338,9 @@ function ruleToString(rule) {
     }
     let ruleString = rule["name"] + " :: ";
     const body = rule["body"];
+    // console.log(rule);
     // console.log(body);
+    // debugger;
     for (let i=0; i<body.length; i++) {
         const literal = body[i];
         ruleString += literalToString(literal);
@@ -367,22 +383,46 @@ function contextToString(context) {
     return contextString;
 }
 
-function graphToString(graph) {
-    if (graph === undefined) {
+function contextToListOfStrings(context) {
+    if (context === undefined) {
         return undefined;
     }
-    let graphString = "{\n";
+    let list = [];
+    for (const literal of context) {
+        list.push(literalToString(literal));
+    }
+    return list;
+}
+
+function listOfLiteralsToString(list) {
+    let output = "";
+    for (const item of list) {
+        output += item + "; ";
+    }
+    return output;
+}
+
+function graphToString(graph) {
+    let graphString = "\{\n";
     for (const key of Object.keys(graph)) {
+        console.log(key);
         graphString += key + ": [";
         for (let i=0; i<graph[key].length; i++) {
-            const rule = graph[key][i];
-            graphString += ruleToString(rule);
+            graphString += graph[key][i];
             if (i < graph[key].length - 1) {
                 graphString += " ";
             }
         }
         graphString += "]\n";
     }
-    graphString += "}"
+    graphString += "}";
     return graphString;
+}
+
+function abductiveProofsToString(proofs) {
+    let proofString = "";
+    for (const proof of proofs) {
+        proofString += "\n[" + contextToString(proof) + "]";
+    }
+    return proofString;
 }
