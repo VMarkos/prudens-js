@@ -153,7 +153,7 @@ If not it returns `undefined`. It is important to note that up to this version `
 
 ### `extendByFacts(literal, facts)`
 Given a literal (grounded or not) and a set of grounded literals, it returns all the possible substitutions that could be constructed by unifying `literal` with all literals in `facts` - where unification is applicable. The output is always a list of substitutions - possibly empty - where each substitution has the following form:
-```javascrpit
+```javascript
 {
     var1: val1,
     var2: val2,
