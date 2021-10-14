@@ -94,7 +94,7 @@ function propositionalAbduction(kb, context, finalTarget) {
         target = targets.shift();
         let hasRule = false;
         for (const rule of kb) {
-            if (rule["head"]["name"] !== target["name"]) {
+            if (rule["head"]["name"] !== target["name"] || rule["head"]["sign"] !== target["sign"]) {
                 continue;
             }
             hasRule = true;
@@ -122,16 +122,40 @@ Iteratively remove an element from missing facts and if target is inferred, then
 
 function prioritizedPropositionalAbduction(kb, context, finalTarget) {
     const missingFacts = propositionalAbduction(kb, context, finalTarget);
-    const toBeRemoved = []; // Queue --- BFS
-    for (let i=0; i<missingFacts.length; i++) {
-        toBeRemoved.push([i]);
-    }
-    const sucessfulProofs = [];
+    // console.log(missingFacts);
+    // debugger;
+    const toBeRemoved = [[]]; // Stack --- DFS
+    // console.log(toBeRemoved);
+    // debugger;
+    const successfulProofs = [];
     while (toBeRemoved.length > 0) {
-        const next = toBeRemoved.shift();
-        const candidateProof = [...missingFacts];
-        for (const index of next.sort((a, b) => a - b)) {
-            candidateProof.splice(index, 1);
+        const next = toBeRemoved.pop();
+        const candidateProof = [];
+        for (let i=0; i<missingFacts.length; i++) {
+            if (!next.includes(i)) {
+                candidateProof.push(missingFacts[i]);
+            }
+        }
+        const allFacts = [...context];
+        allFacts.push(...candidateProof);
+        // console.log(allFacts);
+        // debugger;
+        graph = forwardChaining(kb, allFacts);
+        console.log("Targets");
+        console.log(graph["facts"]);
+        console.log(finalTarget);
+        debugger;
+        if (deepIncludes(finalTarget, graph["facts"])) {
+            console.log("pass");
+            successfulProofs.push(candidateProof);
+            for (let i=0; i<missingFacts.length; i++) {
+                if (!next.includes(i)) {
+                    const newCandidateProof = [...next];
+                    newCandidateProof.push(i);
+                    toBeRemoved.push(newCandidateProof);
+                }
+            }
         }
     }
+    return successfulProofs;
 }

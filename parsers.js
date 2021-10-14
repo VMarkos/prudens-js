@@ -8,6 +8,7 @@ function contextParser() {
         isJS: false,
         isEquality: false,
         isInequality: false,
+        isAction: false,
         args: undefined,
         arity: 0,
     });
@@ -159,6 +160,7 @@ function getRuleBody(bodyString) {
             isJS: (name.charAt(0) === "?"),
             isEquality: (name === "?="),
             isInequality: (name === "?<"),
+            isAction: false,
             arguments: args,
             arity: arity,
         });
@@ -190,6 +192,9 @@ function getRuleHead(headString) {
     return {
         name: name,
         sign: sign,
+        isJS: false,
+        isEquality: false,
+        isInequality: false,
         isAction: (name.charAt(0) === "!"),
         arguments: args,
         arity: arity,

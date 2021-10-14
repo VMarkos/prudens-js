@@ -30,7 +30,8 @@ function abduce() {
     if (targetsObject["type"] === "error") {
         return "ERROR: " + targetsObject["name"] + ":\n" + targetsObject["message"];
     }
-    const output = propositionalAbduction(kbObject["kb"], contextObject["context"], targetsObject["targets"][0]); // TODO This version of abduction handles only one target --- a simple loop could fix this.
+    const output = prioritizedPropositionalAbduction(kbObject["kb"], contextObject["context"], targetsObject["targets"][0]); // TODO This version of abduction handles only one target --- a simple loop could fix this.
+    console.log(output);
     const outputString = "";
     if (warnings.length > 0) {
         outputString += "Warnings:\n";
@@ -153,7 +154,7 @@ function arrayDeepEquals(x, y) { // x, y are arrays --- not used as of now!
     return true;
 }
 
-function deepIncludes(object, list) { //Re-implementation of Array.prototype.includes() that check at depth=1 for equal objects.
+function deepIncludes(object, list) { //Re-implementation of Array.prototype.includes() that checks at depth=1 for equal objects.
     "use strict";
     for (const entry of list) {
         if (deepEquals(object, entry)) {
