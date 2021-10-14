@@ -335,7 +335,7 @@ function forwardChaining(kb, context) {
             if (filteredBody["fols"].length === 0) {
                 let satisfied = true;
                 for (const prop of filteredBody["propositions"]) {
-                    if (!facts.includes(literalToString(prop))) {
+                    if (!deepIncludes(prop, facts)) {
                         satisfied = false;
                     }
                 }
@@ -391,23 +391,33 @@ function forwardChaining(kb, context) {
                     // console.log("Rule head:");
                     // console.log(rule["head"]);
                     const inferredHead = applyToLiteral(sub, rule["head"]);
-                    if (!isConfictingWithList(inferredHead, facts)) {
-                        // console.log("Facts:");
-                        // console.log(facts);
-                        // console.log(inferredHead);
-                        const literalString = literalToString(inferredHead);
-                        if (Object.keys(graph).includes(literalString)) {
-                            if (!deepIncludes(applyToRule(sub, rule), graph[literalString])) {
-                                graph[literalString].push(applyToRule(sub, rule));
-                            }
-                        } else {
-                            graph[literalString] = [applyToRule(sub, rule)];
+                    // console.log("Facts:");
+                    // console.log(facts);
+                    // console.log(inferredHead);
+                    const literalString = literalToString(inferredHead);
+                    if (Object.keys(graph).includes(literalString)) {
+                        if (!graph[literalString].includes(ruleToString(applyToRule(sub, rule)))) {
+                            graph[literalString].push(ruleToString(applyToRule(sub, rule)));
                         }
-                        if (!deepIncludes(inferredHead, facts)) {
-                            facts.push(inferredHead);
-                            // console.log("Head:");
-                            // console.log(inferredHead);
-                            inferred = true;
+                    } else {
+                        graph[literalString] = [ruleToString(applyToRule(sub, rule))];
+                    }
+                    if (!deepIncludes(inferredHead, facts)) {
+                        facts.push(inferredHead);
+                        // console.log("Head:");
+                        // console.log(inferredHead);
+                        inferred = true;
+                    }
+                    const oppositeHead = {}
+                    for (const key of Object.keys(inferredHead)) {
+                        oppositeHead[key] = inferredHead[key];
+                    }
+                    oppositeHead["sign"] = !oppositeHead["sign"];
+                    if (deepIncludes(oppositeHead, facts)) {
+                        const updatedGraph = updateGraph(literalToString(inferredHead), rule, literalToString(oppositeHead), graph, priorities);
+                        graph = updatedGraph["graph"];
+                        if (updatedGraph["isPrior"]) {
+                            facts = parseListOfLiterals(Object.keys(graph));
                         }
                     }
                 }
@@ -548,6 +558,23 @@ function inequalityCheck(literal, sub) {
     }
     return numParser(leftArg["value"] + " < " + rightArg["value"]).call();
 }
+
+/*
+How is a JS predicate executed?
+1. Split the code part to chunks, where each chunk is a corresponding javascript function
+2. When you have a sub available, go get each JS literal, apply sub and execute the corresponding function.
+
+Assume you have a function like the one below:
+function foo(arg1, arg2) {
+    // crazy stuff
+}
+What you actually need to do is replace anywhere in "crazy stuff" the values provided by your substitution and then just define a function with that strings --- which will be called.
+
+!!! This blocks calling a function from another function --- you may need to allow for this in some next release.
+
+In order to replace an argument's name, say arg1, with its value, say x, you have to find and replace any substring 'arg1' that is not preceded by some \w --- and, naturally, no \w 
+precedes it.
+*/
 
 function jsCheck(literal, sub) {
     return;

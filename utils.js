@@ -69,7 +69,7 @@ function deduce() {
         outputString += warning["name"] + ": " + warning["message"] + "\n";
     }
     // console.log(graph);
-    return outputString + "Inferences: " + listOfLiteralsToString(inferences) + "\nGraph: " + graphToString(graph);
+    return outputString + "Inferences: " + contextToString(inferences) + "\nGraph: " + graphToString(graph);
 }
 
 function consoleOutput() {
