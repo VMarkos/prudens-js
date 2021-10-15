@@ -3,6 +3,11 @@ A full implementation of Prudens in Javascript alongside a simple UI and the cor
 
 For the corresponding UI: https://vmarkos.github.io/prudens-js/index.html
 
+# TL;DR
+1. Deduction: see [this function](#forwardChaining(kb-context)).
+2. Abduction: see this function.
+3. Induction: Handle the way your knowledge base object is updated as per your wishes - see [here](#data-structure) for more on data structures in Prudens JS.
+
 # Data Structure
 All interaction within the scope of Prudens JS is conducted based on JSON representations of knowledge bases, rules, literals and variables. In this section we present in detail the properties of each of these separately.
 
@@ -163,8 +168,100 @@ Given a literal (grounded or not) and a set of grounded literals, it returns all
 ```
 In the above, all keys are some of the unassigned arguments of `x` - possibly all.
 
+### `extend(sub, unifier)`
+Given a substitution, `sub`, and a unifier, `unifier`, as returned from `unify`, it extends `sub` by appending to it any new substitutions, if any, appear in `unifier`. In case it successfully manages to do so, it returns an object of the form:
+```javascript
+{
+    var1: val1,
+    var2: val2,
+    ...,
+    varN: valN,
+}
+```
+In case this is not possible - e.g., `sub` and `unifier` assign the same variable with a different value - it returns `undefined`.
+
+### `apply(sub, args)`
+Given a substitution, `sub`, and the _list of arguments_ of some predicate, `args`, it applies `sub` to any unassigned argument in `args` by assigning the corresponding values to them. In case `args` us `undefined`, it returns `undefined` while in any other case it returns a list of variables - possibly with no changes made, in case no variable of `sub` appears in `args`.
+
+### `getSubstitutions(body facts)`
+Given a list of predicates, `body`, and alist of grounded predicates, `facts`, it returns all substitutions that ground all literals in `body` and agree with some literals in `facts`. In case no such substitution exists, it returns an empty list, `[]`, while in any other case itr returns an object of the following form:
+```javascript
+{
+    subs: [sub1, sub2,..., subN],
+    propositions: [prop1, prop2,..., propN],
+}
+```
+The first list, `subs`, contains all substitutions, while the second contains all propositional symbols that may appear in `body` - and to which, hence, one may not apply any substitution.
+
+### Other functions
+Here we present any other functions related to unification contained in `prudens.js`:
+1. `applyToLiteral(sub, literal)`: This function, given a substitution, `sub`, and a literal, `literal`, applies `sub` to all its predicates and returns a *copy* of `literal` with altered arguments, as indicated by `sub`.
+2. `applyToRule(sub, rule)`: This function, given a substitution, `sub` and a rule, `rule`, applies `sub` to all literals in `rule`'s body as well as its head. As with `applyToLtieral`, it returns a *copy* of the initial rule, thus not modifying it.
+3. `filterBody(body)`: This function, given a list of literals - presumably, a rule's body, but not necessarily restricted to that - returns an object of the form `{propositions: [p1,..., pN], fols: [f1,..., fN]}`, where `propositions` is a list of propositional symbols that appear in `body` and `fols` is the list of predicates that appear in `body` - any of whom may well be empty in case no elements of one class appear in `body`.
+
+## Inference
+In this section we shall present any functions that are related to inference as discussed in [this paper](https://www.internetofus.eu/wp-content/uploads/sites/38/2021/05/Michael_2019_MachineCoaching.pdf).
+
+### `getPriorities(kb)`
+Given a list of rules, `kb`, this function returns a dictionary (JSON object) indexed by string representations of rules and with each value being the index of the corresponding rule in `kb`. This function is intended to be overwritten in case one desires some more complex or, in general, non-linear prioritisation of rules in a knowledge base - as for now, it simply sticks to the interaction protocol regarding Machine Coaching that is being presented [here](https://www.internetofus.eu/wp-content/uploads/sites/38/2021/05/Michael_2019_MachineCoaching.pdf). So, the output of `getPriorities` may have the following form:
+```javascript
+{
+    rule1: 1,
+    rule2: 0,
+    rule3: 3,
+    rule4: 2,
+}
+```
+In fact, the above representation is the inverse of the input array, `kb`, in order to facilitate object search in O(1) time, given that all string representations of rules are pairwise different.
+
+### `updateGraph(newLiteralString, newLiteralRule, oldLiteralString, graph, priorities)`
+This function updates the inference graph structure with a new literal in case it conflicts some of the already inferred ones. Namely, given an inference graph, `graph`, a string representation of literal already included in `graph`, `oldLiteralString`, a string representation of a literal conflicting with `oldLiteralString`, `newLiteralString`, the rule that has led to it, `newLiteralRule`, and the priorities of the rules contained in tha knowledge base, `priorities`, it returns an updated version of the graph with all conflicts resolved. For more regarding the structure of a graph object, see [here](#data-structure).
+
+### `forwardChaining(kb, context)`
+Given a knowledge base, `kb`, and a set of grounded literals, `context`, this function deduces anything that may be deduced using the reasoning algorithm presented [here](https://www.internetofus.eu/wp-content/uploads/sites/38/2021/05/Michael_2019_MachineCoaching.pdf). The output has the following form:
+```javascript
+{
+    facts: [f1, f2,..., fN],
+    graph: {
+        f1: [rule11, rule12,..., rule1n],
+        f2: [rule21, rule22,..., rule2m],
+        ...,
+        fN: [ruleN1, ruleN2,..., ruleNz],
+    },
+}
+```
+In the above, `facts` is a list of grounded literals containing all literals that have been inferred as well as the initial context while `graph` is a graph object with all inferred literals as keys and lists of all rules that have led to these literals.
+
 # Abduction
+```diff
+@@ Dependencies @@
+! prudensUtils.js
+! prudens.js
+```
+
 Regarding abduction, the current version of Prudens JS supports only a propositional version which adheres to the deduction process described [here](https://www.internetofus.eu/wp-content/uploads/sites/38/2021/05/Michael_2019_MachineCoaching.pdf). That is, any abductive proof provided by Prudens JS consists of any missing facts that could lead to a given target, _t_, using the aforementioned deduction algorithm.
+
+### `propositionalAbduction(kb, context, finalTarget)`
+Given a knowledge base, `kb`, a list of grounded literals, `context`, and a target literal, `finalTarget`, it computes all abductive proofs that could be generated *ignoring priorities and conflicts*. It returns `undefined` in case no such proof exists or a list of lists of propositional symbols of the following form:
+```javascript
+[
+    [p1, p2,..., pN],
+    ...,
+    [q1, q2,..., qM],
+]
+```
+Each of the lists presented above consists a distinct abductive proof of `finalTarget` given `kb` and `context`. In this function, `context` may well be empty.
+
+### `prioritizedPropositionalAbduction(kb, context, finalTarget)`
+Given a knowledge base, `kb`, a list of grounded literals, `context`, and a target literal, `finalTarget`, it computes all abductive proofs that could be generated *taking into account priorities and conflicts*. It returns `undefined` in case no such proof exists or a list of lists of propositional symbols of the following form:
+```javascript
+[
+    [p1, p2,..., pN],
+    ...,
+    [q1, q2,..., qM],
+]
+```
+Each of the lists presented above consists a distinct abductive proof of `finalTarget` given `kb` and `context`. In this function, `context` may well be empty.
 
 # Induction
 Regarding induction, we again adhere to the learning protocol declared [here](https://www.internetofus.eu/wp-content/uploads/sites/38/2021/05/Michael_2019_MachineCoaching.pdf), so induction within the context of Prudens JS consists to merely appending rules to a knowledge base taking care of updating priorities properly.
