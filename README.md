@@ -4,7 +4,7 @@ A full implementation of Prudens in Javascript alongside a simple UI and the cor
 For the corresponding UI: https://vmarkos.github.io/prudens-js/index.html
 
 # TL;DR
-1. Deduction: see [this function](#forwardChaining(kb-context)).
+1. Deduction: see [this function](#forwardChaining(kb,-context)).
 2. Abduction: see this function.
 3. Induction: Handle the way your knowledge base object is updated as per your wishes - see [here](#data-structure) for more on data structures in Prudens JS.
 
