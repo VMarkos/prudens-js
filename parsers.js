@@ -302,6 +302,12 @@ function parseKB(kbAll) {
     };
 }
 
+function parseCode(code) {
+    const listOfFunctions = [];
+    const delim = /\s*function\s*/;
+    const codeArray = code.split(delim);
+}
+
 // Object-to-string related methods
 
 function literalToString(literal) {
