@@ -6,7 +6,7 @@ For the corresponding UI: https://vmarkos.github.io/prudens-js/index.html
 # TL;DR
 1. Deduction: see [this function](#forwardChainingkb-context).
 2. Abduction: see [this function](#prioritizedPropositionalAbductionkb-context-finalTarget).
-3. Induction: Handle the way your knowledge base object is updated as per your wishes - see [here](#data-structure) for more on data structures in Prudens JS.
+3. Induction: Update your knowledge base accordingly - see [here](#data-structure) for more on data structures in Prudens JS.
 
 # Data Structure
 All interaction within the scope of Prudens JS is conducted based on JSON representations of knowledge bases, rules, literals and variables. In this section we present in detail the properties of each of these separately.
