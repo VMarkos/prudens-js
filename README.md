@@ -335,4 +335,4 @@ Given a knowledge base, `kb`, a list of grounded literals, `context`, and a targ
 Each of the lists presented above consists a distinct abductive proof of `finalTarget` given `kb` and `context`. In this function, `context` may well be empty.
 
 # Induction
-Regarding induction, we again adhere to the learning protocol declared [here](https://www.internetofus.eu/wp-content/uploads/sites/38/2021/05/Michael_2019_MachineCoaching.pdf), so induction within the context of Prudens JS consists to merely appending rules to a knowledge base taking care of updating priorities properly.
+Regarding induction, we again adhere to the learning protocol declared [here](https://www.internetofus.eu/wp-content/uploads/sites/38/2021/05/Michael_2019_MachineCoaching.pdf), so induction within the context of Prudens JS consists to merely appending rules to a knowledge base taking care of updating priorities properly - hence, there are no built-in functionalities regarding induction.
