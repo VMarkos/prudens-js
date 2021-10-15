@@ -4,12 +4,83 @@ A full implementation of Prudens in Javascript alongside a simple UI and the cor
 For the corresponding UI: https://vmarkos.github.io/prudens-js/index.html
 
 # TL;DR
-1. Deduction: see [this function](#forwardChaining(kb,-context)).
-2. Abduction: see this function.
+1. Deduction: see [this function](#forwardChainingkb-context).
+2. Abduction: see [this function](#prioritizedPropositionalAbductionkb-context-finalTarget).
 3. Induction: Handle the way your knowledge base object is updated as per your wishes - see [here](#data-structure) for more on data structures in Prudens JS.
 
 # Data Structure
 All interaction within the scope of Prudens JS is conducted based on JSON representations of knowledge bases, rules, literals and variables. In this section we present in detail the properties of each of these separately.
+
+## Variables
+A variable is a JSON object of the following form:
+```javascript
+{
+    index: i,
+    name: "nameString",
+    isAssignued: true/false,
+    value: "valueString",
+    muted: true/false,
+}
+```
+In the above, `index` corresponds to the index in the arguments' list of a predicate in which the corresponding variable appears. `name` and `value` correspond to the strings that serve as the name and, possibly, the value of the variable, while `isAssigned` is a boolean field which is `true` in case `value` is not `undefined` or `null`. Lastly, `muted` is another boolean parameter which corresponds to whether a variable has been declared as redundant in some case - i.e., using the `_` symbol in Prudens's syntax.
+
+## Literals
+A literal is a JSON object of the following form:
+```javascript
+{
+    name: "nameString",
+    sign: true/false,
+    isJS: true/false,
+    isEquality: true/false,
+    isInequality: true/false,
+    isAction: true/false,
+    args: [var1, var2,..., varN],
+    arity: N,
+}
+```
+In the above, `name` is the string corresponding to a predicate's name, `sign` is the lliteral's sign - i.e. `false` when negated, `true` otherwise - and `isJS`, `isEquality`, `isInequality`, `isAction` are boolean parameters indicating whether a predicate is declared as a javascript function, as an equality operator, as an inequality operator or as an action operator. `args` is a list of arguments, with each argument being a [variable]{#variables} as described above and `arity` is merely the length of `args`. In the case of a propositional literal, `args` is always `undefined` and `arity=0`.
+
+## Rules
+A rule is a JSON object of the following form:
+```javascript
+{
+    name: "nameString",
+    body: [lit1, lit2,..., litN],
+    head: haedLiteral,
+}
+```
+In the above, `name` is a string containing the rule's name, `body` is a list of literals as described above and `head` is a single literal corresponding to the rule's head.
+
+## Knowledge base
+A knowledge base is JSON array of the following form:
+```javascript
+[rule1, rule2,..., ruleN]
+```
+In the above, each item in the list is a rule as described above.
+
+## Substitutions
+A substitution is a JSON object of the following form:
+```javascript
+{
+    var1: val1,
+    var2: val2,
+    ...,
+    varN: valN,
+}
+```
+Both `val` and `var` are strings that correspond to the value and the name of a [variable](#variables) respectively.
+
+## Graphs
+A graph is a JSON object that corresponds to an Inference Graph and has the following form:
+```javascript
+{
+    f1: [rule11, rule12,..., rule1n],
+    f2: [rule21, rule22,..., rule2m],
+    ...,
+    fN: [ruleN1, ruleN2,..., ruleNz],
+}
+```
+In the above, `f`'s are all string representations of literals and each one of them is assigned a list of rules that infer them in an inference graph. Actually, a graph is a dictionary representing a graph with its node's as keys and the directed edges terminating to these nodes as values. It is important to nore that rules in the aforementioned lists are included as strings and not as JSON objects - this may not persist through next releases.
 
 # Utility functions
 `prudensUtils.js` provides a set of Prudens-specific functions that are used in most other scripts. Almost all of them allow for easier and more sound computations using Prudens's native data structures while they also provide some deeper level functionality that vanilla javascript does not support.
