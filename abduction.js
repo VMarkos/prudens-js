@@ -141,12 +141,12 @@ function prioritizedPropositionalAbduction(kb, context, finalTarget) { //FIXME S
         // console.log(allFacts);
         // debugger;
         graph = forwardChaining(kb, allFacts);
-        console.log("Targets");
-        console.log(graph["facts"]);
-        console.log(finalTarget);
+        // console.log("Targets");
+        // console.log(graph["facts"]);
+        // console.log(finalTarget);
         // debugger;
         if (deepIncludes(finalTarget, graph["facts"])) {
-            console.log("pass");
+            // console.log("pass");
             successfulProofs.push(candidateProof);
             for (let i=0; i<missingFacts.length; i++) {
                 if (!next.includes(i)) {

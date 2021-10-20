@@ -95,7 +95,7 @@ function getLiteralArguments(argumentsString) {
         let muted = false;
         const argument = argumentsArray[i].trim();
         const isVar = /[A-Z_]/;
-        const isAssigned = !isVar.test(argument.charAt(0));
+        const isAssigned = !isVar.test(argument.charAt(0)) || /[^\w]/.test(argument);
         if (isAssigned) {
             name = undefined;
             value = argument;
@@ -411,7 +411,7 @@ function listOfLiteralsToString(list) {
 function graphToString(graph) {
     let graphString = "\{\n";
     for (const key of Object.keys(graph)) {
-        console.log(key);
+        // console.log(key);
         graphString += key + ": [";
         for (let i=0; i<graph[key].length; i++) {
             graphString += graph[key][i];

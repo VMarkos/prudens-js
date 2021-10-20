@@ -383,11 +383,14 @@ function forwardChaining(kb, context) {
                 if (subs === undefined) {
                     continue;
                 }
-                for (const sub of subs) {
+                for (let i=0; i<subs.length; i++) {
+                    let sub = subs[i];
                     // console.log(sub);
-                    if (!jsEvaluation(rule["body"], sub)) {
+                    const jsEval = jsEvaluation(rule["body"], sub);
+                    if (!jsEval["isValid"]) {
                         continue;
                     }
+                    sub = jsEval["sub"];
                     // console.log("Rule head:");
                     // console.log(rule["head"]);
                     const inferredHead = applyToLiteral(sub, rule["head"]);
@@ -473,15 +476,19 @@ function jsEvaluation(body, sub) { // Check whether, given a substitution, the c
             isValid = isValid && jsCheck(literal, sub);
         }
     }
-    return isValid;
+    return {
+        isValid: isValid,
+        sub: sub,
+    };
 }
 
 function equalityCheck(literal, sub) {
     let leftArg = literal["args"][0];
     let rightArg = literal["args"][1];
-    // console.log("Args:");
-    // console.log(leftArg);
-    // console.log(rightArg);
+    console.log("Args:");
+    console.log(leftArg);
+    console.log(rightArg);
+    // console.log(rightArg["name"].match(jsRE));
     if (!leftArg["isAssigned"] && Object.keys(sub).includes(leftArg["name"])) {
         leftArg = {
             index: leftArg["index"],
@@ -490,6 +497,7 @@ function equalityCheck(literal, sub) {
             value: sub[leftArg["name"]],
             muted: leftArg["muted"],
         };
+        console.log("Assgn left");
     }
     if (!rightArg["isAssigned"] && Object.keys(sub).includes(rightArg["name"])) {
         rightArg = {
@@ -499,8 +507,11 @@ function equalityCheck(literal, sub) {
             value: sub[rightArg["name"]],
             muted: rightArg["muted"],
         };
+        console.log("Assgn right");
     }
+    console.log(rightArg["name"]);
     if (!leftArg["isAssigned"] && !rightArg["isAssigned"]) {
+        console.log("What?");
         return {
             isValid: false,
             unifier: undefined,
@@ -516,16 +527,18 @@ function equalityCheck(literal, sub) {
     }
     if (leftArg["isAssigned"]) {
         const unifier = {};
-        unifier[rightArg["name"]] = leftArg["value"];
+        unifier[rightArg["name"]] = numParser(applyToString(leftArg["value"], sub)).call();
+        // console.log(unifier);
         return {
             isValid: true,
             unifier: unifier,
         };
     }
     const unifier = {};
-    unifier[leftArg["name"]] = rightArg["value"];
+    unifier[leftArg["name"]] = numParser(applyToString(rightArg["value"], sub)).call();
     // console.log("Equality sub:"); // TODO update equality so as to allow for operations with variables.
     // console.log(sub);
+    // console.log(unifier);
     return {
         isValid: true,
         unifier: unifier,
@@ -585,19 +598,11 @@ function numParser(string) {
 }
 
 function applyToString(string, sub) {
-    // const delimiter = /[\s*+\-\*\/\(\)\%]/;
-    // console.log("string");
-    // console.log(string);
     string = string.trim();
-    for (let variable of Object.keys(sub)) {
-        let varRE = RegExp("((?<!\w)(" + variable + "))(?!\w)", "g");
-        string.replaceAll(varRE, sub[variable]);
+    for (const variable of Object.keys(sub)) {
+        const varRE = RegExp(String.raw`((?<!\w)(` + variable + String.raw`))(?!\w)`, "g");
+        string = string.replaceAll(varRE, sub[variable]);
     }
+    console.log(string);
     return string;
 }
-/*
-Explanation detection algorithm:
-1. For each literal in inferences:
-    a. Find all rules that have that literal as head;
-    b. 
-*/
