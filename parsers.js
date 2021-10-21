@@ -296,16 +296,32 @@ function parseKB(kbAll) {
     return {
         type: "output",
         kb: kbToObject(kb),
+        // code: codeToObject(code),
         code: code,
         imports: imports,
         warnings: warnings,
     };
 }
 
-function parseCode(code) {
+function codeToObject(code) {
+    if (code.length === 0) {
+        return undefined;
+    }
     const listOfFunctions = [];
     const delim = /\s*function\s*/;
     const codeArray = code.split(delim);
+    for (const func of codeArray) {
+        listOfFunctions.push(parseJsFunction(func));
+    }
+    return listOfFunctions;
+}
+
+function parseJsFunction(functionCode) {
+    functionCode = functionCode.trim();
+    const functionHeader = functionCode.split("{")[0];
+    const functionHeaderArray = functionHeader.split("(");
+    const functionName = functionHeaderArray[0];
+    const argsArray = functionHeaderArray[1].trim().substring(0,functionHeaderArray[1].length - 1).split(",")[0];
 }
 
 // Object-to-string related methods

@@ -323,6 +323,7 @@ function updateGraph(newLiteralString, newLiteralRule, oldLiteralString, graph, 
 
 function forwardChaining(kb, context) {
     let facts = context;
+    // console.log(facts);
     let inferred = false;
     let graph = {};
     const priorities = getPriorities(kb);
@@ -366,11 +367,13 @@ function forwardChaining(kb, context) {
                     }
                 }
             } else { // FIXME You have to fix the relational version in the same manner as the propositional!
-                const subsObject = getSubstitutions(rule["body"], facts);
+                const subsObject = getSubstitutions(rule["body"], facts); // FIXME Not computing all substitutions --- actually none for: @KnowledgeBase
+                // R1 :: at(D1, 1), at(D2, 2), ?=(S, D1 + D2) implies sum2(S);
+                // context: at(3, 1); at(5, 2);
                 const subs = subsObject["subs"];
                 const props = subsObject["propositions"];
-                // console.log("FOL");
-                // console.log(props);
+                console.log("FOL");
+                console.log(subs);
                 if (props !== undefined) {
                     for (const prop of props) {
                         if (!deepIncludes(prop, facts)) {
@@ -383,6 +386,7 @@ function forwardChaining(kb, context) {
                 if (subs === undefined) {
                     continue;
                 }
+                console.log(subs);
                 for (let i=0; i<subs.length; i++) {
                     let sub = subs[i];
                     // console.log(sub);
