@@ -55,9 +55,11 @@ Get all substitutions:
 
 function getSubstitutions(body, facts) {
     "use strict";
-    // console.log(body);
+    console.log("Body:");
+    console.log(body);
     let substitutions = extendByFacts(body[0], facts);
-    // console.log(substitutions);
+    console.log("Init Subs:");
+    console.log(substitutions);
     // substitutions = substitutions.filter((element) => {return element !== undefined});
     // console.log("Subs Init:");
     // console.log(substitutions);
@@ -81,8 +83,8 @@ function getSubstitutions(body, facts) {
         const toBeRemoved = [];
         const toBePushed = [];
         for (const sub of substitutions) {
-            // console.log("Sub:");
-            // console.log(sub);
+            console.log("Sub:");
+            console.log(sub);
             let literal = {
                 name: body[i]["name"],
                 sign: body[i]["sign"],
@@ -104,6 +106,8 @@ function getSubstitutions(body, facts) {
                 // console.log(unifier);
                 if (unifier != undefined) {
                     const extension = extend(sub, unifier);
+                    console.log("Extension");
+                    // debugger;
                     if (unifier != undefined && extension != undefined) {
                         toBePushed.push(extension);
                         extended = true;
@@ -202,15 +206,23 @@ function unify(x, y) { // x, y are literals. Assymetric unification since y is a
     for (let i=0; i<x["arity"]; i++) {
         let xArg = xArgs[i];
         let yArg = yArgs[i];
-        if (xArg["muted"] || yArg["muted"]) {
-            continue;
-        }
         if (xArg["isAssigned"] && xArg["value"] != yArg["value"]) {
+            // console.log("Here?");
+            // console.log(xArg);
+            // console.log(yArg);
+            // debugger;
             return undefined;
+        }
+        if (xArg["muted"] || yArg["muted"] || (xArg["name"] === undefined && yArg["name"] === undefined)) {
+            continue;
         }
         if (Object.keys(unifier).length > 0 && Object.keys(unifier).includes(xArg["name"]) && unifier[xArg["name"]] != yArg["value"]) {
             return undefined;
         }
+        // console.log("Here?");
+        // console.log(xArg);
+        // console.log(yArg);
+        // debugger;
         unifier[xArg["name"]] = yArg["value"];
     }
     return unifier;
@@ -218,9 +230,11 @@ function unify(x, y) { // x, y are literals. Assymetric unification since y is a
 
 function extend(sub, unifier) {
     "use strict";
-    // console.log("Unifier:");
+    // console.log("Unifier in extend():");
     // console.log(unifier);
     const extendedSub = deepCopy(sub);
+    // console.log("Sub:");
+    // console.log(extendedSub);
     for (const key of Object.keys(unifier)) {
         if (Object.keys(extendedSub).includes(key) && extendedSub[key] != unifier[key]) {
             return undefined;
@@ -372,8 +386,8 @@ function forwardChaining(kb, context) {
                 // context: at(3, 1); at(5, 2);
                 const subs = subsObject["subs"];
                 const props = subsObject["propositions"];
-                console.log("FOL");
-                console.log(subs);
+                // console.log("FOL");
+                // console.log(subs);
                 if (props !== undefined) {
                     for (const prop of props) {
                         if (!deepIncludes(prop, facts)) {
@@ -489,9 +503,9 @@ function jsEvaluation(body, sub) { // Check whether, given a substitution, the c
 function equalityCheck(literal, sub) {
     let leftArg = literal["args"][0];
     let rightArg = literal["args"][1];
-    console.log("Args:");
-    console.log(leftArg);
-    console.log(rightArg);
+    // console.log("Args:");
+    // console.log(leftArg);
+    // console.log(rightArg);
     // console.log(rightArg["name"].match(jsRE));
     if (!leftArg["isAssigned"] && Object.keys(sub).includes(leftArg["name"])) {
         leftArg = {
@@ -501,7 +515,7 @@ function equalityCheck(literal, sub) {
             value: sub[leftArg["name"]],
             muted: leftArg["muted"],
         };
-        console.log("Assgn left");
+        // console.log("Assgn left");
     }
     if (!rightArg["isAssigned"] && Object.keys(sub).includes(rightArg["name"])) {
         rightArg = {
@@ -511,11 +525,11 @@ function equalityCheck(literal, sub) {
             value: sub[rightArg["name"]],
             muted: rightArg["muted"],
         };
-        console.log("Assgn right");
+        // console.log("Assgn right");
     }
-    console.log(rightArg["name"]);
+    // console.log(rightArg["name"]);
     if (!leftArg["isAssigned"] && !rightArg["isAssigned"]) {
-        console.log("What?");
+        // console.log("What?");
         return {
             isValid: false,
             unifier: undefined,
@@ -607,6 +621,6 @@ function applyToString(string, sub) {
         const varRE = RegExp(String.raw`((?<!\w)(` + variable + String.raw`))(?!\w)`, "g");
         string = string.replaceAll(varRE, sub[variable]);
     }
-    console.log(string);
+    // console.log(string);
     return string;
 }
