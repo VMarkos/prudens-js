@@ -313,6 +313,7 @@ function codeToObject(code) {
     for (const func of codeArray) {
         listOfFunctions.push(parseJsFunction(func));
     }
+    console.log(listOfFunctions);
     return listOfFunctions;
 }
 
@@ -321,7 +322,14 @@ function parseJsFunction(functionCode) {
     const functionHeader = functionCode.split("{")[0];
     const functionHeaderArray = functionHeader.split("(");
     const functionName = functionHeaderArray[0];
-    const argsArray = functionHeaderArray[1].trim().substring(0,functionHeaderArray[1].length - 1).split(",")[0];
+    const argsArray = functionHeaderArray[1].trim().substring(0,functionHeaderArray[1].length - 1).split(",");
+    let functionSource = functionCode.split("{")[1].trim();
+    functionSource = functionSource.substring(0, functionSource.length - 1);
+    return {
+        name: functionName,
+        args: argsArray,
+        source: functionSource,
+    };
 }
 
 // Object-to-string related methods
