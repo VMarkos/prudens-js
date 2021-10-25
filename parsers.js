@@ -296,41 +296,69 @@ function parseKB(kbAll) {
     return {
         type: "output",
         kb: kbToObject(kb),
-        // code: codeToObject(code),
-        code: code,
+        code: codeToObject(code),
+        // code: code,
         imports: imports,
         warnings: warnings,
     };
 }
 
-function codeToObject(code) {
+function codeToObject(code) { // TODO You need to take care of errors here like defining the same function twice etc and create appropriate messages!
     if (code.length === 0) {
         return undefined;
     }
     const listOfFunctions = [];
-    const delim = /\s*function\s*/;
-    const codeArray = code.split(delim);
+    const delim = "function";
+    const codeArray = code.trim().split(delim);
+    console.log("Code array:");
+    console.log(codeArray);
     for (const func of codeArray) {
-        listOfFunctions.push(parseJsFunction(func));
+        if (func !== "") {
+            listOfFunctions.push(parseJsFunction(func));
+        }
     }
+    console.log("List:");
     console.log(listOfFunctions);
+    // debugger;
     return listOfFunctions;
 }
 
 function parseJsFunction(functionCode) {
+    // console.log(functionCode);
+    // debugger;
     functionCode = functionCode.trim();
     const functionHeader = functionCode.split("{")[0];
     const functionHeaderArray = functionHeader.split("(");
     const functionName = functionHeaderArray[0];
+    // console.log(functionHeaderArray);
+    // debugger;
     const argsArray = functionHeaderArray[1].trim().substring(0,functionHeaderArray[1].length - 1).split(",");
+    console.log(argsArray);
+    argsArray[argsArray.length - 1] = argsArray[argsArray.length - 1].substring(0, argsArray[argsArray.length - 1].length - 1);
+    console.log(argsArray);
+    for (let i=0; i<argsArray.length; i++) {
+        argsArray[i] = argsArray[i].trim();
+    }
     let functionSource = functionCode.split("{")[1].trim();
     functionSource = functionSource.substring(0, functionSource.length - 1);
     return {
-        name: functionName,
+        name: functionName.trim(),
         args: argsArray,
         source: functionSource,
     };
 }
+
+/*
+@KnowledgeBase
+R :: f(X), g(Y), ?my_func(X, Y) implies h(X, Y);
+
+@Code
+function my_func(u, v) {
+    u = u + "b";
+    v = "b" + v;
+    return u == v;
+}
+*/
 
 // Object-to-string related methods
 

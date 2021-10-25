@@ -55,11 +55,11 @@ Get all substitutions:
 
 function getSubstitutions(body, facts) {
     "use strict";
-    console.log("Body:");
-    console.log(body);
+    // console.log("Body:");
+    // console.log(body);
     let substitutions = extendByFacts(body[0], facts);
-    console.log("Init Subs:");
-    console.log(substitutions);
+    // console.log("Init Subs:");
+    // console.log(substitutions);
     // substitutions = substitutions.filter((element) => {return element !== undefined});
     // console.log("Subs Init:");
     // console.log(substitutions);
@@ -83,8 +83,8 @@ function getSubstitutions(body, facts) {
         const toBeRemoved = [];
         const toBePushed = [];
         for (const sub of substitutions) {
-            console.log("Sub:");
-            console.log(sub);
+            // console.log("Sub:");
+            // console.log(sub);
             let literal = {
                 name: body[i]["name"],
                 sign: body[i]["sign"],
@@ -106,7 +106,7 @@ function getSubstitutions(body, facts) {
                 // console.log(unifier);
                 if (unifier != undefined) {
                     const extension = extend(sub, unifier);
-                    console.log("Extension");
+                    // console.log("Extension");
                     // debugger;
                     if (unifier != undefined && extension != undefined) {
                         toBePushed.push(extension);
@@ -400,7 +400,7 @@ function forwardChaining(kb, context) {
                 if (subs === undefined) {
                     continue;
                 }
-                console.log(subs);
+                // console.log(subs);
                 for (let i=0; i<subs.length; i++) {
                     let sub = subs[i];
                     // console.log(sub);
