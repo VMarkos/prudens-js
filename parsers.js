@@ -306,18 +306,22 @@ function codeToObject(code) { // TODO You need to take care of errors here like 
     if (code === undefined || code.length === 0) {
         return undefined;
     }
-    const listOfFunctions = [];
+    const listOfFunctions = {};
     const delim = "function";
     const codeArray = code.trim().split(delim);
-    console.log("Code array:");
-    console.log(codeArray);
+    // console.log("Code array:");
+    // console.log(codeArray);
     for (const func of codeArray) {
         if (func !== "") {
-            listOfFunctions.push(parseJsFunction(func));
+            const functionObject = parseJsFunction(func);
+            listOfFunctions[functionObject["name"]] = {
+                args: functionObject["args"],
+                source: functionObject["source"],
+            };
         }
     }
-    console.log("List:");
-    console.log(listOfFunctions);
+    // console.log("List:");
+    // console.log(listOfFunctions);
     // debugger;
     return listOfFunctions;
 }
@@ -332,9 +336,9 @@ function parseJsFunction(functionCode) {
     // console.log(functionHeaderArray);
     // debugger;
     const argsArray = functionHeaderArray[1].trim().substring(0,functionHeaderArray[1].length - 1).split(",");
-    console.log(argsArray);
+    // console.log(argsArray);
     argsArray[argsArray.length - 1] = argsArray[argsArray.length - 1].substring(0, argsArray[argsArray.length - 1].length - 1);
-    console.log(argsArray);
+    // console.log(argsArray);
     for (let i=0; i<argsArray.length; i++) {
         argsArray[i] = argsArray[i].trim();
     }

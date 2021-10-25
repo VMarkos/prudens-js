@@ -145,7 +145,7 @@ function extendByFacts(literal, facts) {
         if (fact["arity"] !== 0) {
             let unifier = {};
             if (literal["isJS"]) {
-                const equality = jsEvaluation([literal], unifier);
+                const equality = jsEvaluation([literal], unifier, undefined);
                 unifier = equality["unifier"];
                 // console.log("Unifier:");
                 // console.log(unifier);
@@ -335,11 +335,14 @@ function updateGraph(newLiteralString, newLiteralRule, oldLiteralString, graph, 
     };
 }
 
-function forwardChaining(kb, context) {
+function forwardChaining(kbObject, context) { //FIXME Huge inconsistency with DOCS! You need to change that from [rule1, ...] to KBObject.
     let facts = context;
+    const kb = kbObject["kb"];
     // console.log(facts);
     let inferred = false;
     let graph = {};
+    // console.log(kbObject);
+    const code = kbObject["code"];
     const priorities = getPriorities(kb);
     // let i = 0;
     do {
@@ -386,8 +389,8 @@ function forwardChaining(kb, context) {
                 // context: at(3, 1); at(5, 2);
                 const subs = subsObject["subs"];
                 const props = subsObject["propositions"];
-                console.log("FOL");
-                console.log(subs);
+                // console.log("FOL");
+                // console.log(subs);
                 if (props !== undefined) {
                     for (const prop of props) {
                         if (!deepIncludes(prop, facts)) {
@@ -404,7 +407,8 @@ function forwardChaining(kb, context) {
                 for (let i=0; i<subs.length; i++) {
                     let sub = subs[i];
                     // console.log(sub);
-                    const jsEval = jsEvaluation(rule["body"], sub);
+                    // console.log(code);
+                    const jsEval = jsEvaluation(rule["body"], sub, code);
                     if (!jsEval["isValid"]) {
                         continue;
                     }
@@ -475,7 +479,7 @@ function isConflicting(x, y) { // x and y are literals.
     return true;
 }
 
-function jsEvaluation(body, sub) { // Check whether, given a substitution, the corresponding JS predicates hold.
+function jsEvaluation(body, sub, code) { // Check whether, given a substitution, the corresponding JS predicates hold.
     let isValid = true;
     // console.log("Body:");
     // console.log(body);
@@ -491,7 +495,9 @@ function jsEvaluation(body, sub) { // Check whether, given a substitution, the c
         } else if (literal["isInequality"]) {
             isValid = isValid && inequalityCheck(literal, sub);
         } else if (literal["isJS"]){
-            isValid = isValid && jsCheck(literal, sub);
+            // console.log("Hey!");
+            // console.log(code);
+            isValid = isValid && jsCheck(literal, sub, code);
         }
     }
     return {
@@ -503,9 +509,9 @@ function jsEvaluation(body, sub) { // Check whether, given a substitution, the c
 function equalityCheck(literal, sub) {
     let leftArg = literal["args"][0];
     let rightArg = literal["args"][1];
-    console.log("Args:");
-    console.log(leftArg);
-    console.log(rightArg);
+    // console.log("Args:");
+    // console.log(leftArg);
+    // console.log(rightArg);
     // console.log(rightArg["name"].match(jsRE));
     if (!leftArg["isAssigned"] && Object.keys(sub).includes(leftArg["name"])) {
         leftArg = {
@@ -553,7 +559,7 @@ function equalityCheck(literal, sub) {
         };
     }
     const unifier = {};
-    console.log("Here!");
+    // console.log("Here!");
     unifier[leftArg["name"]] = numParser(applyToString(rightArg["value"], sub)).call();
     // console.log("Equality sub:"); // TODO update equality so as to allow for operations with variables.
     // console.log(sub);
@@ -608,9 +614,29 @@ In order to replace an argument's name, say arg1, with its value, say x, you hav
 precedes it.
 */
 
-function jsCheck(literal, sub) {
+function jsCheck(literal, sub, code) {
     const name = literal["name"].substring(1, literal["name"].length);
-    return;
+    const functionObject = code[name];
+    if (literal["args"].length !== functionObject["args"].length) {
+        return false;
+    }
+    let source = functionObject["source"];
+    for (let i=0; i<literal["args"].length; i++) {
+        const variable = literal["args"][i];
+        // console.log(variable);
+        // console.log(sub);
+        if (!Object.keys(sub).includes(variable["name"])) {
+            // console.log("Here");
+            return false;
+        }
+        // const varRE = RegExp(String.raw`((?<!\w)(` + functionObject["args"][i] + String.raw`))(?!\w)`, "g");
+        // console.log(varRE);
+        // console.log(sub[variable["name"]]);
+        // source = source.replaceAll(varRE, '"' + sub[variable["name"]] + '"');
+        source = "let " + functionObject["args"][i] + ' = "' + sub[variable["name"]] + '";\n' + source;
+    }
+    // console.log(source);
+    return Function(source).call();
 }
 
 function numParser(string) {
@@ -627,7 +653,7 @@ function applyToString(string, sub) {
         const varRE = RegExp(String.raw`((?<!\w)(` + variable + String.raw`))(?!\w)`, "g");
         const oldString = string;
         string = string.replaceAll(varRE, sub[variable]);
-        console.log(string);
+        // console.log(string);
         if (string === oldString) {
             return "false;";
         }
