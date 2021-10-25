@@ -145,7 +145,7 @@ function extendByFacts(literal, facts) {
         if (fact["arity"] !== 0) {
             let unifier = {};
             if (literal["isJS"]) {
-                const equality = equalityCheck(literal, unifier);
+                const equality = jsEvaluation([literal], unifier);
                 unifier = equality["unifier"];
                 // console.log("Unifier:");
                 // console.log(unifier);
@@ -386,8 +386,8 @@ function forwardChaining(kb, context) {
                 // context: at(3, 1); at(5, 2);
                 const subs = subsObject["subs"];
                 const props = subsObject["propositions"];
-                // console.log("FOL");
-                // console.log(subs);
+                console.log("FOL");
+                console.log(subs);
                 if (props !== undefined) {
                     for (const prop of props) {
                         if (!deepIncludes(prop, facts)) {
@@ -503,9 +503,9 @@ function jsEvaluation(body, sub) { // Check whether, given a substitution, the c
 function equalityCheck(literal, sub) {
     let leftArg = literal["args"][0];
     let rightArg = literal["args"][1];
-    // console.log("Args:");
-    // console.log(leftArg);
-    // console.log(rightArg);
+    console.log("Args:");
+    console.log(leftArg);
+    console.log(rightArg);
     // console.log(rightArg["name"].match(jsRE));
     if (!leftArg["isAssigned"] && Object.keys(sub).includes(leftArg["name"])) {
         leftArg = {
@@ -553,6 +553,7 @@ function equalityCheck(literal, sub) {
         };
     }
     const unifier = {};
+    console.log("Here!");
     unifier[leftArg["name"]] = numParser(applyToString(rightArg["value"], sub)).call();
     // console.log("Equality sub:"); // TODO update equality so as to allow for operations with variables.
     // console.log(sub);
@@ -608,18 +609,28 @@ precedes it.
 */
 
 function jsCheck(literal, sub) {
+    const name = literal["name"].substring(1, literal["name"].length);
     return;
 }
 
 function numParser(string) {
+    // console.log(string);
     return Function('"use strict"; return (' + string + ');');
 }
 
 function applyToString(string, sub) {
+    if (sub === undefined || Object.keys(sub).length === 0) {
+        return "false";
+    }
     string = string.trim();
     for (const variable of Object.keys(sub)) {
         const varRE = RegExp(String.raw`((?<!\w)(` + variable + String.raw`))(?!\w)`, "g");
+        const oldString = string;
         string = string.replaceAll(varRE, sub[variable]);
+        console.log(string);
+        if (string === oldString) {
+            return "false;";
+        }
     }
     // console.log(string);
     return string;

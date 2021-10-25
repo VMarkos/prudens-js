@@ -297,14 +297,13 @@ function parseKB(kbAll) {
         type: "output",
         kb: kbToObject(kb),
         code: codeToObject(code),
-        // code: code,
         imports: imports,
         warnings: warnings,
     };
 }
 
 function codeToObject(code) { // TODO You need to take care of errors here like defining the same function twice etc and create appropriate messages!
-    if (code.length === 0) {
+    if (code === undefined || code.length === 0) {
         return undefined;
     }
     const listOfFunctions = [];
