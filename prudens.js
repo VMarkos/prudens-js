@@ -271,6 +271,15 @@ function getPriorities(kb) { // Linear order induced priorities.
     return priorities;
 }
 
+/* Test case that fails!
+@KnowledgeBase
+R1 :: f(X), h(Y) implies z(X);
+R2 :: g(X) implies f(X);
+R3 :: h(X) implies -f(X);
+
+Context: g(b); h(b);
+*/
+
 function updateGraph(inferredHead, newRule, graph, facts, priorities) { //TODO You may need to store the substitution alongside each rule, in case one needs to count how many time a rule has been triggered or so.
     const oppositeHead = {}
     for (const key of Object.keys(inferredHead)) {
@@ -295,7 +304,7 @@ function updateGraph(inferredHead, newRule, graph, facts, priorities) { //TODO Y
             delete graph[literalToString(oppositeHead)];
             graph[literalToString(inferredHead)] = [newRule];
             facts.push(inferredHead);
-            facts = facts.splice(facts.index(oppositeHead), 1);
+            facts = facts.splice(facts.indexOf(oppositeHead), 1);
         } else {
             graph[literalToString(oppositeHead)] = removeAll(graph[literalToString(oppositeHead)], toBeRemoved);
         }
@@ -327,6 +336,7 @@ function forwardChaining(kbObject, context) { //FIXME Huge inconsistency with DO
             const rule = kb[i];
             // FIXME You have to fix the relational version in the same manner as the propositional!
             const subs = getSubstitutions(rule["body"], facts, code); // FIXME Not computing all substitutions --- actually none for: @KnowledgeBase
+            // console.log(subs);
             for (let i=0; i<subs.length; i++) {
                 const sub = subs[i];
                 // console.log(sub);
@@ -337,8 +347,10 @@ function forwardChaining(kbObject, context) { //FIXME Huge inconsistency with DO
                 const updatedGraph = updateGraph(inferredHead, rule, graph, facts, priorities);
                 graph = updatedGraph["graph"];
                 facts = updatedGraph["facts"];
-                inferred = updatedGraph["inferred"];
-                // graph updating and facts updating takes place here.
+                if (!inferred) {
+                    inferred = updatedGraph["inferred"];
+                }
+                // console.log(graph);
             }
         }
         // i++;
