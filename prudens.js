@@ -133,89 +133,6 @@ function getSubstitutions(body, facts, code) {
     return subs;
 }
 
-// function getSubstitutions(body, facts) {
-//     "use strict";
-//     // console.log("Body:");
-//     // console.log(body);
-//     let substitutions = extendByFacts(body[0], facts);
-//     // console.log("Init Subs:");
-//     // console.log(substitutions);
-//     // substitutions = substitutions.filter((element) => {return element !== undefined});
-//     // console.log("Subs Init:");
-//     // console.log(substitutions);
-//     // debugger;
-//     const jsLiterals = [];
-//     const propositionalLiterals = [];
-//     for (let i=1; i<body.length; i++) {
-//         if (body[i]["isJS"]) {
-//             jsLiterals.push(body[i]);
-//             // console.log("JS Literals:");
-//             // console.log(jsLiterals);
-//             continue;
-//         }
-//         // console.log(i);
-//         if (body[i]["arity"] === 0) {
-//             propositionalLiterals.push(body[i]);
-//             // console.log("Props:");
-//             // console.log(propositionalLiterals);
-//             continue;
-//         }
-//         const toBeRemoved = [];
-//         const toBePushed = [];
-//         for (const sub of substitutions) {
-//             // console.log("Sub:");
-//             // console.log(sub);
-//             let literal = {
-//                 name: body[i]["name"],
-//                 sign: body[i]["sign"],
-//                 isJS: body[i]["isJS"],
-//                 isEquality: body[i]["isEquality"],
-//                 isInequality: body[i]["isInequality"],
-//                 args: apply(sub, body[i]["args"]),
-//                 arity: body[i]["arity"],
-//             }
-//             // console.log("Substituted literal:");
-//             // console.log(literal);
-//             let extended = false;
-//             for (const fact of facts) {
-//                 // console.log("literal/Fact:");
-//                 // console.log(literal);
-//                 // console.log(fact);
-//                 const unifier = unify(literal, fact);
-//                 // console.log("Unifier:");
-//                 // console.log(unifier);
-//                 if (unifier != undefined) {
-//                     const extension = extend(sub, unifier);
-//                     // console.log("Extension");
-//                     // debugger;
-//                     if (unifier != undefined && extension != undefined) {
-//                         toBePushed.push(extension);
-//                         extended = true;
-//                         if (!toBeRemoved.includes(sub)) {
-//                             toBeRemoved.push(sub);
-//                         }
-//                     }
-//                 }
-//             }
-//             if (!extended) {
-//                 toBeRemoved.push(sub);
-//             }
-//         }
-//         substitutions = removeAll(substitutions, toBeRemoved);
-//         substitutions.push(...toBePushed);
-//         if (substitutions.length === 0) {
-//             // console.log("Zero length");
-//             return [];
-//         }
-//     }
-//     // console.log("subs:");
-//     // console.log(substitutions);
-//     return {
-//         "subs": substitutions,
-//         "propositions": propositionalLiterals,
-//     };
-// }
-
 function extendByFacts(literal, facts) {
     "use strict";
     const subs = [];
@@ -345,22 +262,6 @@ function applyToRule(sub, rule) {
     return subRule;
 }
 
-function filterBody(body) {
-    props = [];
-    fols = [];
-    for (let i=0; i<body.length; i++) {
-        if (body[i].arity === 0) {
-            props.push(body[i]);
-        } else {
-            fols.push(body[i]);
-        }
-    }
-    return {
-        propositions: props,
-        fols: fols,
-    };
-}
-
 function getPriorities(kb) { // Linear order induced priorities.
     priorities = {};
     for (let i=0; i<kb.length; i++) {
@@ -370,34 +271,52 @@ function getPriorities(kb) { // Linear order induced priorities.
     return priorities;
 }
 
-function updateGraph(newLiteralString, newLiteralRule, oldLiteralString, graph, priorities) {
-    const toBeRemoved = [];
-    console.log(priorities);
-    for (const rule of graph[oldLiteralString]) { // rule here is already stringified!
-        // console.log(rule);
-        // console.log(ruleToString(newLiteralRule));
-        if (priorities[rule] > priorities[ruleToString(newLiteralRule)]) {
-            toBeRemoved.push(rule);
-        }
+/* Test case that fails!
+@KnowledgeBase
+R1 :: f(X), h(Y) implies z(X);
+R2 :: g(X) implies f(X);
+R3 :: h(X) implies -f(X);
+
+Context: g(b); h(b);
+*/
+
+function updateGraph(inferredHead, newRule, graph, facts, priorities) { //TODO You may need to store the substitution alongside each rule, in case one needs to count how many time a rule has been triggered or so.
+    const oppositeHead = {}
+    for (const key of Object.keys(inferredHead)) {
+        oppositeHead[key] = inferredHead[key];
     }
-        // console.log(toBeRemoved);
-        // debugger;
-    for (let i=0; i<graph[oldLiteralString].length; i++) {
-        if (toBeRemoved.includes(graph[oldLiteralString][i])) {
-            graph[oldLiteralString].splice(i, 1);
-            i--;
+    oppositeHead["sign"] = !oppositeHead["sign"];
+    let inferred = false;
+    if (deepIncludes(inferredHead, facts)) {
+        if (!deepIncludes(newRule, graph[literalToString(inferredHead)])) {
+            graph[literalToString(inferredHead)].push(newRule);
+            inferred = true;
         }
-    }
-    let isPrior = false;
-    if (graph[oldLiteralString].length === 0) {
-        graph[newLiteralString] = [ruleToString(newLiteralRule)];
-        isPrior = true;
-        delete graph[oldLiteralString];
-        // console.log(graph);
+    } else if (deepIncludes(oppositeHead, facts)) {
+        const toBeRemoved = [];
+        for (const rule of graph[literalToString(oppositeHead)]) {
+            if (priorities[ruleToString(rule)] > priorities[ruleToString(newRule)]) {
+                toBeRemoved.push(rule);
+                inferred = true;
+            }
+        }
+        if (graph[literalToString(oppositeHead)].length === toBeRemoved.length) {
+            delete graph[literalToString(oppositeHead)];
+            graph[literalToString(inferredHead)] = [newRule];
+            facts.push(inferredHead);
+            facts = facts.splice(facts.indexOf(oppositeHead), 1);
+        } else {
+            graph[literalToString(oppositeHead)] = removeAll(graph[literalToString(oppositeHead)], toBeRemoved);
+        }
+    } else {
+        facts.push(inferredHead);
+        graph[literalToString(inferredHead)] = [newRule];
+        inferred = true;
     }
     return {
         graph: graph,
-        isPrior: isPrior,
+        facts: facts,
+        inferred: inferred,
     };
 }
 
@@ -417,6 +336,7 @@ function forwardChaining(kbObject, context) { //FIXME Huge inconsistency with DO
             const rule = kb[i];
             // FIXME You have to fix the relational version in the same manner as the propositional!
             const subs = getSubstitutions(rule["body"], facts, code); // FIXME Not computing all substitutions --- actually none for: @KnowledgeBase
+            // console.log(subs);
             for (let i=0; i<subs.length; i++) {
                 const sub = subs[i];
                 // console.log(sub);
@@ -424,40 +344,13 @@ function forwardChaining(kbObject, context) { //FIXME Huge inconsistency with DO
                 // console.log("Rule head:");
                 // console.log(rule["head"]);
                 const inferredHead = applyToLiteral(sub, rule["head"]);
-                // console.log("Facts:");
-                // console.log(facts);
-                // console.log(inferredHead);
-                const literalString = literalToString(inferredHead);
-                if (Object.keys(graph).includes(literalString)) {
-                    if (!graph[literalString].includes(ruleToString(applyToRule(sub, rule)))) {
-                        graph[literalString].push(ruleToString(applyToRule(sub, rule)));
-                    }
-                } else {
-                    graph[literalString] = [ruleToString(applyToRule(sub, rule))];
+                const updatedGraph = updateGraph(inferredHead, rule, graph, facts, priorities);
+                graph = updatedGraph["graph"];
+                facts = updatedGraph["facts"];
+                if (!inferred) {
+                    inferred = updatedGraph["inferred"];
                 }
-                if (!deepIncludes(inferredHead, facts)) { // Something's wrong regarding negation handling --- it is being ignored for some reason.
-                    facts.push(inferredHead);
-                    // console.log("Head:");
-                    // console.log(inferredHead);
-                    inferred = true;
-                }
-                const oppositeHead = {}
-                for (const key of Object.keys(inferredHead)) {
-                    oppositeHead[key] = inferredHead[key];
-                }
-                oppositeHead["sign"] = !oppositeHead["sign"];
-                console.log(oppositeHead);
-                console.log(facts);
-                debugger;
-                if (deepIncludes(oppositeHead, facts)) {
-                    console.log("Here");
-                    const updatedGraph = updateGraph(literalToString(inferredHead), rule, literalToString(oppositeHead), graph, priorities);
-                    console.log(updatedGraph);
-                    graph = updatedGraph["graph"];
-                    if (updatedGraph["isPrior"]) {
-                        facts = parseListOfLiterals(Object.keys(graph));
-                    }
-                }
+                // console.log(graph);
             }
         }
         // i++;

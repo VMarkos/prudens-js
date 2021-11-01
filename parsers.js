@@ -469,7 +469,7 @@ function graphToString(graph) {
         // console.log(key);
         graphString += key + ": [";
         for (let i=0; i<graph[key].length; i++) {
-            graphString += graph[key][i];
+            graphString += ruleToString(graph[key][i]);
             if (i < graph[key].length - 1) {
                 graphString += " ";
             }
