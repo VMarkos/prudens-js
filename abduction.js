@@ -116,6 +116,47 @@ function propositionalAbduction(kb, context, finalTarget) {
     return undefined;
 }
 
+// TODO for any literal/propositional symbol that is not inlcuded in a proof, generate all versions with *unobserved* or -literal in them (os simply agree that they are silently implied).
+
+/*
+Instead of simply checking whether a predicate is included in facts, you generate any valid substitutions from all facts + rule's head (which is grounded) and then check which of these
+facts are included in facts. These not included are pushed as targets and any not grounded variables are muted.
+
+MAYBE extend unify(x, y) so as to unify variables as well? --- what implications will this have in deduction?
+
+***
+kb: R :: f(X), g(Y) implies z(X);
+target: z(a);
+context: empty;
+
+Abductive proofs: {f(a); g(_)} for any value of _. So, returning _ will imply that this argument may be instantiated freely, in any way the user wants.
+***
+*/
+
+function relationalAbduction(kb, context, finalTarget) {
+    const targets = [finalTarget];
+    const proofs = [];
+    let target;
+    const visited = [finalTarget];
+    while (targets.length > 0) {
+        target = targets.shift();
+        let hasRule = false;
+        for (const rule of kb) {
+            if (rule["head"]["name"] !== target["name"] || rule["head"]["sign"] !== target["sign"]) {
+                continue;
+            }
+            hasRule = true;
+            for (const literal of rule["body"]) {
+                const instance = applyToLiteral(unify(literal, rule["head"]), literal);
+                if (!deepIncludes(literal, context) && !deepIncludes(literal, visited)) {
+                    targets.push(literal);
+                    visited.push(literal);
+                }
+            }
+        }
+    }
+}
+
 /*
 Iteratively remove an element from missing facts and if target is inferred, then remove another one. Repeat until target is not inferred from a set of missing facts.
 */
