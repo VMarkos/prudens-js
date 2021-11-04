@@ -116,7 +116,50 @@ function propositionalAbduction(kb, context, finalTarget) {
     return undefined;
 }
 
-// TODO for any literal/propositional symbol that is not inlcuded in a proof, generate all versions with *unobserved* or -literal in them (os simply agree that they are silently implied).
+function extendProofs(proofs, abducibles) {
+    const extendedProofs = [];
+    for (const proof of proofs) {
+        for (const abducible of abducibles) {
+            const negatedAbducible = {};
+            for (const key of Object.keys(abducible)) {
+                negatedAbducible = abducible[key];
+            }
+            negatedAbducible["sign"] = !negatedAbducible["sign"];
+            if (!deepIncludes(abducible, proof) && !deepIncludes(negatedAbducible, proof)) {
+                // Add a new proof here (or so).
+                // Well, not exactly...
+            }
+        }
+    }
+}
+
+/*
+Given an abductive proof and all abducibles you need to check with all possible combinations of negations of abducibles that are not present in the proof whether you can still infer
+your target.
+
+Proof extension algorithm:
+0. Initialize toBePopped = abducibles and frontier = proofs
+1. For each proof in proofs:
+    a. While new proofs are generated do:
+        A. Pop a proof from frontier.
+            1. Try all literals in toBePopped and for each one that leads to a successful proof, add the emerging proof to frontier and for each one that fails, remove it from toBePopped.
+*/
+
+function computeAbducibles(kb) {
+    const abducibles = [];
+    for (const rule of kb) {
+        for (const literal of rule["body"]) {
+            for (const otherRule of kb) {
+                if (deepEquals(otherRule["head"], literal) && !deepIncludes(literal, abducibles)) {
+                    abducibles.push(literal);
+                }
+            }
+        }
+    }
+    return abducibles;
+}
+
+// TODO for any literal/propositional symbol that is not inlcuded in a proof, generate all versions with *unobserved* or -literal in them (or simply agree that they are silently implied).
 
 /*
 Instead of simply checking whether a predicate is included in facts, you generate any valid substitutions from all facts + rule's head (which is grounded) and then check which of these
@@ -161,14 +204,15 @@ function relationalAbduction(kb, context, finalTarget) {
 Iteratively remove an element from missing facts and if target is inferred, then remove another one. Repeat until target is not inferred from a set of missing facts.
 */
 
-function prioritizedPropositionalAbduction(kb, context, finalTarget) { //FIXME Something went wrong when returning back to JSONObjects from strings.
+function prioritizedPropositionalAbduction(kbObject, context, finalTarget) { //FIXME Something went wrong when returning back to JSONObjects from strings.
+    const kb = kbObject["kb"];
     const missingFacts = propositionalAbduction(kb, context, finalTarget);
     // console.log(missingFacts);
     // debugger; 
     const toBeRemoved = [[]]; // Stack --- DFS
     // console.log(toBeRemoved);
     // debugger;
-    const successfulProofs = [];
+    let successfulProofs = [];
     while (toBeRemoved.length > 0) {
         const next = toBeRemoved.pop();
         const candidateProof = [];
@@ -181,13 +225,16 @@ function prioritizedPropositionalAbduction(kb, context, finalTarget) { //FIXME S
         allFacts.push(...candidateProof);
         // console.log(allFacts);
         // debugger;
-        graph = forwardChaining(kb, allFacts);
-        // console.log("Targets");
-        // console.log(graph["facts"]);
+        graph = forwardChaining(kbObject, allFacts);
+        console.log("Targets");
+        console.log(graph["facts"]);
         // console.log(finalTarget);
         // debugger;
-        if (deepIncludes(finalTarget, graph["facts"])) {
-            // console.log("pass");
+        if (deepIncludes(finalTarget, graph["facts"]) && !containsSubsets(successfulProofs, candidateProof)) {
+            console.log("pass");
+            if (containsSupersets(successfulProofs, candidateProof)) {
+                successfulProofs = removeSupersets(successfulProofs, candidateProof);
+            }
             successfulProofs.push(candidateProof);
             for (let i=0; i<missingFacts.length; i++) {
                 if (!next.includes(i)) {

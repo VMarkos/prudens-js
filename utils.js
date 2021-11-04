@@ -30,7 +30,7 @@ function abduce() {
     if (targetsObject["type"] === "error") {
         return "ERROR: " + targetsObject["name"] + ":\n" + targetsObject["message"];
     }
-    const output = prioritizedPropositionalAbduction(kbObject["kb"], contextObject["context"], targetsObject["targets"][0]); // TODO This version of abduction handles only one target --- a simple loop could fix this.
+    const output = prioritizedPropositionalAbduction(kbObject, contextObject["context"], targetsObject["targets"][0]); // TODO This version of abduction handles only one target --- a simple loop could fix this.
     // console.log(output);
     const outputString = "";
     if (warnings.length > 0) {
