@@ -145,6 +145,59 @@ Proof extension algorithm:
             1. Try all literals in toBePopped and for each one that leads to a successful proof, add the emerging proof to frontier and for each one that fails, remove it from toBePopped.
 */
 
+/*
+Consideration about abductive proofs:
+Consider the following KB:
+@KnowledgeBase
+R1 :: a implies z;
+R4 :: -b implies -a;
+// R2 :: b implies a;
+R3 :: c, d implies a;
+
+Also, let A = {b, c, d, -b} be the set of all abducibles.
+
+In the above setting, [c; d; !b] is an abductive proof, while [c; d; -b;] is not since it triggers R4, which blocks a. Also, A is not conflict-free, so you have to distinguish between
+which predicates you may or may not introduce in a possible extension of [c; d;] --- which is a minimal priority-blind abductive proof. Instead of the above, you may consider a 
+DFS/backtracking search for all worth proofs. Namely:
+
+0. Given kb, context and target, initialize a list, targets = [target];
+Generate the inference graph given kb and all abducibles.
+Starting from the target, walk backwards respecting priorities (easier said than done).
+*/
+
+/*
+Heuristic approach:
+Construct the inference graph starting from all abducibles and then search for the most fitting abductive proof e.g. using A*. Actually, it is not the inference graph on which search is
+conducted, but a graph where each node is an abductive proof and each vertex connects proofs to targets (?).
+
+Steps: determine a metric that estimates how "good" a proof is, given some observations, O. Let A be the set of all abducibles and let O be some observed facts and KB be some knowledge
+base. Then, a good proof is one that can prove O given kb (hard constraint), while, at the same time is minimal (small size) as well as short (Occam's razor?). A typical 
+approach would be as follows:
+
+Algorithm:
+Generate the Inference Graph of all possible inferences given KB and A.
+Starting from target, find all rules that lead to it and rank them according to their head's distance from the abducibles (?)
+Find any body literals that are not known and recursively repeat the above until a proof has been found.
+
+Other algorithm, based on a game theoretic conception of abduction:
+1. Given a target, find all rules that lead to it or its negation.
+2. Then what?
+
+Brainstorming:
+1. You have an inference graph and want, starting from a target literal, find all abductive proofs. Actually, you have the following situation:
+    a. For any non-conflicting rule that agrees, you want (recursively), all of their body literals to be included in the proof/be inferred if they are not abducible.
+    b. For any conflicting rule of higher priority than some certain non-conflicting rule r, what we need is at least one of its body literals not to be inferred in some way --- either
+       unobserved or not inferred.
+    c. So, for any non-conflicting rule, r, and for any unobserved body literal of any higher priority rule we have another path of search --- corresponding to triggering r while not 
+       triggering any higher priority conflicting rule in some way (exponentially large).
+    d. Elaborating on this: You have two lists
+        A. One containing all undesired combinations of literals - which is like a tree of the form (-a or -b or -c) and (-d or -e or -f) and ... while each -a may itself be an expression
+           of this form --- since it may well be inferred by some class of rules (at this point, you need to consider counter-arguments so you may have a more complex expression).
+        B. One containing all desired combinations or whatnot...
+2. Heuristic search is not useless in the sense that it may speed up the computation of some certain proof, hopefully the most reasonable one. So, as a heuristic, e.g., in an A* search, 
+   one may use any fitness heuristic (pffff...)
+*/
+
 function computeAbducibles(kb) {
     const abducibles = [];
     for (const rule of kb) {

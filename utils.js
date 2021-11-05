@@ -54,7 +54,7 @@ function deduce() {
     if (contextObject["type"] === "error") {
         return "ERROR: " + contextObject["name"] + ":\n" + contextObject["message"];
     }
-    // console.log(kbObject);
+    console.log(kbObject);
     // console.log(contextObject); // TODO fix some context parsing issue (in propositional cases it includes the semicolon into the name of the prop)
     const output = forwardChaining(kbObject, contextObject["context"]);
     const inferences = output["facts"];

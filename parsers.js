@@ -1,5 +1,7 @@
 // TODO add to all items a 'string' field which will correspond to its string representation, so as to avoid all these conversion functions (is this useful?)
 
+// FIXME Handle the case of a list argument when SPLITING the corresponding argument string in a predicate!
+
 function contextParser() {
     const context = document.getElementById(tab + "-context").value;
     const contextList = parseContext(context);
@@ -36,7 +38,7 @@ function parseContext(context) {
         }
     }
     const spacingRe = /(\t|\r|\n|\v|\f|\s)*/;
-    const varNameRe = /(([a-z0-9]\w*)|(\d+[.]?\d*))/;
+    const varNameRe = /(([a-z0-9]\w*)|(\d+[.]?\d*))|(\[(\s*\w+,\s*)*\s*\w+\s*\])/;
     const predicateNameRe = /-?[a-z]\w*/;
     const casualPredicateRe = RegExp(predicateNameRe.source + String.raw`\((\s*` + varNameRe.source + String.raw`\s*,)*\s*` + varNameRe.source + String.raw`\s*\)`);
     const propositionalPredicateRe = /-?[a-z]\w*/;
@@ -96,6 +98,11 @@ function getLiteralArguments(argumentsString) {
         const argument = argumentsArray[i].trim();
         const isVar = /[A-Z_]/;
         const isAssigned = !isVar.test(argument.charAt(0)) || /[^\w]/.test(argument);
+        const isList = /\[(\s*\w+,\s*)*\s*\w+\s*\]/;
+        let list = undefined;
+        if (isList.test(argument)) {
+            list = argument.split(/(?:,\s*)/);
+        }
         if (isAssigned) {
             name = undefined;
             value = argument;
@@ -113,6 +120,8 @@ function getLiteralArguments(argumentsString) {
             isAssigned: isAssigned,
             value: value,
             muted: muted,
+            isList: isList,
+            list: list,
         });
     }
     return args;
@@ -275,7 +284,7 @@ function parseKB(kbAll) {
     const predicateNameRe = /(-?\??[a-z]\w*)/; // CHECKED!
     const mathPredicateRe = /\s*((-?\?=)|(-?\?<))\(.+,.+\)\s*/; // CHECKED!
     const headNameRe = /((-?!?[a-z]\w*))/; // CHECKED!
-    const varNameRe = /(([a-zA-z]\w*)|(\d+[.]?\d*)|_)/; // CHECKED!
+    const varNameRe = /(([a-zA-z]\w*)|(\d+[.]?\d*)|_|(\[(\s*\w+,\s*)*\s*\w+\s*\]))/; // CHECKED!
     const ruleName = RegExp(spacingRe.source + String.raw`\w+`); // CHECKED!
     const casualPredicateRe = RegExp(predicateNameRe.source + String.raw`\((\s*` + varNameRe.source + String.raw`\s*,)*\s*` + varNameRe.source + String.raw`\s*\)`); // CHECKED!
     const propositionalPredicateRe = /(-?[a-z]\w*)/; // CHECKED!
