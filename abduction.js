@@ -310,47 +310,88 @@ greedRelationalAbduction(kb, context, target):
     return proofs;
 */
 
-function greedyRelationalAbduction(kb, context, target, predicateValues) {
+function greedyRelationalAbduction(kbObject, context, target, predicateValues) {
+    const kb = kbObject["kb"];
     const abducibles = getAllAbducibles(predicateValues);
-    const proofStack = [[]];
+    const initProof = [];
+    for (const abducible of abducibles) {
+        initProof[literalToString(abducible)] = 0; // Again, 0 = unobserved, 1 = true, 2 = false;
+    }
+    const proofStack = [initProof];
     const proofs = [];
     while (proofStack.length > 0) {
-        // console.log(proofStack);
-        // debugger;
         const proof = proofStack.pop();
-        // console.log(abducibles); // FIXME literal undefined...
-        const literal = abducibles[proof.length];
-        const instances = generateInstances(literal["name"], predicateValues[literal["name"]]);
         const allFacts = extendContextByRelationalProof(context, proof);
-        const inferences = forwardChaining(kb, allFacts);
-        if (deepIncludes(target, inferences["facts"])) {
+        const inferences = forwardChaining(kbObject, allFacts);
+        // console.log(target);
+        // console.log(inferences);
+        // debugger;
+        if (deepIncludes(target, inferences["facts"])) { // You are here...
+            // console.log("Proved?");
+            // console.log(proof);
             proofs.push(proof);
             continue;
         }
-        for (const instance of instances) {
-            let positiveInstance = {};
-            let negativeInstance = {};
-            for (const key of Object.keys(instance)) {
-                positiveInstance[key] = instance[key];
-                negativeInstance = instance[key];
+        for (const abducible of abducibles) {
+            const stringAbducible = literalToString(abducible);
+            if (proof[stringAbducible] === 0) {
+                const positiveProof = {};
+                const negativeProof = {};
+                for (const key of Object.keys(proof)) {
+                    positiveProof[key] = proof[key];
+                    negativeProof[key] = proof[key];
+                }
+                positiveProof[stringAbducible] = 1;
+                negativeProof[stringAbducible] = 2;
+                proofStack.push(positiveProof);
+                proofStack.push(negativeProof);
+                break;
             }
-            positiveInstance["sign"] = true;
-            negativeInstance["sign"] = false;
-            const positiveProof = [...proof];
-            const negativeProof = [...proof];
-            positiveProof.push(positiveInstance);
-            negativeProof.push(negativeInstance);
-            proofStack.push(positiveProof);
-            proofStack.push(negativeProof);
         }
     }
     return proofs;
+    // SINCE you have propositionalised everything, you may follow the same logic as above (?)
+    // while (proofStack.length > 0) {
+    //     // console.log(proofStack);
+    //     // debugger;
+    //     const proof = proofStack.pop();
+    //     // console.log(abducibles); // FIXME literal undefined...
+    //     const literal = abducibles[proof.length];
+    //     // console.log(predicateValues);
+    //     // console.log(literal);
+    //     const instances = generateInstances(literal["name"], predicateValues);
+    //     const allFacts = extendContextByRelationalProof(context, proof);
+    //     const inferences = forwardChaining(kb, allFacts);
+    //     if (deepIncludes(target, inferences["facts"])) {
+    //         proofs.push(proof);
+    //         continue;
+    //     }
+    //     for (const instance of instances) {
+    //         let positiveInstance = {};
+    //         let negativeInstance = {};
+    //         for (const key of Object.keys(instance)) {
+    //             positiveInstance[key] = instance[key];
+    //             negativeInstance = instance[key];
+    //         }
+    //         positiveInstance["sign"] = true;
+    //         negativeInstance["sign"] = false;
+    //         const positiveProof = [...proof];
+    //         const negativeProof = [...proof];
+    //         positiveProof.push(positiveInstance);
+    //         negativeProof.push(negativeInstance);
+    //         proofStack.push(positiveProof);
+    //         proofStack.push(negativeProof);
+    //     }
+    // }
+    // return proofs;
 }
 
 function extendContextByRelationalProof(context, proof) {
     const allFacts = [...context];
-    for (const literal of proof) {
-        if (!deepIncludes(literal, allFacts)) {
+    for (const key of Object.keys(proof)) {
+        const literal = parseLiteral(key);
+        if (proof[key] !== 0 && !deepIncludes(literal, allFacts)) {
+            literal["sign"] = proof[key] === 1;
             allFacts.push(literal);
         }
     }
@@ -359,11 +400,23 @@ function extendContextByRelationalProof(context, proof) {
 
 function getAllAbducibles(predicateValues) {
     const abducibles = [];
-    console.log("PredVal");
-    console.log(predicateValues); // FIXME You are passing predvals while you need assignments!
+    // console.log("PredVal");
+    // console.log(predicateValues); // FIXME You are passing predvals while you need assignments!
     for (const key of Object.keys(predicateValues)) {
         instances = generateInstances(key, predicateValues);
-        abducibles.push(...instances);
+        for (const instance of instances) {
+            const negativeInstance = {};
+            const positiveInstance = {};
+            for (const key of Object.keys(instance)) {
+                positiveInstance[key] = instance[key];
+                negativeInstance[key] = instance[key];
+            }
+            positiveInstance["sign"] = true;
+            negativeInstance["sign"] = false;
+            if (!deepIncludes(positiveInstance, abducibles) && !deepIncludes(negativeInstance, abducibles)) {
+                abducibles.push(positiveInstance);
+            }
+        }
         /* FIXME Points to check:
             1. Whether this works.
             2. Possible duplicates.
@@ -375,7 +428,9 @@ function getAllAbducibles(predicateValues) {
 
 function generateInstances(literalName, predicateValues) { // FIXME You may merge this method with the one below...
     const instances = [];
-    const assignments = generateAssignments(predicateValues);
+    // console.log(literalName);
+    // console.log(predicateValues);
+    const assignments = generateAssignments(predicateValues[literalName]);
     for (const assignment of assignments) {
         instances.push(parseLiteral(literalName + "(" + assignmentToString(assignment) + ")"));
     }
@@ -396,7 +451,8 @@ function assignmentToString(assignment) {
 
 function generateAssignments(predicateValues) {
     const assignments = [];
-    const assignmentsStack = [...predicateValues[0]];
+    console.log(predicateValues);
+    const assignmentsStack = [...Object.values(predicateValues)[0]];
     while (assignmentsStack.length > 0) {
         const assignment = assignmentsStack.pop();
         if (assignment.length === predicateValues.length) {
