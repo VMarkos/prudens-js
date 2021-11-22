@@ -318,9 +318,9 @@ function greedyRelationalAbduction(kb, context, target, predicateValues) {
         // console.log(proofStack);
         // debugger;
         const proof = proofStack.pop();
-        console.log(abducibles); // FIXME literal undefined...
+        // console.log(abducibles); // FIXME literal undefined...
         const literal = abducibles[proof.length];
-        const instances = generateInstances(literal, predicateValues[literal["name"]]);
+        const instances = generateInstances(literal["name"], predicateValues[literal["name"]]);
         const allFacts = extendContextByRelationalProof(context, proof);
         const inferences = forwardChaining(kb, allFacts);
         if (deepIncludes(target, inferences["facts"])) {
@@ -359,17 +359,25 @@ function extendContextByRelationalProof(context, proof) {
 
 function getAllAbducibles(predicateValues) {
     const abducibles = [];
+    console.log("PredVal");
+    console.log(predicateValues); // FIXME You are passing predvals while you need assignments!
     for (const key of Object.keys(predicateValues)) {
-        abducibles.push(parseLiteral(key));
+        instances = generateInstances(key, predicateValues);
+        abducibles.push(...instances);
+        /* FIXME Points to check:
+            1. Whether this works.
+            2. Possible duplicates.
+            3. Change the logic to a 0-1-2 logic as in the propositional case.
+        */
     }
     return abducibles;
 }
 
-function generateInstances(literal, predicateValues) { // FIXME You may merge this method with the one below...
+function generateInstances(literalName, predicateValues) { // FIXME You may merge this method with the one below...
     const instances = [];
     const assignments = generateAssignments(predicateValues);
     for (const assignment of assignments) {
-        instances.push(parseLiteral(literal["name"] + "(" + assignmentToString(assignment) + ")"));
+        instances.push(parseLiteral(literalName + "(" + assignmentToString(assignment) + ")"));
     }
     return instances;
 }
