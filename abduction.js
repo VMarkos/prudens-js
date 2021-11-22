@@ -85,6 +85,77 @@ any proofs you have.
 //     }
 // }
 
+/*
+GreedyPropositionalAbduction(kb, target):
+    Generate all abducibles;
+    Initialize everything to unobserved;
+    Let initProof = all unobserved;
+    proofStack = stack containing initProof;
+    proofs = [];
+    While proofStack.length > 0:
+        proof = proofStack.pop();
+        if proof + kb implies target:
+            proofs.push(proof);
+            continue;
+        for each a in proof that is unobserved:
+            proofStack.push(proof + [a]);
+            proofStack.push(proof + [-a]);
+    return proofs;
+*/
+
+function greedyPropositionalAbduction(kbObject, context, target) {
+    const kb = kbObject["kb"];
+    const abducibles = computeAbducibles(kb);
+    // console.log(abducibles);
+    const initProof = {};
+    for (const abducible of abducibles) {
+        initProof[literalToString(abducible)] = 0; // 0 = unobserved, 1 = true, 2 = false;
+    }
+    const proofStack = [initProof];
+    const proofs = [];
+    while (proofStack.length > 0) {
+        const proof = proofStack.pop();
+        const allFacts = extendContextByProof(context, proof);
+        const inferences = forwardChaining(kbObject, allFacts);
+        // console.log(target);
+        // console.log(inferences);
+        if (deepIncludes(target, inferences["facts"])) { // You are here...
+            // console.log("Proved?");
+            // console.log(proof);
+            proofs.push(proof);
+            continue;
+        }
+        for (const abducible of abducibles) {
+            const stringAbducible = literalToString(abducible);
+            if (proof[stringAbducible] === 0) {
+                const positiveProof = {};
+                const negativeProof = {};
+                for (const key of Object.keys(proof)) {
+                    positiveProof[key] = proof[key];
+                    negativeProof[key] = proof[key];
+                }
+                positiveProof[stringAbducible] = 1;
+                negativeProof[stringAbducible] = 2;
+                proofStack.push(positiveProof);
+                proofStack.push(negativeProof);
+            }
+        }
+    }
+    return proofs;
+}
+
+function extendContextByProof(context, proof) {
+    const allFacts = [...context];
+    for (const key of Object.keys(proof)) {
+        const literal = parseLiteral(key);
+        if (proof[key] !== 0 && !deepIncludes(literal, allFacts)) {
+            literal["sign"] = proof[key] === 1;
+            allFacts.push(literal);
+        }
+    }
+    return allFacts;
+}
+
 function propositionalAbduction(kb, context, finalTarget) {
     const targets = [finalTarget];
     const proofs = [];
@@ -114,23 +185,6 @@ function propositionalAbduction(kb, context, finalTarget) {
         return proofs;
     }
     return undefined;
-}
-
-function extendProofs(proofs, abducibles) {
-    const extendedProofs = [];
-    for (const proof of proofs) {
-        for (const abducible of abducibles) {
-            const negatedAbducible = {};
-            for (const key of Object.keys(abducible)) {
-                negatedAbducible = abducible[key];
-            }
-            negatedAbducible["sign"] = !negatedAbducible["sign"];
-            if (!deepIncludes(abducible, proof) && !deepIncludes(negatedAbducible, proof)) {
-                // Add a new proof here (or so).
-                // Well, not exactly...
-            }
-        }
-    }
 }
 
 /*
@@ -202,9 +256,21 @@ function computeAbducibles(kb) {
     const abducibles = [];
     for (const rule of kb) {
         for (const literal of rule["body"]) {
+            let isHead = false;
             for (const otherRule of kb) {
-                if (deepEquals(otherRule["head"], literal) && !deepIncludes(literal, abducibles)) {
-                    abducibles.push(literal);
+                if (deepEquals(otherRule["head"], literal)) {
+                    isHead = true;
+                    break;
+                }
+            }
+            if (!isHead) {
+                const positiveLiteral = {};
+                for (const key of Object.keys(literal)) {
+                    positiveLiteral[key] = literal[key];
+                }
+                positiveLiteral["sign"] = true;
+                if (!deepIncludes(positiveLiteral, abducibles)) {
+                    abducibles.push(positiveLiteral);
                 }
             }
         }
@@ -212,52 +278,139 @@ function computeAbducibles(kb) {
     return abducibles;
 }
 
-// TODO for any literal/propositional symbol that is not inlcuded in a proof, generate all versions with *unobserved* or -literal in them (or simply agree that they are silently implied).
-
 /*
-Instead of simply checking whether a predicate is included in facts, you generate any valid substitutions from all facts + rule's head (which is grounded) and then check which of these
-facts are included in facts. These not included are pushed as targets and any not grounded variables are muted.
+1. Ask for the users to determine the values of each predicate's argument providing a json of the form:
+{
+    pred1: [
+        [val01, val02, ...],
+        [val11, val12, ...],
+        ...,
+    ],
+    pred2: [...],
+    ...
+}
+2. Missing abducible handling?
+    a. Backpropagate variables --- actually, propagate variables, which means that you need to fix deduction so as to take into account ungrounded contexts as well.
 
-MAYBE extend unify(x, y) so as to unify variables as well? --- what implications will this have in deduction?
-
-***
-kb: R :: f(X), g(Y) implies z(X);
-target: z(a);
-context: empty;
-
-Abductive proofs: {f(a); g(_)} for any value of _. So, returning _ will imply that this argument may be instantiated freely, in any way the user wants.
-***
+Assuming that there are no missing abducibles:
+greedRelationalAbduction(kb, context, target):
+    abducibles = getAllAbducibles(...);
+    unobservedStack = [];
+    proofStack = [[]];
+    proofs = [];
+    while proofStack.length > 0:
+        proof = proofStack.pop();
+        literal = abducibles[proof.length];
+        instances = generateInstances(literal, subs) --- subs are presumably stored somewhere...
+        for instance in instances:
+            if context + proof + kb infers target:
+                proofs.push(proof);
+            else:
+                proofStack.push([proof + positive, proof + negative]);
+    return proofs;
 */
 
-function relationalAbduction(kb, context, finalTarget) {
-    const targets = [finalTarget];
+function greedyRelationalAbduction(kb, context, target, predicateValues) {
+    const abducibles = getAllAbducibles(predicateValues);
+    const proofStack = [[]];
     const proofs = [];
-    let target;
-    const visited = [finalTarget];
-    while (targets.length > 0) {
-        target = targets.shift();
-        let hasRule = false;
-        for (const rule of kb) {
-            if (rule["head"]["name"] !== target["name"] || rule["head"]["sign"] !== target["sign"]) {
-                continue;
+    while (proofStack.length > 0) {
+        // console.log(proofStack);
+        // debugger;
+        const proof = proofStack.pop();
+        console.log(abducibles); // FIXME literal undefined...
+        const literal = abducibles[proof.length];
+        const instances = generateInstances(literal, predicateValues[literal["name"]]);
+        const allFacts = extendContextByRelationalProof(context, proof);
+        const inferences = forwardChaining(kb, allFacts);
+        if (deepIncludes(target, inferences["facts"])) {
+            proofs.push(proof);
+            continue;
+        }
+        for (const instance of instances) {
+            let positiveInstance = {};
+            let negativeInstance = {};
+            for (const key of Object.keys(instance)) {
+                positiveInstance[key] = instance[key];
+                negativeInstance = instance[key];
             }
-            hasRule = true;
-            for (const literal of rule["body"]) {
-                const instance = applyToLiteral(unify(literal, rule["head"]), literal);
-                if (!deepIncludes(literal, context) && !deepIncludes(literal, visited)) {
-                    targets.push(literal);
-                    visited.push(literal);
-                }
-            }
+            positiveInstance["sign"] = true;
+            negativeInstance["sign"] = false;
+            const positiveProof = [...proof];
+            const negativeProof = [...proof];
+            positiveProof.push(positiveInstance);
+            negativeProof.push(negativeInstance);
+            proofStack.push(positiveProof);
+            proofStack.push(negativeProof);
         }
     }
+    return proofs;
 }
 
-/*
-Iteratively remove an element from missing facts and if target is inferred, then remove another one. Repeat until target is not inferred from a set of missing facts.
-*/
+function extendContextByRelationalProof(context, proof) {
+    const allFacts = [...context];
+    for (const literal of proof) {
+        if (!deepIncludes(literal, allFacts)) {
+            allFacts.push(literal);
+        }
+    }
+    return allFacts;
+}
 
-function prioritizedPropositionalAbduction(kbObject, context, finalTarget) { //FIXME Something went wrong when returning back to JSONObjects from strings.
+function getAllAbducibles(predicateValues) {
+    const abducibles = [];
+    for (const key of Object.keys(predicateValues)) {
+        abducibles.push(parseLiteral(key));
+    }
+    return abducibles;
+}
+
+function generateInstances(literal, predicateValues) { // FIXME You may merge this method with the one below...
+    const instances = [];
+    const assignments = generateAssignments(predicateValues);
+    for (const assignment of assignments) {
+        instances.push(parseLiteral(literal["name"] + "(" + assignmentToString(assignment) + ")"));
+    }
+    return instances;
+}
+
+function assignmentToString(assignment) {
+    let assgnString = "";
+    for (let i=0; i<assignment.length; i++) {
+        if (i < assignment.length - 1) {
+            assgnString += assignment[i] + ", ";
+        } else {
+            assgnString += assignment[i];
+        }
+    }
+    return assgnString;
+}
+
+function generateAssignments(predicateValues) {
+    const assignments = [];
+    const assignmentsStack = [...predicateValues[0]];
+    while (assignmentsStack.length > 0) {
+        const assignment = assignmentsStack.pop();
+        if (assignment.length === predicateValues.length) {
+            assignments.push(assignment);
+            continue;
+        }
+        // console.log(predicateValues);
+        // console.log(assignment);
+        for (const value of predicateValues[assignment.length]) {
+            const tempCopy = [...assignment];
+            tempCopy.push(value);
+            assignmentsStack.push(tempCopy);
+            // console.log(assignmentsStack);
+            // debugger;
+        }
+    }
+    // console.log(assignments);
+    // debugger;
+    return assignments;
+}
+
+function prioritizedPropositionalAbduction(kbObject, context, finalTarget) {
     const kb = kbObject["kb"];
     const missingFacts = propositionalAbduction(kb, context, finalTarget);
     // console.log(missingFacts);
@@ -279,12 +432,12 @@ function prioritizedPropositionalAbduction(kbObject, context, finalTarget) { //F
         // console.log(allFacts);
         // debugger;
         graph = forwardChaining(kbObject, allFacts);
-        console.log("Targets");
-        console.log(graph["facts"]);
+        // console.log("Targets");
+        // console.log(graph["facts"]);
         // console.log(finalTarget);
         // debugger;
         if (deepIncludes(finalTarget, graph["facts"]) && !containsSubsets(successfulProofs, candidateProof)) {
-            console.log("pass");
+            // console.log("pass");
             if (containsSupersets(successfulProofs, candidateProof)) {
                 successfulProofs = removeSupersets(successfulProofs, candidateProof);
             }

@@ -30,7 +30,13 @@ function abduce() {
     if (targetsObject["type"] === "error") {
         return "ERROR: " + targetsObject["name"] + ":\n" + targetsObject["message"];
     }
-    const output = prioritizedPropositionalAbduction(kbObject, contextObject["context"], targetsObject["targets"][0]); // TODO This version of abduction handles only one target --- a simple loop could fix this.
+    const domainsObject = domainsParser();
+    if (domainsObject["type"] === "error") {
+        return "ERROR: " + domainsObject["name"] + ":\n" + domainsObject["message"];
+    }
+    // const output = greedyPropositionalAbduction(kbObject, contextObject["context"], targetsObject["targets"][0]); // TODO This version of abduction handles only one target --- a simple loop could fix this.
+    console.log(domainsObject);
+    const output = greedyRelationalAbduction(kbObject, contextObject["context"], targetsObject["targets"][0], domainsObject["predicates"]);
     // console.log(output);
     const outputString = "";
     if (warnings.length > 0) {
@@ -54,7 +60,7 @@ function deduce() {
     if (contextObject["type"] === "error") {
         return "ERROR: " + contextObject["name"] + ":\n" + contextObject["message"];
     }
-    console.log(kbObject);
+    // console.log(kbObject);
     // console.log(contextObject); // TODO fix some context parsing issue (in propositional cases it includes the semicolon into the name of the prop)
     const output = forwardChaining(kbObject, contextObject["context"]);
     const inferences = output["facts"];

@@ -1,6 +1,69 @@
 // TODO add to all items a 'string' field which will correspond to its string representation, so as to avoid all these conversion functions (is this useful?)
 
-// FIXME Handle the case of a list argument when SPLITING the corresponding argument string in a predicate!
+/*
+Domains Syntax Exm:
+pred1: {
+    [\w+, \w+, ...],
+    [\w+, \w+, ...],
+}
+pred2: {
+    [\w+, \w+, ...],
+    [\w+, \w+, ...],
+}
+
+@KnowledgeBase
+R :: f(X, Y), g(X, Z) implies h(X);
+
+Target: h(a);
+
+Domains:
+f: {[a, b, c], [a, b]}
+g: {[a, b,c, d ], [a, c,d ]}
+*/
+
+function domainsParser() {
+    const domains = document.getElementById(tab + "-domains").value;
+    return parseDomains(domains);
+}
+
+function parseDomains(domainsString) {
+    const syntaxCheck = /(\s*\w+\s*:\s*\{\s*(\[(\s*\w+\s*,)*\s*\s+\s*\]\s*,)*\[(\s*\w+\s*,)*\s*\s+\s*\]\s*\}\s*)*/;
+    if (!syntaxCheck.test(domainsString)) {
+        return {
+            type: "error",
+            name: "DomainSyntaxError",
+            message: "There is some syntax error in some of the declared predicate domain(s).",
+        };
+    }
+    const predicateDelim = /\s*}\s*/;
+    const predicateDomainsArray = domainsString.split(predicateDelim);
+    // console.log(predicateDomainsArray);
+    const predicates = {};
+    for (const predicateDomain of predicateDomainsArray) {
+        if (predicateDomain === "") {
+            continue;
+        }
+        const nameSplit = predicateDomain.trim().split(/\s*:\s*{\s*/);
+        // console.log(nameSplit);
+        predicates[nameSplit[0]] = parseValues(nameSplit[1]); // FIXME
+    }
+    // console.log(predicates);
+    return {
+        type: "output",
+        predicates: predicates,
+    };
+}
+
+function parseValues(values) {
+    const argDelim = /\s*(?<=\]\s*),\s*/;
+    const argumentValuesArray = values.split(argDelim);
+    console.log(argumentValuesArray);
+    const argumentValues = [];
+    for (const argValues of argumentValuesArray) {
+        argumentValues.push(argValues.substring(1,argValues.length - 1).trim().split(/\s*,\s*/));
+    }
+    return argumentValues;
+}
 
 function contextParser() {
     const context = document.getElementById(tab + "-context").value;
@@ -89,7 +152,9 @@ function parseTarget(targets) {
 
 function getLiteralArguments(argumentsString) {
     "use strict";
-    const argumentsArray = argumentsString.split(",");
+    const splitDelim = /(?<!(?:\[(?:\s*\w+\s*,)*\s*\w+\s*))(?:,)/;
+    const argumentsArray = argumentsString.split(splitDelim);
+    // console.log(argumentsArray);
     const args = [];
     for (let i=0; i<argumentsArray.length; i++) {
         let name;
@@ -98,10 +163,12 @@ function getLiteralArguments(argumentsString) {
         const argument = argumentsArray[i].trim();
         const isVar = /[A-Z_]/;
         const isAssigned = !isVar.test(argument.charAt(0)) || /[^\w]/.test(argument);
-        const isList = /\[(\s*\w+,\s*)*\s*\w+\s*\]/;
+        const isList = /\[(\s*\w+\s*,\s*)*\s*\w+\s*\]/.test(argument);
         let list = undefined;
-        if (isList.test(argument)) {
-            list = argument.split(/(?:,\s*)/);
+        if (isList) {
+            list = argument.substring(1, argument.length - 1).split(/(?:\s*,\s*)/);
+            list[0] = list[0].trim();
+            list[list.length - 1] = list[list.length - 1].trim();
         }
         if (isAssigned) {
             name = undefined;
@@ -187,7 +254,7 @@ function parseLiteral(literal) {
         isJS: (name.charAt(0) === "?"),
         isEquality: (name === "?="),
         isInequality: (name === "?<"),
-        isAction: false, // FIXME Actions!
+        isAction: (name.charAt(0) === "!"),
         args: args,
         arity: arity,
     }
@@ -284,7 +351,11 @@ function parseKB(kbAll) {
     const predicateNameRe = /(-?\??[a-z]\w*)/; // CHECKED!
     const mathPredicateRe = /\s*((-?\?=)|(-?\?<))\(.+,.+\)\s*/; // CHECKED!
     const headNameRe = /((-?!?[a-z]\w*))/; // CHECKED!
-    const varNameRe = /(([a-zA-z]\w*)|(\d+[.]?\d*)|_|(\[(\s*\w+,\s*)*\s*\w+\s*\]))/; // CHECKED!
+    const simpleListRe = /(\[(\s*\w+,\s*)*\s*\w+\s*\])/; // Syntactically, you have allowed for a (grounded?) list to contain variables. // CHECKED!
+    const headTailListRe = RegExp(String.raw`(\[(\s*\w+\s*,)*\s*\w+\s*\|\s*(([A-Z_]\w*)|` + simpleListRe.source + String.raw`)\s*\])`); // CHECKED!
+    const listRe = RegExp(String.raw`(` + simpleListRe.source + String.raw`|` + headTailListRe.source + String.raw`)`); // CHECKED!
+    const varNameRe = RegExp(String.raw`(([a-zA-z]\w*)|(\d+[.]?\d*)|_|` + listRe.source + String.raw`)`); // CHECKED!
+    // const varNameRe = /(([a-zA-z]\w*)|(\d+[.]?\d*)|_|)/; // CHECKED!
     const ruleName = RegExp(spacingRe.source + String.raw`\w+`); // CHECKED!
     const casualPredicateRe = RegExp(predicateNameRe.source + String.raw`\((\s*` + varNameRe.source + String.raw`\s*,)*\s*` + varNameRe.source + String.raw`\s*\)`); // CHECKED!
     const propositionalPredicateRe = /(-?[a-z]\w*)/; // CHECKED!
@@ -294,7 +365,7 @@ function parseKB(kbAll) {
     const headRe = RegExp(String.raw`(` + casualHeadRe.source + String.raw`)|(` + propositionalHeadRe.source + String.raw`)`);
     const kbRe = RegExp(String.raw`(` + ruleName.source + String.raw`\s*::(\s*` + predicateRe.source + String.raw`\s*,)*\s*` + predicateRe.source + String.raw`\s+implies\s+` + headRe.source + String.raw`\s*;` + spacingRe.source + String.raw`)+`); // CHECKED!
     // const kbRe = /((\t|\r|\n|\v|\f|\s)*\w+\s*::(\s*((-?\??[a-z]\w*)|(\?=)|(\?<))\((\s*(([a-zA-z]\w*)|(\d+[.]?\d*)|_)\s*,)*\s*(([a-zA-z]\w*)|(\d+[.]?\d*)|_)\s*\)\s*,)*\s*((-?\??[a-z]\w*)|(\?=)|(\?<))\((\s*(([a-zA-z]\w*)|(\d+[.]?\d*)|_)\s*,)*\s*(([a-zA-z]\w*)|(\d+[.]?\d*)|_)\s*\)\s+implies\s+((-?!?[a-z]\w*))\((\s*(([a-zA-z]\w*)|(\d+[.]?\d*)|_)\s*,)*\s*(([a-zA-z]\w*)|(\d+[.]?\d*)|_)\s*\)\s*;(\t|\r|\n|\v|\f|\s)*)+/;
-    // console.log(kbRe); // TODO Update reasoning scripts to allow for propositional predicates!
+    // console.log(kbRe);
     if (!kbRe.test(kb)) {
         return {
             type: "error",
@@ -492,7 +563,22 @@ function graphToString(graph) {
 function abductiveProofsToString(proofs) {
     let proofString = "";
     for (const proof of proofs) {
-        proofString += "\n[" + contextToString(proof) + "]";
+        // proofString += "\n[" + contextToString(proof) + "]";
+        proofString += "\n" + proofToString(proof) + ";";
     }
     return proofString;
+}
+
+function proofToString(proof) {
+    let proofString = "[";
+    for (const key of Object.keys(proof)) {
+        if (proof[key] === 0) {
+            proofString += "!" + key + "; ";
+        } else if (proof[key] === 1) {
+            proofString += key + "; ";
+        } else {
+            proofString += "-" + key + "; ";
+        }
+    }
+    return proofString.substring(0, proofString.length - 1) + "]";
 }
