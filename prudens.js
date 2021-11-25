@@ -173,13 +173,18 @@ function apply(sub, args) {
 
 /*
 List unification cases:
-    1. Two unsplit lists unify if they contain the same elements.
+    1. Two unsplit lists unify if they contain the same elements at the very same positions.
     2. A split with an unsplit list unify if there is an assignment to the split one's variables that makes it equal to the unsplit one.
     3. Two split lists unify always trivially (?) or never (?).
 */
 
 function listUnification(list1, list2, unifier) {
-    
+    if (!list1["isSplit"] && !list2["isSplit"]) {
+        return undefined; // TODO Remember to catch this in unify(x, y).
+    }
+    if (!list1["isSplit"]) {
+        // TODO See above.
+    }
     return unifier;
 }
 

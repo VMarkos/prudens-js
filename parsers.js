@@ -68,7 +68,10 @@ function parseValues(values) {
 function contextParser() {
     const context = document.getElementById(tab + "-context").value;
     const contextList = parseContext(context);
-    console.log(contextList);
+    // console.log(contextList);
+    if (contextList["type"] === "error") {
+        return contextList;
+    }
     contextList["context"].push({
         name: "true",
         sign: true,
@@ -101,12 +104,12 @@ function parseContext(context) {
         }
     }
     const spacingRe = /(\t|\r|\n|\v|\f|\s)*/;
-    const varNameRe = /(([a-z0-9]\w*)|(\d+[.]?\d*))|(\[(\s*\w+,\s*)*\s*\w+\s*\])/;
+    const varNameRe = /(([a-z0-9]\w*)|(\d+[.]?\d*)|(\[(\s*\w+,\s*)*\s*\w+\s*\]))/;
     const predicateNameRe = /-?[a-z]\w*/;
     const casualPredicateRe = RegExp(predicateNameRe.source + String.raw`\((\s*` + varNameRe.source + String.raw`\s*,)*\s*` + varNameRe.source + String.raw`\s*\)`);
     const propositionalPredicateRe = /-?[a-z]\w*/;
     const predicateRe = RegExp(String.raw`((` + casualPredicateRe.source + String.raw`)|(` + propositionalPredicateRe.source + String.raw`))`);
-    const contextRE = RegExp(String.raw`(` + spacingRe.source + predicateRe.source + String.raw`\s*;\s*)+` + spacingRe.source); // FIXME There is some issue here!
+    const contextRE = RegExp(String.raw`(` + spacingRe.source + predicateRe.source + String.raw`\s*;\s*)+` + spacingRe.source);
     // const contextRE = /(\t|\r|\n|\v|\f|\s)*(-?[a-z]\w*\((\s*(([a-z0-9]\w*)|(\d+[.]?\d*))\s*,)*\s*(([a-z0-9]\w*)|(\d+[.]?\d*))\s*\)\s*;\s*)+(\t|\r|\n|\v|\f|\s)*/;
     if (!contextRE.test(context)) {
         return {
