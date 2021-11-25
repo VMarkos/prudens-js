@@ -68,7 +68,7 @@ function parseValues(values) {
 function contextParser() {
     const context = document.getElementById(tab + "-context").value;
     const contextList = parseContext(context);
-    // console.log(contextList);
+    console.log(contextList);
     contextList["context"].push({
         name: "true",
         sign: true,
@@ -106,7 +106,7 @@ function parseContext(context) {
     const casualPredicateRe = RegExp(predicateNameRe.source + String.raw`\((\s*` + varNameRe.source + String.raw`\s*,)*\s*` + varNameRe.source + String.raw`\s*\)`);
     const propositionalPredicateRe = /-?[a-z]\w*/;
     const predicateRe = RegExp(String.raw`((` + casualPredicateRe.source + String.raw`)|(` + propositionalPredicateRe.source + String.raw`))`);
-    const contextRE = RegExp(String.raw`(` + spacingRe.source + predicateRe.source + String.raw`\s*;\s*)+` + spacingRe.source);
+    const contextRE = RegExp(String.raw`(` + spacingRe.source + predicateRe.source + String.raw`\s*;\s*)+` + spacingRe.source); // FIXME There is some issue here!
     // const contextRE = /(\t|\r|\n|\v|\f|\s)*(-?[a-z]\w*\((\s*(([a-z0-9]\w*)|(\d+[.]?\d*))\s*,)*\s*(([a-z0-9]\w*)|(\d+[.]?\d*))\s*\)\s*;\s*)+(\t|\r|\n|\v|\f|\s)*/;
     if (!contextRE.test(context)) {
         return {
@@ -150,6 +150,45 @@ function parseTarget(targets) {
     };
 }
 
+/*
+A list may have one of the following forms:
+    1. [a, b, c, ...]
+    2. [X, Y, ... | A]
+    3. [X, Y, ... | [a, b, c, ...]]
+*/
+
+function getList(argument) {
+    if (argument.includes("|")) {
+        const listArray = argument.split("|");
+        let tail;
+        if (tail.includes("[")) {
+            tail = parseList(listArray[1].trim().substring(1,length - 1));
+        } else {
+            tail = {
+                name: listArray[1].trim(),
+                value: undefined,
+                isAssigned: false,
+            };
+        }
+        return {
+            isSplit: true,
+            head: parseList(listArray[0].trim()),
+            tail: tail,
+            list: undefined,
+        };
+    }
+    return {
+        isSplit: false,
+        head: undefined,
+        tail: undefined,
+        list: parseList(argument.trim().substring(1, length - 1)),
+    };
+}
+
+function parseList(listString) { // Input is of the form arg1, arg2, ..., argN, where argi is variable or constant.
+    return getLiteralArguments(listString); // TODO Just rename the function below and make sure everything is up to date.
+}
+
 function getLiteralArguments(argumentsString) {
     "use strict";
     const splitDelim = /(?<!(?:\[(?:\s*\w+\s*,)*\s*\w+\s*))(?:,)/;
@@ -163,7 +202,7 @@ function getLiteralArguments(argumentsString) {
         const argument = argumentsArray[i].trim();
         const isVar = /[A-Z_]/;
         const isAssigned = !isVar.test(argument.charAt(0)) || /[^\w]/.test(argument);
-        const isList = /\[(\s*\w+\s*,\s*)*\s*\w+\s*\]/.test(argument);
+        const isList = /\[.+\]/.test(argument); // TODO This may need to be further specified.
         let list = undefined;
         if (isList) {
             list = argument.substring(1, argument.length - 1).split(/(?:\s*,\s*)/);
@@ -573,7 +612,7 @@ function proofToString(proof) {
     let proofString = "[";
     for (const key of Object.keys(proof)) {
         if (proof[key] === 0) {
-            proofString += "!" + key + "; ";
+            proofString += "~" + key + "; ";
         } else if (proof[key] === 1) {
             proofString += key + "; ";
         } else {

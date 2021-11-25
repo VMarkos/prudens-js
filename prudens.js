@@ -171,6 +171,18 @@ function apply(sub, args) {
     return localArguments;
 }
 
+/*
+List unification cases:
+    1. Two unsplit lists unify if they contain the same elements.
+    2. A split with an unsplit list unify if there is an assignment to the split one's variables that makes it equal to the unsplit one.
+    3. Two split lists unify always trivially (?) or never (?).
+*/
+
+function listUnification(list1, list2, unifier) {
+    
+    return unifier;
+}
+
 function unify(x, y) { // x, y are literals. Assymetric unification since y is assumed variable-free!
     "use strict";
     if (x["name"] != y["name"] || x["arity"] != y["arity"] || x["sign"] != y["sign"]) {
