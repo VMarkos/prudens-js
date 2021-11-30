@@ -69,3 +69,43 @@ function deepIncludes(object, list) { //Re-implementation of Array.prototype.inc
     }
     return false;
 }
+
+function isSuperset(list1, list2) {
+    for (const item of list2) {
+        if (!deepIncludes(item, list1)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+function containsSupersets(listOfLists, list) {
+    for (const item of listOfLists) {
+        if (isSuperset(item, list)) {
+            return true;
+        }
+    }
+    return false;
+}
+
+function containsSubsets(listOfLists, list) {
+    for (const item of listOfLists) {
+        if (isSuperset(list, item)) {
+            // console.log(list);
+            // console.log(item);
+            // debugger;
+            return true;
+        }
+    }
+    return false;
+}
+
+function removeSupersets(listOfLists, list) {
+    const toBeRemoved = [];
+    for (const item of listOfLists) {
+        if (isSuperset(item, list)) {
+            toBeRemoved.push(item);
+        }
+    }
+    return removeAll(listOfLists, toBeRemoved);
+}

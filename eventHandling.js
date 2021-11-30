@@ -60,3 +60,21 @@ document.getElementById("abduce-tab-targets").addEventListener("scroll", context
 function contextScrollListener(event) {
     document.getElementById(tab + "-targets-lines").scrollTop = document.getElementById(tab + "-targets").scrollTop;
 }
+
+// Update Domains lines
+
+function domainKeyListener(event) {
+    "use strict";
+    if (event.key.length === 1 || event.key === "Enter" || event.key === "Backspace" || event.key === "Delete") {
+        updateLineNumber(tab + "-domains");
+    }
+}
+
+document.getElementById("abduce-tab-domains").addEventListener("keyup", domainKeyListener, false);
+document.getElementById("abduce-tab-domains").addEventListener("paste", (event) => {setTimeout(() => {updateLineNumber("abduce-tab-domains")}, 0);}, false);
+document.getElementById("abduce-tab-domains").addEventListener("cut", (event) => {setTimeout(() => {updateLineNumber("abduce-tab-domains")}, 0);}, false);
+document.getElementById("abduce-tab-domains").addEventListener("scroll", contextScrollListener, false);
+
+function contextScrollListener(event) {
+    document.getElementById(tab + "-domains-lines").scrollTop = document.getElementById(tab + "-domains").scrollTop;
+}

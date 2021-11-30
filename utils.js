@@ -30,7 +30,13 @@ function abduce() {
     if (targetsObject["type"] === "error") {
         return "ERROR: " + targetsObject["name"] + ":\n" + targetsObject["message"];
     }
-    const output = prioritizedPropositionalAbduction(kbObject["kb"], contextObject["context"], targetsObject["targets"][0]); // TODO This version of abduction handles only one target --- a simple loop could fix this.
+    const domainsObject = domainsParser();
+    if (domainsObject["type"] === "error") {
+        return "ERROR: " + domainsObject["name"] + ":\n" + domainsObject["message"];
+    }
+    // const output = greedyPropositionalAbduction(kbObject, contextObject["context"], targetsObject["targets"][0]); // TODO This version of abduction handles only one target --- a simple loop could fix this.
+    console.log(domainsObject);
+    const output = greedyRelationalAbduction(kbObject, contextObject["context"], targetsObject["targets"][0], domainsObject["predicates"]);
     // console.log(output);
     const outputString = "";
     if (warnings.length > 0) {

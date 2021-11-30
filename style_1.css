@@ -2,6 +2,7 @@ html, body {
     height: 100%;
     padding: 0px;
     margin: 0px;
+    background-color: whitesmoke;
 }
 
 a {
@@ -189,12 +190,13 @@ textarea:focus {
     height: 100%;
     width: 100%;
     column-gap: 25px;
-    grid-template-columns: 0.1fr 1fr 1fr;
+    grid-template-columns:0.1fr 1fr 1fr;
     padding-right: 10px;
 }
 
 .flex-container {
     margin: 10px;
+    /* width: 100%; */
 }
 
 .tab-menu {
@@ -280,7 +282,7 @@ textarea:focus {
     grid-row: 1 / 2;
     display: grid;
     background-color: whitesmoke;
-    width: fit-content;
+    width: 100%;
     height: 90%;
     row-gap: 28px;
     column-gap: 25px;
@@ -290,7 +292,7 @@ textarea:focus {
 }
 
 .sub-grid.abduce {
-    grid-template-rows: 1fr 1fr 2fr;
+    grid-template-rows: 1fr 1fr 1fr 2fr;
 }
 
 .hidden {
