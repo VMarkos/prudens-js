@@ -1,6 +1,6 @@
 # Introduction
 
-The provided script ([here](https://github.com/VMarkos/prudens-js/blob/main/datasets/propositional_kb_generator.py)) allows for the generation of structured knowledge bases 
+The provided script ([here](https://github.com/VMarkos/prudens-js/blob/main/datasets/propositional_kb_generator.py)) allows for the generation of structured knowledge bases, as described below. *Documentation under construction.*
 
 ```diff
 + Tested on python 3.8.10
