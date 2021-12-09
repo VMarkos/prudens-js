@@ -1,4 +1,6 @@
-# Description of the Propositional KB Generation Script
+# Introduction
+
+The provided script ([here](https://github.com/VMarkos/prudens-js/blob/main/datasets/propositional_kb_generator.py)) allows for the generation of structured knowledge bases 
 
 ```diff
 + Tested on python 3.8.10
@@ -8,7 +10,7 @@
 
 The generated knowledge base has the following structure:
 ```
-{
+[
     {
         name: 'asdy123',
         body: ['a', '-b', ..., 'c'],
@@ -20,8 +22,10 @@ The generated knowledge base has the following structure:
         head: '-z',
     },
     ...
-}
+]
 ```
+
+Rule priorities are determined by the order of rules in the knowledge base, increasing from top to bottom (i.e., rule `asdy124` is of higher priority than `asdy123`).
 
 ## `generate_kb(n_roots, *args)`
 
