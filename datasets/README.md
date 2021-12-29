@@ -29,7 +29,7 @@ Rule priorities are determined by the order of rules in the knowledge base, incr
 
 ## `generate_kb(n_roots, *args)`
 
-`n_roots` specifies the number of roots and, consequently, the number of trees contained in a knowledge base. That is, `n_roots=2` would mean that the generated knowledge base would contain two exception trees, as, for instance, in the example below:
+`n_trees` specifies the number of trees contained in a knowledge base. That is, `n_trees=2` would mean that the generated knowledge base would contain two exception trees, as, for instance, in the example below:
 
 ```diff
 + R1 :: a, b implies x;
@@ -53,3 +53,5 @@ Rule priorities are determined by the order of rules in the knowledge base, incr
 | `avg_tree_depth` | Float indicating the average tree depth for each sub-tree in the generated knowledge base. | 6 |
 | `avg_branching_factor` | Float indicating the average number of child nodes each node in each tree should have. | 2 |
 | `removal_probability` | Float in (0,1) indicating the probability that, at each iteration, a premise of a parent node will not also be a premise of a child node. | 0.1 |
+|`roots`|List of roots in the form specified above. The list **must** have length equal to `n_trees`. The default value, `None` calls the internal initialization process of the script. |`None`|
+|`all_premises`|List of premises (i.e. strings). Default value `None` results in a list containing strings of the form `pi` where `i` is some integer. |`None`|
