@@ -563,7 +563,9 @@ function jsCheck(literal, sub, code) {
     }
     // console.log(source);
     // debugger;
-    return Function(source).call();
+    // console.log(literal);
+    // debugger;
+    return Function(source).call() == literal["sign"];
 }
 
 function numParser(string) {
