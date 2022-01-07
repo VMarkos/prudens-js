@@ -183,28 +183,9 @@ function listUnification(list1, list2, unifier) {
         return undefined; // TODO Remember to catch this in unify(x, y).
     }
     if (!list1["isSplit"]) {
-        // Unify each element of list2's head with the corresponding elements in list1.
-        for (let i=0; i<list2["head"].length; i++) { // This may well be a function.
-            const variable = list2["head"][i]["name"];
-            if (unifier[variable] !== list1[i]) {
-                return undefined;
-            }
-            unifier[variable] = list1[i];
-        }
-        return unifier;
+        // TODO See above.
     }
-    if (!list["isSplit"]) {
-        // Similar to the above but reversed.
-        for (let i=0; i<list1["head"].length; i++) {
-            const variable = list1["head"][i]["name"];
-            if (unifier[variable] !== list2[i]) {
-                return undefined;
-            }
-            unifier[variable] = list2[i];
-        }
-        return unifier;
-    }
-    return undefined;
+    return unifier;
 }
 
 function unify(x, y) { // x, y are literals. Assymetric unification since y is assumed variable-free!
@@ -214,7 +195,7 @@ function unify(x, y) { // x, y are literals. Assymetric unification since y is a
     }
     const xArgs = x["args"];
     const yArgs = y["args"];
-    let unifier = {};
+    const unifier = {};
     for (let i=0; i<x["arity"]; i++) {
         let xArg = xArgs[i];
         let yArg = yArgs[i];
@@ -230,12 +211,6 @@ function unify(x, y) { // x, y are literals. Assymetric unification since y is a
         }
         if (Object.keys(unifier).length > 0 && Object.keys(unifier).includes(xArg["name"]) && unifier[xArg["name"]] != yArg["value"]) {
             return undefined;
-        }
-        if (xArg["isList"] && yArg["isList"]) {
-            unifier = listUnification(xArg["list"], yArg["list"], unifier);
-            if (unifier === undefined) {
-                return undefined;
-            }
         }
         // console.log("Here?");
         // console.log(xArg);
@@ -587,6 +562,7 @@ function jsCheck(literal, sub, code) {
         source = "let " + functionObject["args"][i] + ' = "' + sub[variable["name"]] + '";\n' + source;
     }
     // console.log(source);
+    // debugger;
     return Function(source).call();
 }
 

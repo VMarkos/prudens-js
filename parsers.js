@@ -464,7 +464,7 @@ function parseJsFunction(functionCode) {
     for (let i=0; i<argsArray.length; i++) {
         argsArray[i] = argsArray[i].trim();
     }
-    let functionSource = functionCode.split("{")[1].trim();
+    let functionSource = functionCode.trim().substring(functionCode.indexOf("{") + 1, functionCode.length);
     functionSource = functionSource.substring(0, functionSource.length - 1);
     return {
         name: functionName.trim(),
