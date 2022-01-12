@@ -9,16 +9,29 @@ function deepCopy(object) { // This is a level 1 deep copy --- i.e. if some valu
 
 function removeAll(list, toBeRemoved) {
     "use strict";
+    // console.log(list, toBeRemoved);
     if (toBeRemoved.length == 0) {
         return list;
     }
     for (let i=0; i<list.length; i++) {
-        if (toBeRemoved.includes(list[i])) { // Shallow check, might need rivision!
+        if (deepIncludes(list[i], toBeRemoved)) { // Shallow check, might need revision!
+            // console.log("List pre-splice in removeAll: ", list, "\nList[i]: ", list[i]);
             list.splice(i, 1);
+            // console.log("List post splicing: ", list);
+            // debugger;
             i--;
         }
     }
     return list;
+}
+
+function deepIndexOf(list, item) { // Deep equivalent of Array.prototype.indexOf().
+    for (let i=0; i<list.length; i++) {
+        if (deepEquals(item, list[i])) {
+            return i;
+        }
+    }
+    return -1;
 }
 
 function deepEquals(x, y) { // x, y are objects --- possibly restricted version of deep equality for our purposes only!
