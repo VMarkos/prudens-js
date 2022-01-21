@@ -103,7 +103,7 @@ GreedyPropositionalAbduction(kb, target):
     return proofs;
 */
 
-function greedyPropositionalAbduction(kbObject, context, target) {
+function greedyPropositionalAbduction(kbObject, context, targets) {
     const kb = kbObject["kb"];
     const abducibles = computeAbducibles(kb);
     // console.log(abducibles);
@@ -119,7 +119,8 @@ function greedyPropositionalAbduction(kbObject, context, target) {
         const inferences = forwardChaining(kbObject, allFacts);
         // console.log(target);
         // console.log(inferences);
-        if (deepIncludes(target, inferences["facts"]) && !deepIncludes(proof, proofs)) { // You are here...
+        if (isSuperset(inferences["facts"], targets) && !deepIncludes(proof, proofs)) { // You are here...
+        // if (deepIncludes(target, inferences["facts"]) && !deepIncludes(proof, proofs)) {
             // console.log("Proved?");
             // console.log(proof);
             proofs.push(proof);
