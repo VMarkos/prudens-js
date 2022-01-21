@@ -119,7 +119,7 @@ function greedyPropositionalAbduction(kbObject, context, target) {
         const inferences = forwardChaining(kbObject, allFacts);
         // console.log(target);
         // console.log(inferences);
-        if (deepIncludes(target, inferences["facts"])) { // You are here...
+        if (deepIncludes(target, inferences["facts"]) && !deepIncludes(proof, proofs)) { // You are here...
             // console.log("Proved?");
             // console.log(proof);
             proofs.push(proof);
