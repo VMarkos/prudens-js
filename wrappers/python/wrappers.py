@@ -1,4 +1,3 @@
-# import js2py
 import execjs
 import json
 
