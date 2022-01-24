@@ -23,12 +23,12 @@ def deduce(kb_string, context_string):
     print(output)
     return output
 
-if __name__ == '__main__':
-    KNOWLEDGE_BASE = '''@KnowledgeBase
-        R4 :: w implies d;
-        R3 :: x, -y implies -d;
-        R2 :: b, d implies c;
-        R1 :: a implies b;'''
-    TARGET = 'c'
-    CONTEXT = 'a; w;'
-    deduce(KNOWLEDGE_BASE, CONTEXT)
+# if __name__ == '__main__':
+#     KNOWLEDGE_BASE = '''@KnowledgeBase
+#         R4 :: w implies d;
+#         R3 :: x, -y implies -d;
+#         R2 :: b, d implies c;
+#         R1 :: a implies b;'''
+#     TARGET = 'c'
+#     CONTEXT = 'a; w;'
+#     deduce(KNOWLEDGE_BASE, CONTEXT)
