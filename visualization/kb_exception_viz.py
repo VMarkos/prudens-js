@@ -16,11 +16,25 @@ KB DATA STRUCTURE:
 ]
 '''
 
-def kb_to_graph(kb_object):
+def specificity_graph(kb_object): # Graph-representation of a KB, based on a Hasse-like diagram.
+    edges = []
+    nodes = []
     for rule in kb_object:
-        pass
+        edges, nodes = add_node(edges, nodes, rule)
     pass # TODO Add edges one at a time.
 
+def add_node(edges, nodes, rule):
+    if rule in nodes:
+        return edges, nodes
+    nodes.append(rule)
+    front = []
+    visited = []
+    found_new = True
+    while found_new:
+        front = []
+        for node in nodes:
+          pass
+  
 def visualize_kb(kb):
     pass
 
