@@ -91,7 +91,7 @@ def expand_node(children_count, deviation, parent, removal_probability, all_prem
         new_head = negate_head(parent_head)
         new_body = expand_body(parent_body, deviation, removal_probability, all_premises)
         children.append({
-            'name': parent['name'] + str(i),
+            'name': parent['name'] + '.' +  str(i),
             'body': new_body,
             'head': new_head,
         })
@@ -120,7 +120,7 @@ if __name__ == '__main__':
     avg_root_similarity = 0.4
     deviation = 0.3
     avg_tree_depth = 6
-    avg_branching_factor = 2
+    avg_branching_factor = 3
     removal_probability = 0.1
     kb = generate_kb(n_roots, avg_root_size, avg_root_similarity, deviation, avg_tree_depth, avg_branching_factor, removal_probability)
     with open('test_kb.json', 'w') as file:
