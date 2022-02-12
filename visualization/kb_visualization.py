@@ -32,22 +32,11 @@ def plot_specificity_graph(kb):
         if node['name'] not in nodes_with_edge:
             G.add_node(node['name'])
     connected_components = (G.subgraph(x) for x in nx.weakly_connected_components(G))
-    # hyperG.add_nodes_from(connected_components)
-    # print(graph.edges)
-    # print(graph.get_edges_as_tuples())
-    colors = list(x for x in mcolors.CSS4_COLORS.values() if int(x[1:], 16) > 1000)
-    graphs = []
-    for index, H in enumerate(connected_components):
-        graphs.append(nx.draw(H, with_labels=True, node_color=colors[index % len(colors)], node_size=1200))
-    n = ceil(sqrt(len(graphs)))
-    print(n)
-    plt.subplots(nrows=n, ncols=n)
-    for i in range(len(graphs)):
-        print(n)
-        ax = plt.subplot(n, n, i)
-        nx.draw(H, with_labels=True, node_color=colors[index % len(colors)], node_size=1200)
-    plt.show()
-    # plt.imshow(G)
+    colors = list(x for x in mcolors.CSS4_COLORS.values() if int(x[1:], 16) > 4000)
+    cc = list(connected_components)
+    for i in range(len(cc)):
+        nx.draw(cc[i], with_labels=True, node_color=colors[i % len(colors)], node_size=1200)
+        plt.show()
   
 '''
 Specificity graph structure:
@@ -153,10 +142,7 @@ class SpecificityGraph:
                 edge_pairs.append((node, child))
         return edge_pairs
 
-if __name__ == '__main__':
-    with open('test_kb.json', 'r') as file:
-        kb = json.load(file)
-    # graph = SpecificityGraph(kb)
-    # print(graph.get_edges_as_tuples())
-    # print(graph.edges)
-    plot_specificity_graph(kb)
+# if __name__ == '__main__':
+#     with open('test_kb.json', 'r') as file:
+#         kb = json.load(file)
+#     plot_specificity_graph(kb)
