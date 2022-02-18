@@ -22,3 +22,4 @@ In the following `.gif`s you may see the two available ways to create an excepti
 - [ ] When choosing the "Cancel" option in the "Add Existing Exception..." dialogue box, there might be observed unexpected behaviors regarding rule namings - yet, nothing significant has been observed so far.
 - [ ] When hovering over existing nodes while drawing a new exception through the "Add Exception" option, arrows are temporarily dislocated.
 - [ ] Exception Graphs that correspond to some prioritized knowledge base are a strict subset of all directed acyclic graphs, however the current implementation of the UI allows for any graph to be inserted, leading to unexpected behavior when incosistent EGs are drawn.
+- [ ] Once drawn through the "Add Exception" option, arrows are positioned away from the current cursor position - this is resolved on cursor's move, however.
