@@ -12,7 +12,12 @@ The interface of KB Generator is quite intuitive. The basic actions allowed by t
    - `Add Exception`: Adds an arrow starting from the current (clicked) node and pointing to the cursor's position. Once the user clicks again on the drawing area, a new node is positioned and the arrow is fixed. *For several open bugs regarding node positioning see [Warnings & Known Bugs](#warnings--known-bugs).*
    - `Add Existing Exception...`: Opens a pop-up dialog box where the user is prompted to enter the label of an already existing node. Then, an arrow is drawn between the current (clicked) and the specified node.
 
+In the following `.gif`s you may see the two available ways to create an exception (inserting a new exception and connecting existing nodes, respectively).
+!(Inserting a new exception.)[/assets/kb_generator/new_exc.gif]
+!(Drawing an existing exception.)[/assets/kb_generator/ex_exc.gif]
+
 ## Warnings & Known Bugs
 - [ ] On window resize, the drawing panel's axes rescale, leading to unexpected behavior regarding node and arrow positioning.
-- [ ] When choosing the "Cancel" option in the "Add Existing Exception..." dialogue box, there might be obsreved unexpected behaviors regarding rule namings - yet, nothing significant has been observed so far.
-- [ ] When hovering over existing nodes while drawing a new exception through the "Add Exception" option, arrows temporarily dislocate.
+- [ ] When choosing the "Cancel" option in the "Add Existing Exception..." dialogue box, there might be observed unexpected behaviors regarding rule namings - yet, nothing significant has been observed so far.
+- [ ] When hovering over existing nodes while drawing a new exception through the "Add Exception" option, arrows are temporarily dislocated.
+- [ ] Exception Graphs that correspond to some prioritized knowledge base are a strict subset of all directed acyclic graphs, however the current implementation of the UI allows for any graph to be inserted, leading to unexpected behavior when incosistent EGs are drawn.
