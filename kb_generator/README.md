@@ -17,6 +17,25 @@ In the following `.gif`s you may see the two available ways to create an excepti
 | --- | --- |
 | ![Drawing a new exception](/assets/kb_generator/new_exc.gif) | ![Drawing an existing exception](/assets/kb_generator/ex_exc.gif) |
 
+## Output
+Having designed a graph on the drawing area, pressing the "Generate" button prompts you to download a `.json` file. The contents of the file have the following structure:
+```
+"kbString": "String representation of the knowledge base",
+"kbSimple": [
+   {
+      "name": "R0",
+      "body": [
+        "p0",
+        "p1"
+      ],
+      "head": "p6"
+    },
+    ... // Similarly...
+],
+"kbFull": // See below...
+```
+For more about the value of the `kbFull` key see [here](https://github.com/VMarkos/prudens-js#parsekbkb) - it is actually the full internal representation of a knowledge base as used by Prudens and all its (sub)components.
+
 ## Warnings & Known Bugs
 - [ ] On window resize, the drawing panel's axes rescale, leading to unexpected behavior regarding node and arrow positioning.
 - [ ] When choosing the "Cancel" option in the "Add Existing Exception..." dialogue box, there might be observed unexpected behaviors regarding rule namings - yet, nothing significant has been observed so far.
