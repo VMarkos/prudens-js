@@ -15,7 +15,7 @@
                         <div class="logo-text">KB Generator</div>
                     </div>
                     <div class="button-container">
-                        <div class="generate-button">Generate</div>
+                        <div class="generate-button" onclick="download('kb.json', JSON.stringify(constructKb(), null, 2))">Generate</div>
                     </div>
                 </div>
             </div>
@@ -35,5 +35,8 @@
             </div>
         </div>
         <script type="text/javascript" src="utils.js"></script>
+        <script type="text/javascript" src="prudens.js"></script>
+        <script type="text/javascript" src="prudensUtils.js"></script>
+        <script type="text/javascript" src="parsers.js"></script>
     </body>
 </html>
