@@ -58,6 +58,7 @@ function getSubstitutions(body, facts, code) {
     const jsLiterals = [];
     for (const literal of body) {
         if (literal["arity"] === 0 && !deepIncludes(literal, facts)) { // In case you have a propositional literal, check whether it is included in facts and if not return [].
+            // console.log("Literal ", literal["name"], " not included in facts: ", facts);
             return [];
         }
         if (literal["arity"] === 0) {
@@ -283,7 +284,7 @@ function getPriorities(kb) { // Linear order induced priorities.
     priorities = {};
     for (let i=0; i<kb.length; i++) {
         // console.log(kb);
-        priorities[ruleToString(kb[i])] = i
+        priorities[ruleToString(kb[i])] = kb.length - i - 1; // TODO Remember this is in reverse order!
     }
     return priorities;
 }
@@ -297,7 +298,7 @@ R3 :: h(X) implies -f(X);
 Context: g(b); h(b);
 */
 
-function updateGraph(inferredHead, newRule, graph, facts, priorities) { //TODO You may need to store the substitution alongside each rule, in case one needs to count how many time a rule has been triggered or so.
+function updateGraph(inferredHead, newRule, graph, facts, priorities, deletedRules) { //TODO You may need to store the substitution alongside each rule, in case one needs to count how many time a rule has been triggered or so.
     const oppositeHead = {}
     for (const key of Object.keys(inferredHead)) {
         oppositeHead[key] = inferredHead[key];
@@ -305,23 +306,39 @@ function updateGraph(inferredHead, newRule, graph, facts, priorities) { //TODO Y
     oppositeHead["sign"] = !oppositeHead["sign"];
     let inferred = false;
     if (deepIncludes(inferredHead, facts)) {
-        if (!deepIncludes(newRule, graph[literalToString(inferredHead)])) {
+        if (!Object.keys(graph).includes(literalToString(inferredHead))) {
+            graph[literalToString(inferredHead)] = [newRule]; // TODO Newly added code, check for potentially unexpected behaviours!
+            inferred = true;
+        }
+        if (!deepIncludes(newRule, graph[literalToString(inferredHead)]) && !deepIncludes(newRule, deletedRules)) {
             graph[literalToString(inferredHead)].push(newRule);
             inferred = true;
+            // console.log("Includes head and not rule.");
         }
     } else if (deepIncludes(oppositeHead, facts)) {
         const toBeRemoved = [];
         for (const rule of graph[literalToString(oppositeHead)]) {
             if (priorities[ruleToString(rule)] > priorities[ruleToString(newRule)]) {
                 toBeRemoved.push(rule);
+                if (!deepIncludes(rule, deletedRules)); {
+                    deletedRules.push(rule);
+                }
                 inferred = true;
+                // console.log("Includes opposite head and not rule.");
             }
         }
         if (graph[literalToString(oppositeHead)].length === toBeRemoved.length) {
             delete graph[literalToString(oppositeHead)];
             graph[literalToString(inferredHead)] = [newRule];
+            // console.log("Facts prior to pushing: ", facts);
+            // debugger;
             facts.push(inferredHead);
-            facts = facts.splice(facts.indexOf(oppositeHead), 1);
+            // console.log("Facts prior to splicing: ", facts, "\nIndex of opposite head: " + deepIndexOf(facts, oppositeHead));
+            // debugger;
+            // facts = facts.splice(deepIndexOf(facts, oppositeHead), 1); // FIXME .indexOf() returns -1 because, guess what, it does not work with lists of objects... Create a deep alternative.
+            facts = removeAll(facts, [oppositeHead]);
+            // console.log("Facts post splicing: ", facts);
+            // debugger;
         } else {
             graph[literalToString(oppositeHead)] = removeAll(graph[literalToString(oppositeHead)], toBeRemoved);
         }
@@ -329,11 +346,14 @@ function updateGraph(inferredHead, newRule, graph, facts, priorities) { //TODO Y
         facts.push(inferredHead);
         graph[literalToString(inferredHead)] = [newRule];
         inferred = true;
+        // console.log("Includes neither head nor rule.");
     }
+    // console.log("Deleted Rules: ", deletedRules);
     return {
         graph: graph,
         facts: facts,
         inferred: inferred,
+        deletedRules: deletedRules,
     };
 }
 
@@ -343,6 +363,7 @@ function forwardChaining(kbObject, context) { //FIXME Huge inconsistency with DO
     // console.log(facts);
     let inferred = false;
     let graph = {};
+    let deletedRules = [];
     // console.log(kbObject);
     const code = kbObject["code"];
     const priorities = getPriorities(kb);
@@ -351,26 +372,31 @@ function forwardChaining(kbObject, context) { //FIXME Huge inconsistency with DO
         inferred = false;
         for (let i=0; i<kb.length; i++) {
             const rule = kb[i];
+            // console.log(ruleToString(rule));
             // FIXME You have to fix the relational version in the same manner as the propositional!
             const subs = getSubstitutions(rule["body"], facts, code); // FIXME Not computing all substitutions --- actually none for: @KnowledgeBase
             // console.log(subs);
+            // debugger;
             for (let i=0; i<subs.length; i++) {
                 const sub = subs[i];
                 // console.log(sub);
                 // console.log(code);
                 // console.log("Rule head:");
                 // console.log(rule["head"]);
-                const inferredHead = applyToLiteral(sub, rule["head"]);
-                const updatedGraph = updateGraph(inferredHead, rule, graph, facts, priorities);
-                graph = updatedGraph["graph"];
+                const inferredHead = applyToLiteral(sub, rule["head"]); // FIXME What is a user provides an ungrounded head with a propositional body?
+                const updatedGraph = updateGraph(inferredHead, rule, graph, facts, priorities, deletedRules);
+                // console.log(updatedGraph);
+                graph = updatedGraph["graph"]; // You could probably push the entire graph Object!
                 facts = updatedGraph["facts"];
+                deletedRules = updatedGraph["deletedRules"];
                 if (!inferred) {
                     inferred = updatedGraph["inferred"];
                 }
-                // console.log(graph);
+                console.log(graph);
             }
         }
         // i++;
+        // console.log(i);
     } while (inferred);
     return {
         facts: facts,
@@ -562,7 +588,10 @@ function jsCheck(literal, sub, code) {
         source = "let " + functionObject["args"][i] + ' = "' + sub[variable["name"]] + '";\n' + source;
     }
     // console.log(source);
-    return Function(source).call();
+    // debugger;
+    // console.log(literal);
+    // debugger;
+    return Function(source).call() == literal["sign"];
 }
 
 function numParser(string) {
