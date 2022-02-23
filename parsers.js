@@ -57,7 +57,7 @@ function parseDomains(domainsString) {
 function parseValues(values) {
     const argDelim = /\s*(?<=\]\s*),\s*/;
     const argumentValuesArray = values.split(argDelim);
-    console.log(argumentValuesArray);
+    // console.log(argumentValuesArray);
     const argumentValues = [];
     for (const argValues of argumentValuesArray) {
         argumentValues.push(argValues.substring(1,argValues.length - 1).trim().split(/\s*,\s*/));
@@ -104,7 +104,7 @@ function parseContext(context) {
         }
     }
     const spacingRe = /(\t|\r|\n|\v|\f|\s)*/;
-    const varNameRe = /(([a-z0-9]\w*)|(\d+[.]?\d*)|(\[(\s*\w+,\s*)*\s*\w+\s*\]))/;
+    const varNameRe = /(([a-zA-Z0-9]\w*)|(\d+[.]?\d*)|(\[(\s*\w+,\s*)*\s*\w+\s*\]))/; // FIXME This has been altered recently, allowing for variables in contexts!
     const predicateNameRe = /-?[a-z]\w*/;
     const casualPredicateRe = RegExp(predicateNameRe.source + String.raw`\((\s*` + varNameRe.source + String.raw`\s*,)*\s*` + varNameRe.source + String.raw`\s*\)`);
     const propositionalPredicateRe = /-?[a-z]\w*/;
@@ -241,7 +241,7 @@ function getRuleBody(bodyString) {
     // const delim = /((?<=(?:\)\s*))(?:,))|((?<!(?:\([a-zA-Z0-9_,\s]+\)))(?:,))|(?:;)/; //This is added for the context. Originally, only /,/ is needed!
     const delim = /(?:;)|((?<=(?:\)\s*))(?:,))|((?<!(?:\(.*))(?:,))/;
     const bodyArray = bodyString.trim().split(delim);
-    if (bodyArray[bodyArray.length-1] == "") {
+    if (bodyArray[bodyArray.length-1] === "") {
         bodyArray.pop();
     }
     // console.log(bodyArray);
@@ -389,26 +389,36 @@ function parseKB(kbAll) {
         kb = kbWithCode;
         code = undefined;
     }
-    const spacingRe = /(\t|\r|\n|\v|\f|\s)*/; // CHECKED!
+    const spacingRe = /\s*/; // CHECKED!
     const predicateNameRe = /(-?\??[a-z]\w*)/; // CHECKED!
     const mathPredicateRe = /\s*((-?\?=)|(-?\?<))\(.+,.+\)\s*/; // CHECKED!
     const headNameRe = /((-?!?[a-z]\w*))/; // CHECKED!
     const simpleListRe = /(\[(\s*\w+,\s*)*\s*\w+\s*\])/; // Syntactically, you have allowed for a (grounded?) list to contain variables. // CHECKED!
     const headTailListRe = RegExp(String.raw`(\[(\s*\w+\s*,)*\s*\w+\s*\|\s*(([A-Z_]\w*)|` + simpleListRe.source + String.raw`)\s*\])`); // CHECKED!
     const listRe = RegExp(String.raw`(` + simpleListRe.source + String.raw`|` + headTailListRe.source + String.raw`)`); // CHECKED!
-    const varNameRe = RegExp(String.raw`(([a-zA-z]\w*)|(\d+[.]?\d*)|_|` + listRe.source + String.raw`)`); // CHECKED!
+    // const varNameRe = RegExp(String.raw`(([a-zA-z]\w*)|(\d+[.]?\d*)|_|` + listRe.source + String.raw`)`); // CHECKED!
+    const varNameRe = RegExp(String.raw`(([a-zA-z]\w*)|(\d+[.]?\d*)|_)`); // CHECKED!
     // const varNameRe = /(([a-zA-z]\w*)|(\d+[.]?\d*)|_|)/; // CHECKED!
     const ruleName = RegExp(spacingRe.source + String.raw`\w+`); // CHECKED!
-    const casualPredicateRe = RegExp(predicateNameRe.source + String.raw`\((\s*` + varNameRe.source + String.raw`\s*,)*\s*` + varNameRe.source + String.raw`\s*\)`); // CHECKED!
+    const casualPredicateRe = RegExp(String.raw`(` + predicateNameRe.source + String.raw`\((\s*` + varNameRe.source + String.raw`\s*,)*\s*` + varNameRe.source + String.raw`\s*\))`); // CHECKED!
     const propositionalPredicateRe = /(-?[a-z]\w*)/; // CHECKED!
     const predicateRe = RegExp(String.raw`((` + casualPredicateRe.source + String.raw`)|(` + mathPredicateRe.source + String.raw`)|(` + propositionalPredicateRe.source + String.raw`))`); // CHECKED!
+    // console.log(predicateRe.source);
     const casualHeadRe = RegExp(headNameRe.source + String.raw`\((\s*` + varNameRe.source + String.raw`\s*,)*\s*` + varNameRe.source + String.raw`\s*\)`); // CHECKED!
     const propositionalHeadRe = /(-?!?[a-z]\w*)/; // CHECKED!
-    const headRe = RegExp(String.raw`(` + casualHeadRe.source + String.raw`)|(` + propositionalHeadRe.source + String.raw`)`);
-    const kbRe = RegExp(String.raw`(` + ruleName.source + String.raw`\s*::(\s*` + predicateRe.source + String.raw`\s*,)*\s*` + predicateRe.source + String.raw`\s+implies\s+` + headRe.source + String.raw`\s*;` + spacingRe.source + String.raw`)+`); // CHECKED!
+    const orListRe = RegExp(String.raw`(\s*\(\s*` + predicateRe.source + String.raw`\s+or\s+` + predicateRe.source + String.raw`(\s+or\s+` + predicateRe.source + String.raw`\s*)*` + String.raw`\s*\)\s*)`); // OR structure "(predicate or predicate or ... )"
+    const bodyRe = RegExp(String.raw`((\s*` + String.raw`((` + predicateRe.source + String.raw`)|(` + orListRe.source + String.raw`))` + String.raw`\s*,)*\s*` + String.raw`(` + predicateRe.source  + String.raw`)|(` + orListRe.source + String.raw`))`); // CHECKED!
+    // const bodyRe = RegExp(String.raw`(\s*` + predicateRe.source + String.raw`\s*,)*\s*` + String.raw`(` + predicateRe.source + String.raw`)`); // CHECKED!
+    // console.log(bodyRe.source);
+    const headRe = RegExp(String.raw`((` + casualHeadRe.source + String.raw`)|(` + propositionalHeadRe.source + String.raw`))`); // CHECKED!
+    // console.log(headRe.source);
+    const kbRe = RegExp(String.raw`(` + ruleName.source + String.raw`\s+::\s+` + bodyRe.source + String.raw`\s+implies\s+` + headRe.source + String.raw`\s*;` + spacingRe.source + String.raw`)+`); // CHECKED!
+    // const kbRe = RegExp(String.raw`(` + ruleName.source + String.raw`\s*::(\s*` + predicateRe.source + String.raw`\s*,)*\s*` + predicateRe.source + String.raw`\s+implies\s+` + headRe.source + String.raw`\s*;` + spacingRe.source + String.raw`)+`); // CHECKED!
     // const kbRe = /((\t|\r|\n|\v|\f|\s)*\w+\s*::(\s*((-?\??[a-z]\w*)|(\?=)|(\?<))\((\s*(([a-zA-z]\w*)|(\d+[.]?\d*)|_)\s*,)*\s*(([a-zA-z]\w*)|(\d+[.]?\d*)|_)\s*\)\s*,)*\s*((-?\??[a-z]\w*)|(\?=)|(\?<))\((\s*(([a-zA-z]\w*)|(\d+[.]?\d*)|_)\s*,)*\s*(([a-zA-z]\w*)|(\d+[.]?\d*)|_)\s*\)\s+implies\s+((-?!?[a-z]\w*))\((\s*(([a-zA-z]\w*)|(\d+[.]?\d*)|_)\s*,)*\s*(([a-zA-z]\w*)|(\d+[.]?\d*)|_)\s*\)\s*;(\t|\r|\n|\v|\f|\s)*)+/;
-    // console.log(kbRe);
-    if (!kbRe.test(kb)) {
+    // console.log(kbRe.source);
+    // console.log(kb.match(kbRe));
+    // console.log(kbToObject(kb));
+    if (kb.match(kbRe)[0] !== kb) {
         return {
             type: "error",
             name: "KnowledgeBaseSyntaxError",
@@ -464,7 +474,7 @@ function parseJsFunction(functionCode) {
     for (let i=0; i<argsArray.length; i++) {
         argsArray[i] = argsArray[i].trim();
     }
-    let functionSource = functionCode.split("{")[1].trim();
+    let functionSource = functionCode.trim().substring(functionCode.indexOf("{") + 1, functionCode.length);
     functionSource = functionSource.substring(0, functionSource.length - 1);
     return {
         name: functionName.trim(),

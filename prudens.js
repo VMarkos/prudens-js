@@ -100,11 +100,11 @@ function getSubstitutions(body, facts, code) {
                 const unifier = unify(instance, fact);
                 // console.log("Unifier:");
                 // console.log(unifier);
-                if (unifier != undefined) {
+                if (unifier !== undefined) {
                     const extension = extend(sub, unifier);
                     // console.log("Extension");
                     // debugger;
-                    if (unifier != undefined && extension != undefined) {
+                    if (unifier !== undefined && extension !== undefined) {
                         toBePushed.push(extension);
                         extended = true;
                         if (!toBeRemoved.includes(sub)) {
@@ -148,23 +148,33 @@ function extendByFacts(literal, facts) {
 
 // Substitution = {varname1: val1, varname2: val2, ...}
 
-function apply(sub, args) {
+function apply(sub, args) { // FIXME Redefine apply so as to check whether a value is not a constant but actually another variable!
     "use strict";
     if (args === undefined) {
         return undefined;
     }
-    // console.log(args);
-    // console.log(sub);
+    console.log(args);
+    console.log(sub);
     const localArguments = [];
     for (const argument of args) {
         if (!argument["isAssigned"] && Object.keys(sub).includes(argument["name"])) {
-            localArguments.push({
-                index: argument["index"],
-                name: argument["name"],
-                isAssigned: true,
-                value: sub[argument["name"]],
-                muted: argument["muted"],
-            });
+            if (/[A-Z]/.test(sub[argument["name"]].charAt(0))) {
+                localArguments.push({
+                    index: argument["index"],
+                    name: sub[argument["name"]],
+                    isAssigned: false,
+                    value: undefined,
+                    muted: argument["muted"],    
+                });
+            } else {
+                localArguments.push({
+                    index: argument["index"],
+                    name: argument["name"],
+                    isAssigned: true,
+                    value: sub[argument["name"]],
+                    muted: argument["muted"],
+                });
+            }
         } else {
             localArguments.push(argument);
         }
@@ -189,7 +199,7 @@ function listUnification(list1, list2, unifier) {
     return unifier;
 }
 
-function unify(x, y) { // x, y are literals. Assymetric unification since y is assumed variable-free!
+function unify(x, y) { // x, y are literals. Assymetric unification since y is assumed to be known/part of some set of inferred facts!
     "use strict";
     if (x["name"] != y["name"] || x["arity"] != y["arity"] || x["sign"] != y["sign"]) {
         return undefined;
@@ -217,6 +227,9 @@ function unify(x, y) { // x, y are literals. Assymetric unification since y is a
         // console.log(xArg);
         // console.log(yArg);
         // debugger;
+        if (!xArg["isAssigned"] && !yArg["isAssigned"]) {
+            unifier[xArg["name"]] = yArg["name"]; // TODO Fix this stuff where you use unify!
+        }
         unifier[xArg["name"]] = yArg["value"];
     }
     return unifier;
@@ -230,7 +243,7 @@ function extend(sub, unifier) {
     // console.log("Sub:");
     // console.log(extendedSub);
     for (const key of Object.keys(unifier)) {
-        if (Object.keys(extendedSub).includes(key) && extendedSub[key] != unifier[key]) {
+        if (Object.keys(extendedSub).includes(key) && extendedSub[key] !== unifier[key]) {
             return undefined;
         } else if (!Object.keys(extendedSub).includes(key)) {
             extendedSub[key] = unifier[key];
