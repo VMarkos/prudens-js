@@ -140,7 +140,8 @@ function extendByFacts(literal, facts) {
     for (const fact of facts) {
         if (fact["arity"] !== 0) {
             const unifier = unify(literal, fact);
-            (unifier != undefined) && subs.push(unifier);
+            // console.log("unifier:", unifier);
+            (unifier !== undefined) && subs.push(unifier);
         }
     }
     return subs;
@@ -153,8 +154,8 @@ function apply(sub, args) { // FIXME Redefine apply so as to check whether a val
     if (args === undefined) {
         return undefined;
     }
-    console.log(args);
-    console.log(sub);
+    // console.log(args);
+    // console.log(sub);
     const localArguments = [];
     for (const argument of args) {
         if (!argument["isAssigned"] && Object.keys(sub).includes(argument["name"])) {
@@ -228,12 +229,32 @@ function unify(x, y) { // x, y are literals. Assymetric unification since y is a
         // console.log(yArg);
         // debugger;
         if (!xArg["isAssigned"] && !yArg["isAssigned"]) {
+            // console.log("Here!\nxArg:", xArg, "\nyArg:", yArg);
             unifier[xArg["name"]] = yArg["name"]; // TODO Fix this stuff where you use unify!
+            // console.log(unifier);
+        } else {
+            unifier[xArg["name"]] = yArg["value"];
         }
-        unifier[xArg["name"]] = yArg["value"];
     }
     return unifier;
 }
+
+/*
+KNOWN BUG:
+@KnowledgeBase
+R :: f(X, Y) implies g(X, Y);
+
+Context:
+f(A, b); f(X, b)
+
+Inferences: f(A, b); f(X, b); true; g(A, b); g(X, b);
+Graph: {
+g(A, b): [R :: f(X, Y) implies g(X, Y);]
+g(X, b): [R :: f(X, Y) implies g(X, Y);]
+}
+
+This may not be a bug in the sense that if the developer has chosen different var names then they may want to highlight something.
+*/
 
 function extend(sub, unifier) {
     "use strict";
@@ -405,7 +426,7 @@ function forwardChaining(kbObject, context) { //FIXME Huge inconsistency with DO
                 if (!inferred) {
                     inferred = updatedGraph["inferred"];
                 }
-                console.log(graph);
+                // console.log(graph);
             }
         }
         // i++;

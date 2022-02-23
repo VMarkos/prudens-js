@@ -223,6 +223,7 @@ function getLiteralArguments(argumentsString) {
             name = argument;
             value = undefined;
         }
+        // console.log("name:", name, "\nargument:", argument);
         args.push({
             index: i,
             name: name,
@@ -352,7 +353,7 @@ function kbToObject(kb) {
     return kbObject;
 }
 
-function parseKB(kbAll) {
+function parseKB(kbAll) { // TODO Add an error here about rules with the same name.
     "use strict";
     const warnings = [];
     if (!kbAll.includes("@KnowledgeBase")){
