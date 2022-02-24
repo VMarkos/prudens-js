@@ -419,7 +419,7 @@ function parseKB(kbAll) { // TODO Add an error here about rules with the same na
     // console.log(kbRe.source);
     // console.log(kb.match(kbRe));
     // console.log(kbToObject(kb));
-    if (kb.match(kbRe)[0] !== kb) {
+    if (!kb.match(kbRe) || kb.match(kbRe)[0] !== kb) {
         return {
             type: "error",
             name: "KnowledgeBaseSyntaxError",
