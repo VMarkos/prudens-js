@@ -71,6 +71,7 @@ function getSubstitutions(body, facts, code) {
         if (substitutions.includes(undefined)) {
             substitutions = extendByFacts(literal, facts);
         }
+        // console.log("body:", body);
         const toBeRemoved = [];
         const toBePushed = [];
         for (const sub of substitutions) {
@@ -79,8 +80,11 @@ function getSubstitutions(body, facts, code) {
             const instance = {};
             for (const key of Object.keys(literal)) {
                 instance[key] = literal[key];
+                // console.log("key:", key, instance[key]);
             }
+            // console.log("literal:", literal, "\n(pre-apply) body:", instance);
             instance["args"] = apply(sub, literal["args"]);
+            // console.log("(post-apply) body:", instance);
             // let instance = {
             //     name: body[i]["name"],
             //     sign: body[i]["sign"],
@@ -102,7 +106,7 @@ function getSubstitutions(body, facts, code) {
                 // console.log(unifier);
                 if (unifier !== undefined) {
                     const extension = extend(sub, unifier);
-                    // console.log("Extension");
+                    // console.log("sub:", sub, "\nextension:", extension);
                     // debugger;
                     if (unifier !== undefined && extension !== undefined) {
                         toBePushed.push(extension);
@@ -131,6 +135,7 @@ function getSubstitutions(body, facts, code) {
             subs.push(jsEval["sub"]);
         }
     }
+    // console.log("subs:", subs);
     return subs;
 }
 
@@ -159,10 +164,22 @@ function apply(sub, args) { // FIXME Redefine apply so as to check whether a val
     const localArguments = [];
     for (const argument of args) {
         if (!argument["isAssigned"] && Object.keys(sub).includes(argument["name"])) {
-            if (/[A-Z]/.test(sub[argument["name"]].charAt(0))) {
+            let tempArg = argument["name"];
+            let tempVal = sub[tempArg];
+            const visitedArgs = [tempArg];
+            while (isVarString(tempVal) && Object.keys(sub).includes(tempVal) && !visitedArgs.includes(tempVal)) { // While the sub maps a variable to a variable that is also in the sub...
+                tempArg = tempVal; // ...move to the next variable.
+                tempVal = sub[tempArg];
+                visitedArgs.push(tempVal);
+            }
+            // if (visitedArgs.includes(tempVal)) { // In case we have an infinite loop like X/Y, Y/Z, Z/X...
+            //     console.log("Messed up...");
+            //     return undefined; // ...return undefined.
+            // }
+            if (isVarString(tempVal)) {
                 localArguments.push({
                     index: argument["index"],
-                    name: sub[argument["name"]],
+                    name: tempVal,
                     isAssigned: false,
                     value: undefined,
                     muted: argument["muted"],    
@@ -172,7 +189,7 @@ function apply(sub, args) { // FIXME Redefine apply so as to check whether a val
                     index: argument["index"],
                     name: argument["name"],
                     isAssigned: true,
-                    value: sub[argument["name"]],
+                    value: tempVal,
                     muted: argument["muted"],
                 });
             }
@@ -202,16 +219,17 @@ function listUnification(list1, list2, unifier) {
 
 function unify(x, y) { // x, y are literals. Assymetric unification since y is assumed to be known/part of some set of inferred facts!
     "use strict";
-    if (x["name"] != y["name"] || x["arity"] != y["arity"] || x["sign"] != y["sign"]) {
+    if (x["name"] !== y["name"] || x["arity"] !== y["arity"] || x["sign"] !== y["sign"]) {
         return undefined;
     }
     const xArgs = x["args"];
     const yArgs = y["args"];
     const unifier = {};
+    // console.log("x:", x, "\ny:", y);
     for (let i=0; i<x["arity"]; i++) {
         let xArg = xArgs[i];
         let yArg = yArgs[i];
-        if (xArg["isAssigned"] && xArg["value"] != yArg["value"]) {
+        if (xArg["isAssigned"] && yArg["isAssigned"] && xArg["value"] !== yArg["value"]) {
             // console.log("Here?");
             // console.log(xArg);
             // console.log(yArg);
@@ -219,9 +237,13 @@ function unify(x, y) { // x, y are literals. Assymetric unification since y is a
             return undefined;
         }
         if (xArg["muted"] || yArg["muted"] || (xArg["name"] === undefined && yArg["name"] === undefined)) {
+            // console.log("xArg:", xArg, "\nyArg:", yArg);
             continue;
         }
-        if (Object.keys(unifier).length > 0 && Object.keys(unifier).includes(xArg["name"]) && unifier[xArg["name"]] != yArg["value"]) {
+        if (Object.keys(unifier).length > 0 && Object.keys(unifier).includes(xArg["name"]) && yArg["isAssigned"] && (unifier[xArg["name"]] !== yArg["value"] || unifier[xArg["name"]] !== yArg["name"])) {
+            return undefined;
+        }
+        if (Object.keys(unifier).includes(yArg["name"]) && xArg["isAssigned"] && (unifier[yArg["name"]] !== xArg["value"] || unifier[yArg["name"]] !== xArg["name"])) {
             return undefined;
         }
         // console.log("Here?");
@@ -230,10 +252,19 @@ function unify(x, y) { // x, y are literals. Assymetric unification since y is a
         // debugger;
         if (!xArg["isAssigned"] && !yArg["isAssigned"]) {
             // console.log("Here!\nxArg:", xArg, "\nyArg:", yArg);
-            unifier[xArg["name"]] = yArg["name"]; // TODO Fix this stuff where you use unify!
+            unifier[xArg["name"]] = yArg["name"];
+            // console.log("One", unifier);
             // console.log(unifier);
-        } else {
+        } else if (xArg["isAssigned"] && !yArg["isAssigned"]) {
+            unifier[yArg["name"]] = xArg["value"]; // TODO Does it work?
+            // console.log("Two:", unifier);
+        } else if (!xArg["isAssigned"] && yArg["isAssigned"]) {
             unifier[xArg["name"]] = yArg["value"];
+            // console.log("Three", unifier);
+        } else {
+            // console.log("Four");
+            unifier[yArg["name"]] = xArg["value"];
+            // console.log("Four", unifier);
         }
     }
     return unifier;
@@ -258,16 +289,34 @@ This may not be a bug in the sense that if the developer has chosen different va
 
 function extend(sub, unifier) {
     "use strict";
+    // console.log("sub:", sub);
     // console.log("Unifier in extend():");
     // console.log(unifier);
     const extendedSub = deepCopy(sub);
     // console.log("Sub:");
     // console.log(extendedSub);
     for (const key of Object.keys(unifier)) {
-        if (Object.keys(extendedSub).includes(key) && extendedSub[key] !== unifier[key]) {
+        if (Object.keys(extendedSub).includes(key) && extendedSub[key] !== unifier[key] && !isVarString(extendedSub[key])) {
+            // console.log("key:", key, "extendedSub[key]:", extendedSub[key]);
+            // console.log("ext includes?", Object.keys(extendedSub).includes(key));
+            // console.log("Var?", isVarString(extendedSub[key]));
             return undefined;
         } else if (!Object.keys(extendedSub).includes(key)) {
             extendedSub[key] = unifier[key];
+        }
+    }
+    for (const key of Object.keys(extendedSub)) {
+        // console.log("key:", key);
+        if (isVarString(extendedSub[key]) && Object.keys(unifier).includes(extendedSub[key])) { // In case some variable is unified with another variable included in the unifier...
+            let tempKey = key;
+            let tempVal = extendedSub[key];
+            const visitedKeys = [tempKey];
+            while (isVarString(tempVal) && Object.keys(unifier).includes(tempVal) && !visitedKeys.includes(tempVal)) {
+                tempKey = tempVal;
+                tempVal = unifier[tempVal];
+                visitedKeys.push(tempVal);
+            }
+            extendedSub[key] = tempVal;
         }
     }
     return extendedSub;
@@ -406,7 +455,7 @@ function forwardChaining(kbObject, context) { //FIXME Huge inconsistency with DO
         inferred = false;
         for (let i=0; i<kb.length; i++) {
             const rule = kb[i];
-            // console.log(ruleToString(rule));
+            // console.log(rule);
             // FIXME You have to fix the relational version in the same manner as the propositional!
             const subs = getSubstitutions(rule["body"], facts, code); // FIXME Not computing all substitutions --- actually none for: @KnowledgeBase
             // console.log(subs);

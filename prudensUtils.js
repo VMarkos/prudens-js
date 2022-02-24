@@ -122,3 +122,8 @@ function removeSupersets(listOfLists, list) {
     }
     return removeAll(listOfLists, toBeRemoved);
 }
+
+
+function isVarString(string) { // Is this really needed?
+    return /[A-Z]/.test(string.charAt(0));
+}
