@@ -104,7 +104,7 @@ function parseContext(context) {
         }
     }
     const spacingRe = /(\t|\r|\n|\v|\f|\s)*/;
-    const varNameRe = /(([a-z0-9]\w*)|(\d+[.]?\d*)|(\[(\s*\w+,\s*)*\s*\w+\s*\]))/;
+    const varNameRe = /(([a-zA-Z0-9]\w*)|(\d+[.]?\d*)|(\[(\s*\w+,\s*)*\s*\w+\s*\]))/; // FIXME This has been altered recently, allowing for variables in contexts!
     const predicateNameRe = /-?[a-z]\w*/;
     const casualPredicateRe = RegExp(predicateNameRe.source + String.raw`\((\s*` + varNameRe.source + String.raw`\s*,)*\s*` + varNameRe.source + String.raw`\s*\)`);
     const propositionalPredicateRe = /-?[a-z]\w*/;
@@ -223,6 +223,7 @@ function getLiteralArguments(argumentsString) {
             name = argument;
             value = undefined;
         }
+        // console.log("name:", name, "\nargument:", argument);
         args.push({
             index: i,
             name: name,
@@ -241,7 +242,7 @@ function getRuleBody(bodyString) {
     // const delim = /((?<=(?:\)\s*))(?:,))|((?<!(?:\([a-zA-Z0-9_,\s]+\)))(?:,))|(?:;)/; //This is added for the context. Originally, only /,/ is needed!
     const delim = /(?:;)|((?<=(?:\)\s*))(?:,))|((?<!(?:\(.*))(?:,))/;
     const bodyArray = bodyString.trim().split(delim);
-    if (bodyArray[bodyArray.length-1] == "") {
+    if (bodyArray[bodyArray.length-1] === "") {
         bodyArray.pop();
     }
     // console.log(bodyArray);
@@ -352,7 +353,7 @@ function kbToObject(kb) {
     return kbObject;
 }
 
-function parseKB(kbAll) {
+function parseKB(kbAll) { // TODO Add an error here about rules with the same name.
     "use strict";
     const warnings = [];
     if (!kbAll.includes("@KnowledgeBase")){
@@ -382,7 +383,7 @@ function parseKB(kbAll) {
             warnings.push({
                 type: "warning",
                 name: "CodeNotFound",
-                message: "I found no code under the @Code decorator. While I have no issue with it, as a kind reminder, @Code is used strictly below your knowledge base's rules to declare any custom Javascript predicates."
+                message: "I found no code under the @Code decorator. While I have no issue with that, as a kind reminder, @Code is used strictly below your knowledge base's rules to declare any custom Javascript predicates."
             });
         }
     } else {
@@ -425,6 +426,14 @@ function parseKB(kbAll) {
             message: "I found some syntax error in your knowledge base's rules. However, I'm still in beta so I can't tell you more about this! :("
         }
     }
+    const duplicate = containsDuplicates(kb);
+    if (duplicate) {
+        return {
+            type: "error",
+            name: "DuplicateRuleNamesError",
+            message: `You have provided at least two rules with the same name (${duplicate}).`,
+        }
+    }
     return {
         type: "output",
         kb: kbToObject(kb),
@@ -432,6 +441,19 @@ function parseKB(kbAll) {
         imports: imports,
         warnings: warnings,
     };
+}
+
+function containsDuplicates(kbString) {
+    const ruleNames = [];
+    for (const rule of kbString.split(";")) {
+        const trimmedRule = rule.trim();
+        const newRuleName = trimmedRule.substring(0, trimmedRule.indexOf("::")).trim();
+        if (ruleNames.includes(newRuleName)) {
+            return newRuleName;
+        }
+        ruleNames.push(newRuleName);
+    }
+    return undefined;
 }
 
 function codeToObject(code) { // TODO You need to take care of errors here like defining the same function twice etc and create appropriate messages!
