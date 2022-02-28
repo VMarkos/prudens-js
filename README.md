@@ -336,3 +336,6 @@ Each of the lists presented above consists a distinct abductive proof of `finalT
 
 # Induction
 Regarding induction, we again adhere to the learning protocol declared [here](https://www.internetofus.eu/wp-content/uploads/sites/38/2021/05/Michael_2019_MachineCoaching.pdf), so induction within the context of Prudens JS consists to merely appending rules to a knowledge base taking care of updating priorities properly - hence, there are no built-in functionalities regarding induction.
+
+# Known Bugs
+- [ ] Relatively large and complex knowledge bases (e.g., about 460 rules large with an average body size of 10-15) fail to pass syntax checks. This is a known bug of the knowledge base parser (`parseKB()`) and is not related to knowledge bases that are passed diretly as JSON objects to the deduction or abduction functions.
