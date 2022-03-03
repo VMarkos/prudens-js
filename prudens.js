@@ -481,6 +481,8 @@ function forwardChaining(kbObject, context) { //FIXME Huge inconsistency with DO
         // i++;
         // console.log(i);
     } while (inferred);
+    console.log("facts:", facts);
+    console.log("graph:", graph);
     return {
         facts: facts,
         graph: graph,
