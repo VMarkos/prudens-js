@@ -1,8 +1,20 @@
 function deepCopy(object) { // This is a level 1 deep copy --- i.e. if some value is itself another JS-object, it will be copied in a shallow manner.
     "use strict";
-    const copycat = {};
+    let copycat;
+    if (Array.isArray(object)) {
+        copycat = [];
+        for (const element of object) {
+            copycat.push(deepCopy(element));
+        }
+        return copycat;
+    }
+    copycat = {};
     for (const key of Object.keys(object)) {
-        copycat[key] = object[key];
+        if (typeof object[key] === "object") {
+            copycat[key] = deepCopy(object[key]);
+        } else {
+            copycat[key] = object[key];
+        }
     }
     return copycat;
 }

@@ -34,9 +34,9 @@ function abduce() {
     if (domainsObject["type"] === "error") {
         return "ERROR: " + domainsObject["name"] + ":\n" + domainsObject["message"];
     }
-    // const output = greedyPropositionalAbduction(kbObject, contextObject["context"], targetsObject["targets"][0]); // TODO This version of abduction handles only one target --- a simple loop could fix this.
+    const output = greedyPropositionalAbduction(kbObject, contextObject["context"], targetsObject["targets"]); // TODO This version of abduction handles only one target --- a simple loop could fix this.
     console.log(domainsObject);
-    const output = greedyRelationalAbduction(kbObject, contextObject["context"], targetsObject["targets"][0], domainsObject["predicates"]);
+    // const output = greedyRelationalAbduction(kbObject, contextObject["context"], targetsObject["targets"][0], domainsObject["predicates"]);
     // console.log(output);
     const outputString = "";
     if (warnings.length > 0) {
@@ -75,7 +75,7 @@ function deduce() {
         outputString += warning["name"] + ": " + warning["message"] + "\n";
     }
     // console.log(graph);
-    return outputString + "Inferences: " + contextToString(inferences) + "\nGraph: " + graphToString(graph);
+    return outputString + "Context: " + contextToString(contextObject["context"]) + "\nInferences: " + contextToString(inferences) + "\nGraph: " + graphToString(graph);
 }
 
 function consoleOutput() {

@@ -441,7 +441,17 @@ function updateGraph(inferredHead, newRule, graph, facts, priorities, deletedRul
 }
 
 function forwardChaining(kbObject, context) { //FIXME Huge inconsistency with DOCS! You need to change that from [rule1, ...] to KBObject.
-    let facts = context;
+    let facts = deepCopy(context);
+    facts.push({
+        name: "true",
+        sign: true,
+        isJS: false,
+        isEquality: false,
+        isInequality: false,
+        isAction: false,
+        args: undefined,
+        arity: 0,
+    });
     const kb = kbObject["kb"];
     // console.log(facts);
     let inferred = false;
@@ -482,6 +492,7 @@ function forwardChaining(kbObject, context) { //FIXME Huge inconsistency with DO
         // console.log(i);
     } while (inferred);
     return {
+        context: context,
         facts: facts,
         graph: graph,
     }
