@@ -72,16 +72,16 @@ function contextParser() {
     if (contextList["type"] === "error") {
         return contextList;
     }
-    contextList["context"].push({
-        name: "true",
-        sign: true,
-        isJS: false,
-        isEquality: false,
-        isInequality: false,
-        isAction: false,
-        args: undefined,
-        arity: 0,
-    });
+    // contextList["context"].push({
+    //     name: "true",
+    //     sign: true,
+    //     isJS: false,
+    //     isEquality: false,
+    //     isInequality: false,
+    //     isAction: false,
+    //     args: undefined,
+    //     arity: 0,
+    // });
     return contextList;
 }
 
@@ -115,7 +115,7 @@ function parseContext(context) {
         return {
             type: "error",
             name: "ContextSyntaxError",
-            message: "I found some syntax error in your context. Remember that only predicates with **all** their arguments instantiated (i.e. constants) should appear. Also, all predicates should be separated by a semicolon (;), including the last one.",
+            message: "I found some syntax error in your context, however I am still in beta, so I cannot tell you more about that! :)",
         };
     }
     // console.log(context);
@@ -190,6 +190,10 @@ function getList(argument) {
 
 function parseList(listString) { // Input is of the form arg1, arg2, ..., argN, where argi is variable or constant.
     return getLiteralArguments(listString); // TODO Just rename the function below and make sure everything is up to date.
+}
+
+function parseConflicts() { // TODO You are here!
+
 }
 
 function getLiteralArguments(argumentsString) {
@@ -336,8 +340,7 @@ function getRuleHead(headString) {
 
 function kbToObject(kb) {
     "use strict";
-    const rules = kb.split(";");
-    rules.pop();
+    const rules = kb.split(";").filter(Boolean);
     const kbObject = [];
     for (const rule of rules){
         const delimiter = /(?:::)|(?:\simplies\s)/;
@@ -390,6 +393,36 @@ function parseKB(kbAll) { // TODO Add an error here about rules with the same na
         kb = kbWithCode;
         code = undefined;
     }
+    // const kbRe = RegExp(String.raw`(` + ruleName.source + String.raw`\s*::(\s*` + predicateRe.source + String.raw`\s*,)*\s*` + predicateRe.source + String.raw`\s+implies\s+` + headRe.source + String.raw`\s*;` + spacingRe.source + String.raw`)+`); // CHECKED!
+    // const kbRe = /((\t|\r|\n|\v|\f|\s)*\w+\s*::(\s*((-?\??[a-z]\w*)|(\?=)|(\?<))\((\s*(([a-zA-z]\w*)|(\d+[.]?\d*)|_)\s*,)*\s*(([a-zA-z]\w*)|(\d+[.]?\d*)|_)\s*\)\s*,)*\s*((-?\??[a-z]\w*)|(\?=)|(\?<))\((\s*(([a-zA-z]\w*)|(\d+[.]?\d*)|_)\s*,)*\s*(([a-zA-z]\w*)|(\d+[.]?\d*)|_)\s*\)\s+implies\s+((-?!?[a-z]\w*))\((\s*(([a-zA-z]\w*)|(\d+[.]?\d*)|_)\s*,)*\s*(([a-zA-z]\w*)|(\d+[.]?\d*)|_)\s*\)\s*;(\t|\r|\n|\v|\f|\s)*)+/;
+    // console.log(kbRe.source);
+    // console.log(kb.match(kbRe));
+    // console.log(kbToObject(kb));
+    // if (!kb.match(kbRe) || kb.match(kbRe)[0] !== kb) {
+    const kbTest = kbCheck(kb);
+    // console.log(kbTest);
+    if (kbTest["type"] === "error") {
+        return kbTest;
+    }
+    const duplicate = containsDuplicates(kbTest["rules"]);
+    if (duplicate) {
+        return {
+            type: "error",
+            name: "DuplicateRuleNamesError",
+            message: `You have provided at least two rules with the same name (${duplicate}).`,
+        };
+    }
+    return {
+        type: "output",
+        kb: kbToObject(kbTest["rules"]),
+        constraints: parseConstraints(kbTest["constraints"]),
+        code: codeToObject(code),
+        imports: imports,
+        warnings: warnings,
+    };
+}
+
+function kbCheck(kb) {
     const spacingRe = /\s*/; // CHECKED!
     const predicateNameRe = /(-?\??[a-z]\w*)/; // CHECKED!
     const mathPredicateRe = /\s*((-?\?=)|(-?\?<))\(.+,.+\)\s*/; // CHECKED!
@@ -413,34 +446,36 @@ function parseKB(kbAll) { // TODO Add an error here about rules with the same na
     // console.log(bodyRe.source);
     const headRe = RegExp(String.raw`((` + casualHeadRe.source + String.raw`)|(` + propositionalHeadRe.source + String.raw`))`); // CHECKED!
     // console.log(headRe.source);
-    const kbRe = RegExp(String.raw`(` + ruleName.source + String.raw`\s+::\s+` + bodyRe.source + String.raw`\s+implies\s+` + headRe.source + String.raw`\s*;` + spacingRe.source + String.raw`)+`); // CHECKED!
-    // const kbRe = RegExp(String.raw`(` + ruleName.source + String.raw`\s*::(\s*` + predicateRe.source + String.raw`\s*,)*\s*` + predicateRe.source + String.raw`\s+implies\s+` + headRe.source + String.raw`\s*;` + spacingRe.source + String.raw`)+`); // CHECKED!
-    // const kbRe = /((\t|\r|\n|\v|\f|\s)*\w+\s*::(\s*((-?\??[a-z]\w*)|(\?=)|(\?<))\((\s*(([a-zA-z]\w*)|(\d+[.]?\d*)|_)\s*,)*\s*(([a-zA-z]\w*)|(\d+[.]?\d*)|_)\s*\)\s*,)*\s*((-?\??[a-z]\w*)|(\?=)|(\?<))\((\s*(([a-zA-z]\w*)|(\d+[.]?\d*)|_)\s*,)*\s*(([a-zA-z]\w*)|(\d+[.]?\d*)|_)\s*\)\s+implies\s+((-?!?[a-z]\w*))\((\s*(([a-zA-z]\w*)|(\d+[.]?\d*)|_)\s*,)*\s*(([a-zA-z]\w*)|(\d+[.]?\d*)|_)\s*\)\s*;(\t|\r|\n|\v|\f|\s)*)+/;
-    // console.log(kbRe.source);
-    // console.log(kb.match(kbRe));
-    // console.log(kbToObject(kb));
-    if (!kb.match(kbRe) || kb.match(kbRe)[0] !== kb) {
-        return {
-            type: "error",
-            name: "KnowledgeBaseSyntaxError",
-            message: "I found some syntax error in your knowledge base's rules. However, I'm still in beta so I can't tell you more about this! :("
+    // const kbRe = RegExp(String.raw`(` + ruleName.source + String.raw`\s+::\s+` + bodyRe.source + String.raw`\s+implies\s+` + headRe.source + String.raw`\s*;` + spacingRe.source + String.raw`)+`); // CHECKED!
+    const ruleRe = RegExp(String.raw`(` + ruleName.source + String.raw`\s+::\s+` + bodyRe.source + String.raw`\s+implies\s+` + headRe.source + String.raw`\s*;` + spacingRe.source + String.raw`)`);
+    const constrainRe = RegExp(String.raw`(` + ruleName.source + String.raw`\s+::\s+` + predicateRe.source + String.raw`\s+#\s+` + predicateRe.source + String.raw`\s*;` + spacingRe.source + String.raw`)`);
+    const ruleStrings = kb.split(";").filter(Boolean);
+    let rules = "", constraints = "";
+    // console.log(ruleStrings);
+    for (let i=0; i<ruleStrings.length; i++) {
+        const ruleString = ruleStrings[i] + ";";
+        const ruleMatch = ruleString.match(ruleRe);
+        const constraintMatch = ruleString.match(constrainRe);
+        if (ruleMatch && ruleMatch[0] === ruleString) {
+            rules += ruleString;
         }
-    }
-    const duplicate = containsDuplicates(kb);
-    if (duplicate) {
-        return {
-            type: "error",
-            name: "DuplicateRuleNamesError",
-            message: `You have provided at least two rules with the same name (${duplicate}).`,
+        else if (constraintMatch && constraintMatch[0] === ruleString) {
+            constraints += ruleString;
+            // console.log("constraints:", constraints);
+        }
+        else {
+            return {
+                type: "error",
+                name: "KnowledgeBaseSyntaxError",
+                message: `Invalid syntax in rule "${ruleString}"`,
+            };
         }
     }
     return {
-        type: "output",
-        kb: kbToObject(kb),
-        code: codeToObject(code),
-        imports: imports,
-        warnings: warnings,
-    };
+        type: "valid", // FIXME Well, better phrasing would be... better.
+        rules: rules,
+        constraints: constraints,
+    }
 }
 
 function containsDuplicates(kbString) {
@@ -454,6 +489,40 @@ function containsDuplicates(kbString) {
         ruleNames.push(newRuleName);
     }
     return undefined;
+}
+
+function parseConstraints(constraintsString) {
+    const constraints = new Map();
+    let item;
+    for (const constraint of constraintsString.split(";").filter(Boolean)) {
+        item = parseConstraint(constraint);
+        if (constraints.has(item["key1"])) {
+            constraints.get(item["key1"]).push(item["constraint1"]);
+        } else {
+            constraints.set(item["key1"], [item["constraint1"]]);
+        }
+        if (constraints.has(item["key2"])) {
+            constraints.get(item["key2"]).push(item["constraint2"]);
+        } else {
+            constraints.set(item["key2"], [item["constraint2"]]);
+        }
+    }
+    return constraints;
+}
+
+function parseConstraint(constraintString) {
+    // console.log("constraintsString:", constraintString);
+    const predicates = constraintString.split("::")[1].split("#");
+    // console.log("predicates:", predicates);
+    // .split("#");
+    const leftPredicate = parseLiteral(predicates[0]);
+    const rightPredicate = parseLiteral(predicates[1]);
+    return {
+        key1: ((leftPredicate["sign"])? "" : "-") + leftPredicate["name"] + leftPredicate["arity"],
+        constraint1: rightPredicate,
+        key2: ((rightPredicate["sign"])? "" : "-") + rightPredicate["name"] + rightPredicate["arity"],
+        constraint2: leftPredicate,
+    }
 }
 
 function codeToObject(code) { // TODO You need to take care of errors here like defining the same function twice etc and create appropriate messages!

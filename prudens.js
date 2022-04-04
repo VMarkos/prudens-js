@@ -381,14 +381,13 @@ R3 :: h(X) implies -f(X);
 Context: g(b); h(b);
 */
 
-function updateGraph(inferredHead, newRule, graph, facts, priorities, deletedRules) { //TODO You may need to store the substitution alongside each rule, in case one needs to count how many time a rule has been triggered or so.
-    const oppositeHead = {}
-    for (const key of Object.keys(inferredHead)) {
-        oppositeHead[key] = inferredHead[key];
-    }
-    oppositeHead["sign"] = !oppositeHead["sign"];
+function updateGraph(inferredHead, newRule, graph, facts, priorities, deletedRules, sub, constraints) { //TODO You may need to store the substitution alongside each rule, in case one needs to count how many time a rule has been triggered or so.
     let inferred = false;
+    console.log("inferredHead:", inferredHead);
+    console.log("facts:", facts);
+    // debugger;
     if (deepIncludes(inferredHead, facts)) {
+        console.log("Includes inferredHead");
         if (!Object.keys(graph).includes(literalToString(inferredHead))) {
             graph[literalToString(inferredHead)] = [newRule]; // TODO Newly added code, check for potentially unexpected behaviours!
             inferred = true;
@@ -398,39 +397,80 @@ function updateGraph(inferredHead, newRule, graph, facts, priorities, deletedRul
             inferred = true;
             // console.log("Includes head and not rule.");
         }
-    } else if (deepIncludes(oppositeHead, facts)) {
-        const toBeRemoved = [];
-        for (const rule of graph[literalToString(oppositeHead)]) {
-            if (priorities[ruleToString(rule)] > priorities[ruleToString(newRule)]) {
-                toBeRemoved.push(rule);
-                if (!deepIncludes(rule, deletedRules)); {
-                    deletedRules.push(rule);
+        return {
+            graph: graph,
+            facts: facts,
+            inferred: inferred,
+            deletedRules: deletedRules,
+        };
+    }
+    const casualConflict = {}
+    for (const key of Object.keys(inferredHead)) {
+        casualConflict[key] = inferredHead[key];
+    }
+    casualConflict["sign"] = !casualConflict["sign"];
+    const conflicts = [applyToLiteral(sub, casualConflict)];
+    console.log("constraints:", constraints);
+    const key = ((inferredHead["sign"])? "": "-") + inferredHead["name"] + inferredHead["arity"];
+    if (constraints.has(key)) {
+        for (const conflict of constraints.get(key)) {
+            conflicts.push(applyToLiteral(sub, conflict));
+            /* Temp Bug:
+            @KnowledgeBase
+            R1 :: f(X) implies z(X);
+            R2 :: g(Y) implies y(Y);
+            C1 :: z(X) # y(X);
+            */
+        }
+    }
+    console.log("conflicts:", conflicts);
+    let includesConflict = false;
+    for (const oppositeHead of conflicts) {
+        console.log("Here");
+        if (deepIncludes(oppositeHead, facts, true)) {
+            console.log("indludes:", oppositeHead);
+            includesConflict = true;
+            const toBeRemoved = [];
+            console.log("facts:", facts);
+            console.log("graph:", graph);
+            console.log("lit:", oppositeHead);
+            for (const rule of graph[literalToString(oppositeHead)]) {
+                if (priorities[ruleToString(rule)] > priorities[ruleToString(newRule)]) {
+                    toBeRemoved.push(rule);
+                    if (!deepIncludes(rule, deletedRules)); {
+                        deletedRules.push(rule);
+                    }
+                    inferred = true;
+                    // console.log("Includes opposite head and not rule.");
                 }
-                inferred = true;
-                // console.log("Includes opposite head and not rule.");
+            }
+            if (graph[literalToString(oppositeHead)].length === toBeRemoved.length) {
+                console.log("Delete opp");
+                delete graph[literalToString(oppositeHead)];
+                console.log("graph:", graph);
+                // debugger;
+                graph[literalToString(inferredHead)] = [newRule];
+                // console.log("Facts prior to pushing: ", facts);
+                // debugger;
+                facts.push(inferredHead);
+                // console.log("Facts prior to splicing: ", facts, "\nIndex of opposite head: " + deepIndexOf(facts, oppositeHead));
+                // debugger;
+                // facts = facts.splice(deepIndexOf(facts, oppositeHead), 1); // FIXME .indexOf() returns -1 because, guess what, it does not work with lists of objects... Create a deep alternative.
+                facts = removeAll(facts, [oppositeHead]);
+                console.log("Facts post splicing: ", facts);
+                // debugger;
+            } else {
+                graph[literalToString(oppositeHead)] = removeAll(graph[literalToString(oppositeHead)], toBeRemoved);
             }
         }
-        if (graph[literalToString(oppositeHead)].length === toBeRemoved.length) {
-            delete graph[literalToString(oppositeHead)];
-            graph[literalToString(inferredHead)] = [newRule];
-            // console.log("Facts prior to pushing: ", facts);
-            // debugger;
-            facts.push(inferredHead);
-            // console.log("Facts prior to splicing: ", facts, "\nIndex of opposite head: " + deepIndexOf(facts, oppositeHead));
-            // debugger;
-            // facts = facts.splice(deepIndexOf(facts, oppositeHead), 1); // FIXME .indexOf() returns -1 because, guess what, it does not work with lists of objects... Create a deep alternative.
-            facts = removeAll(facts, [oppositeHead]);
-            // console.log("Facts post splicing: ", facts);
-            // debugger;
-        } else {
-            graph[literalToString(oppositeHead)] = removeAll(graph[literalToString(oppositeHead)], toBeRemoved);
-        }
-    } else {
+    }
+    if (!includesConflict) {
+        console.log("No conflict");
         facts.push(inferredHead);
         graph[literalToString(inferredHead)] = [newRule];
         inferred = true;
-        // console.log("Includes neither head nor rule.");
     }
+    // console.log("Includes neither head nor rule.");
     // console.log("Deleted Rules: ", deletedRules);
     return {
         graph: graph,
@@ -441,7 +481,17 @@ function updateGraph(inferredHead, newRule, graph, facts, priorities, deletedRul
 }
 
 function forwardChaining(kbObject, context) { //FIXME Huge inconsistency with DOCS! You need to change that from [rule1, ...] to KBObject.
-    let facts = context;
+    let facts = deepCopy(context);
+    facts.push({
+        name: "true",
+        sign: true,
+        isJS: false,
+        isEquality: false,
+        isInequality: false,
+        isAction: false,
+        args: undefined,
+        arity: 0,
+    });
     const kb = kbObject["kb"];
     // console.log(facts);
     let inferred = false;
@@ -466,8 +516,8 @@ function forwardChaining(kbObject, context) { //FIXME Huge inconsistency with DO
                 // console.log(code);
                 // console.log("Rule head:");
                 // console.log(rule["head"]);
-                const inferredHead = applyToLiteral(sub, rule["head"]); // FIXME What is a user provides an ungrounded head with a propositional body?
-                const updatedGraph = updateGraph(inferredHead, rule, graph, facts, priorities, deletedRules);
+                const inferredHead = applyToLiteral(sub, rule["head"]);
+                const updatedGraph = updateGraph(inferredHead, rule, graph, facts, priorities, deletedRules, sub, kbObject["constraints"]);
                 // console.log(updatedGraph);
                 graph = updatedGraph["graph"]; // You could probably push the entire graph Object!
                 facts = updatedGraph["facts"];
@@ -482,6 +532,7 @@ function forwardChaining(kbObject, context) { //FIXME Huge inconsistency with DO
         // console.log(i);
     } while (inferred);
     return {
+        context: context,
         facts: facts,
         graph: graph,
     }

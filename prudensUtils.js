@@ -1,8 +1,20 @@
 function deepCopy(object) { // This is a level 1 deep copy --- i.e. if some value is itself another JS-object, it will be copied in a shallow manner.
     "use strict";
-    const copycat = {};
+    let copycat;
+    if (Array.isArray(object)) {
+        copycat = [];
+        for (const element of object) {
+            copycat.push(deepCopy(element));
+        }
+        return copycat;
+    }
+    copycat = {};
     for (const key of Object.keys(object)) {
-        copycat[key] = object[key];
+        if (typeof object[key] === "object") {
+            copycat[key] = deepCopy(object[key]);
+        } else {
+            copycat[key] = object[key];
+        }
     }
     return copycat;
 }
@@ -14,7 +26,7 @@ function removeAll(list, toBeRemoved) {
         return list;
     }
     for (let i=0; i<list.length; i++) {
-        if (deepIncludes(list[i], toBeRemoved)) { // Shallow check, might need revision!
+        if (deepIncludes(list[i], toBeRemoved, true)) { // Shallow check, might need revision!
             // console.log("List pre-splice in removeAll: ", list, "\nList[i]: ", list[i]);
             list.splice(i, 1);
             // console.log("List post splicing: ", list);
@@ -73,8 +85,22 @@ function arrayDeepEquals(x, y) { // x, y are arrays --- not used as of now!
     return true;
 }
 
-function deepIncludes(object, list) { //Re-implementation of Array.prototype.includes() that checks at depth=1 for equal objects.
-    "use strict";
+function deepIncludes(object, list, stringHash = false) { //Re-implementation of Array.prototype.includes() that checks at depth=1 for equal objects. 
+    // "use strict"; // TODO Consider rewriting this or somehow map each object to it (hashed) string representation (it seems that this is what you actually need).
+    if (stringHash) { // FIXME Too bad...
+        // const stringLiteral = literalToString(object);
+        // for (const entry of list) {
+        //     if (literalToString(entry) == stringLiteral) {
+        //         return true;
+        //     }
+        // }
+        for (const entry of list) {
+            if (unify(object, entry) !== undefined) {
+                return true;
+            }
+        }
+        return false;
+    }
     for (const entry of list) {
         if (deepEquals(object, entry)) {
             return true;

@@ -75,7 +75,7 @@ function deduce() {
         outputString += warning["name"] + ": " + warning["message"] + "\n";
     }
     // console.log(graph);
-    return outputString + "Inferences: " + contextToString(inferences) + "\nGraph: " + graphToString(graph);
+    return outputString + "Context: " + contextToString(contextObject["context"]) + "\nInferences: " + contextToString(inferences) + "\nGraph: " + graphToString(graph);
 }
 
 function consoleOutput() {
