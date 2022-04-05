@@ -356,7 +356,7 @@ function kbToObject(kb) {
     return kbObject;
 }
 
-function parseKB(kbAll) { // TODO Add an error here about rules with the same name.
+function parseKB(kbAll) {
     "use strict";
     const warnings = [];
     if (!kbAll.includes("@KnowledgeBase")){
@@ -447,7 +447,7 @@ function kbCheck(kb) {
     const headRe = RegExp(String.raw`((` + casualHeadRe.source + String.raw`)|(` + propositionalHeadRe.source + String.raw`))`); // CHECKED!
     // console.log(headRe.source);
     // const kbRe = RegExp(String.raw`(` + ruleName.source + String.raw`\s+::\s+` + bodyRe.source + String.raw`\s+implies\s+` + headRe.source + String.raw`\s*;` + spacingRe.source + String.raw`)+`); // CHECKED!
-    const ruleRe = RegExp(String.raw`(` + ruleName.source + String.raw`\s+::\s+` + bodyRe.source + String.raw`\s+implies\s+` + headRe.source + String.raw`\s*;` + spacingRe.source + String.raw`)`);
+    const ruleRe = RegExp(String.raw`(` + ruleName.source + String.raw`\s*::\s*(` + bodyRe.source + String.raw`)?\s+implies\s+` + headRe.source + String.raw`\s*;` + spacingRe.source + String.raw`)`);
     const constrainRe = RegExp(String.raw`(` + ruleName.source + String.raw`\s+::\s+` + predicateRe.source + String.raw`\s+#\s+` + predicateRe.source + String.raw`\s*;` + spacingRe.source + String.raw`)`);
     const ruleStrings = kb.split(";").filter(Boolean);
     let rules = "", constraints = "";
@@ -497,14 +497,14 @@ function parseConstraints(constraintsString) {
     for (const constraint of constraintsString.split(";").filter(Boolean)) {
         item = parseConstraint(constraint);
         if (constraints.has(item["key1"])) {
-            constraints.get(item["key1"]).push(item["constraint1"]);
+            constraints.get(item["key1"])["constraints"].push(item["constraint1"]);
         } else {
-            constraints.set(item["key1"], [item["constraint1"]]);
+            constraints.set(item["key1"], {constraints: [item["constraint1"]], keyObject: item["constraint2"]});
         }
         if (constraints.has(item["key2"])) {
-            constraints.get(item["key2"]).push(item["constraint2"]);
+            constraints.get(item["key2"])["constraints"].push(item["constraint2"]);
         } else {
-            constraints.set(item["key2"], [item["constraint2"]]);
+            constraints.set(item["key2"], {constraints: [item["constraint2"]], keyObject: item["constraint1"]});
         }
     }
     return constraints;

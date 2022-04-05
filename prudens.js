@@ -383,11 +383,11 @@ Context: g(b); h(b);
 
 function updateGraph(inferredHead, newRule, graph, facts, priorities, deletedRules, sub, constraints) { //TODO You may need to store the substitution alongside each rule, in case one needs to count how many time a rule has been triggered or so.
     let inferred = false;
-    console.log("inferredHead:", inferredHead);
-    console.log("facts:", facts);
+    // console.log("inferredHead:", inferredHead);
+    // console.log("facts:", facts);
     // debugger;
     if (deepIncludes(inferredHead, facts)) {
-        console.log("Includes inferredHead");
+        // console.log("Includes inferredHead");
         if (!Object.keys(graph).includes(literalToString(inferredHead))) {
             graph[literalToString(inferredHead)] = [newRule]; // TODO Newly added code, check for potentially unexpected behaviours!
             inferred = true;
@@ -410,30 +410,26 @@ function updateGraph(inferredHead, newRule, graph, facts, priorities, deletedRul
     }
     casualConflict["sign"] = !casualConflict["sign"];
     const conflicts = [applyToLiteral(sub, casualConflict)];
-    console.log("constraints:", constraints);
+    // console.log("constraints:", constraints);
     const key = ((inferredHead["sign"])? "": "-") + inferredHead["name"] + inferredHead["arity"];
     if (constraints.has(key)) {
-        for (const conflict of constraints.get(key)) {
-            conflicts.push(applyToLiteral(sub, conflict));
-            /* Temp Bug:
-            @KnowledgeBase
-            R1 :: f(X) implies z(X);
-            R2 :: g(Y) implies y(Y);
-            C1 :: z(X) # y(X);
-            */
+        const keyObject = constraints.get(key)["keyObject"];
+        for (const conflict of constraints.get(key)["constraints"]) {
+            const constraintUnifier = unify(keyObject, inferredHead);
+            conflicts.push(applyToLiteral(sub, applyToLiteral(constraintUnifier, conflict)));
         }
     }
-    console.log("conflicts:", conflicts);
+    // console.log("key:", key, "\nconflicts:", conflicts);
     let includesConflict = false;
     for (const oppositeHead of conflicts) {
-        console.log("Here");
+        // console.log("Here");
         if (deepIncludes(oppositeHead, facts, true)) {
-            console.log("indludes:", oppositeHead);
+            // console.log("indludes:", oppositeHead);
             includesConflict = true;
             const toBeRemoved = [];
-            console.log("facts:", facts);
-            console.log("graph:", graph);
-            console.log("lit:", oppositeHead);
+            // console.log("facts:", facts);
+            // console.log("graph:", graph);
+            // console.log("lit:", oppositeHead);
             for (const rule of graph[literalToString(oppositeHead)]) {
                 if (priorities[ruleToString(rule)] > priorities[ruleToString(newRule)]) {
                     toBeRemoved.push(rule);
@@ -442,12 +438,13 @@ function updateGraph(inferredHead, newRule, graph, facts, priorities, deletedRul
                     }
                     inferred = true;
                     // console.log("Includes opposite head and not rule.");
+                    // debugger;
                 }
             }
             if (graph[literalToString(oppositeHead)].length === toBeRemoved.length) {
-                console.log("Delete opp");
+                // console.log("Delete opp");
                 delete graph[literalToString(oppositeHead)];
-                console.log("graph:", graph);
+                // console.log("graph:", graph);
                 // debugger;
                 graph[literalToString(inferredHead)] = [newRule];
                 // console.log("Facts prior to pushing: ", facts);
@@ -457,7 +454,7 @@ function updateGraph(inferredHead, newRule, graph, facts, priorities, deletedRul
                 // debugger;
                 // facts = facts.splice(deepIndexOf(facts, oppositeHead), 1); // FIXME .indexOf() returns -1 because, guess what, it does not work with lists of objects... Create a deep alternative.
                 facts = removeAll(facts, [oppositeHead]);
-                console.log("Facts post splicing: ", facts);
+                // console.log("Facts post splicing: ", facts);
                 // debugger;
             } else {
                 graph[literalToString(oppositeHead)] = removeAll(graph[literalToString(oppositeHead)], toBeRemoved);
@@ -465,7 +462,7 @@ function updateGraph(inferredHead, newRule, graph, facts, priorities, deletedRul
         }
     }
     if (!includesConflict) {
-        console.log("No conflict");
+        // console.log("No conflict");
         facts.push(inferredHead);
         graph[literalToString(inferredHead)] = [newRule];
         inferred = true;
@@ -505,6 +502,9 @@ function forwardChaining(kbObject, context) { //FIXME Huge inconsistency with DO
         inferred = false;
         for (let i=0; i<kb.length; i++) {
             const rule = kb[i];
+            if (deepIncludes(rule, deletedRules)) {
+                continue;
+            }
             // console.log(rule);
             // FIXME You have to fix the relational version in the same manner as the propositional!
             const subs = getSubstitutions(rule["body"], facts, code); // FIXME Not computing all substitutions --- actually none for: @KnowledgeBase
