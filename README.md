@@ -20,6 +20,9 @@ A variable is a JSON object of the following form:
     isAssignued: true/false,
     value: "valueString",
     muted: true/false,
+    isExpression: true/false,
+    isList: [beta feature],
+    list: [beta feature],
 }
 ```
 In the above, `index` corresponds to the index in the arguments' list of a predicate in which the corresponding variable appears. `name` and `value` correspond to the strings that serve as the name and, possibly, the value of the variable, while `isAssigned` is a boolean field which is `true` in case `value` is not `undefined` or `null`. Lastly, `muted` is another boolean parameter which corresponds to whether a variable has been declared as redundant in some case - i.e., using the `_` symbol in Prudens's syntax.
