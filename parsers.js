@@ -208,7 +208,8 @@ function getLiteralArguments(argumentsString) {
         let muted = false;
         const argument = argumentsArray[i].trim();
         const isVar = /[A-Z_]/;
-        const isAssigned = !isVar.test(argument.charAt(0)) || /[^\w]/.test(argument);
+        const isExpression = /[^\w]/.test(argument);
+        const isAssigned = !isVar.test(argument.charAt(0)) || isExpression;
         const isList = /\[.+\]/.test(argument); // TODO This may need to be further specified.
         let list = undefined;
         if (isList) {
@@ -236,6 +237,7 @@ function getLiteralArguments(argumentsString) {
             muted: muted,
             isList: isList,
             list: list,
+            isExpression: isExpression,
         });
     }
     return args;

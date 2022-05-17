@@ -561,7 +561,7 @@ function isConflicting(x, y) { // x and y are literals.
     return true;
 }
 
-function jsEvaluation(body, sub, code) { // Check whether, given a substitution, the corresponding JS predicates hold.
+function jsEvaluation(body, sub, code) { // Checks whether, given a substitution, the corresponding JS predicates hold.
     let isValid = true;
     // console.log("Body:");
     // console.log(body);
@@ -591,6 +591,7 @@ function jsEvaluation(body, sub, code) { // Check whether, given a substitution,
 function equalityCheck(literal, sub) {
     let leftArg = literal["args"][0];
     let rightArg = literal["args"][1];
+    const sign = literal["sign"];
     // console.log("Args:");
     // console.log(leftArg);
     // console.log(rightArg);
@@ -624,10 +625,9 @@ function equalityCheck(literal, sub) {
         };
     }
     if (leftArg["isAssigned"] && rightArg["isAssigned"]) {
-        // const parser = ;
         // console.log(leftArg["value"] + " === " + rightArg["value"]);
         return {
-            isValid: numParser(leftArg["value"] + " === " + rightArg["value"]).call(),
+            isValid: sign === numParser(evalExpression(leftArg, sub) + " === " + evalExpression(rightArg, sub)).call(), // TODO Consider unifying evalExpression() and applyToString() to a single function if it actually makes sense.
             unifier: undefined,
         };
     }
@@ -729,7 +729,7 @@ function jsCheck(literal, sub, code) {
 }
 
 function numParser(string) {
-    // console.log(string);
+    // console.log("numParser:", string);
     return Function('"use strict"; return (' + string + ');');
 }
 
@@ -740,13 +740,21 @@ function applyToString(string, sub) {
     string = string.trim();
     for (const variable of Object.keys(sub)) {
         const varRE = RegExp(String.raw`((?<!\w)(` + variable + String.raw`))(?!\w)`, "g");
-        const oldString = string;
+        // const oldString = string; // TODO This as well?
         string = string.replaceAll(varRE, sub[variable]);
-        // console.log(string);
-        if (string === oldString) {
-            return "false;";
-        }
+        // console.log("string in loop:", string);
+        // if (string === oldString) { // TODO Why was this here?
+        //     return "false";
+        // }
     }
-    // console.log(string);
+    // console.log("applyToString", string);
     return string;
+}
+
+function evalExpression(expression, sub) {
+    if (!expression["isExpression"]) {
+        return expression["value"];
+    }
+    // console.log("expression:", expression, "sub:", sub);
+    return applyToString(expression["value"], sub);
 }

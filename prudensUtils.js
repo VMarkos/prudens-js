@@ -151,5 +151,6 @@ function removeSupersets(listOfLists, list) {
 
 
 function isVarString(string) { // Is this really needed?
-    return /[A-Z]/.test(string.charAt(0));
+    // console.log("string:", string);
+    return /[A-Z]/.test(("" + string).charAt(0));
 }
