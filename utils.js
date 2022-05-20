@@ -35,7 +35,7 @@ function abduce() {
         return "ERROR: " + domainsObject["name"] + ":\n" + domainsObject["message"];
     }
     const output = greedyPropositionalAbduction(kbObject, contextObject["context"], targetsObject["targets"]); // TODO This version of abduction handles only one target --- a simple loop could fix this.
-    console.log(domainsObject);
+    // console.log(domainsObject);
     // const output = greedyRelationalAbduction(kbObject, contextObject["context"], targetsObject["targets"][0], domainsObject["predicates"]);
     // console.log(output);
     const outputString = "";
@@ -75,7 +75,7 @@ function deduce() {
         outputString += warning["name"] + ": " + warning["message"] + "\n";
     }
     // console.log(graph);
-    return outputString + "Context: " + contextToString(contextObject["context"]) + "\nInferences: " + contextToString(inferences) + "\nGraph: " + graphToString(graph);
+    return outputString + "Context: " + contextToString(contextObject["context"]) + "\nInferences: " + contextToString(inferences) + "\nGraph: " + graphToString(graph) + "\nDilemmas: " + dilemmasToString(output["dilemmas"]);
 }
 
 function consoleOutput() {
@@ -199,4 +199,41 @@ function download(filename, content) {
     document.body.appendChild(element);
     element.click();
     document.body.removeChild(element);
+}
+
+// Parsers
+
+function contextParser() {
+    const context = document.getElementById(tab + "-context").value;
+    const contextList = parseContext(context);
+    // console.log(contextList);
+    if (contextList["type"] === "error") {
+        return contextList;
+    }
+    // contextList["context"].push({
+    //     name: "true",
+    //     sign: true,
+    //     isJS: false,
+    //     isEquality: false,
+    //     isInequality: false,
+    //     isAction: false,
+    //     args: undefined,
+    //     arity: 0,
+    // });
+    return contextList;
+}
+
+function targetParser() {
+    const targets = document.getElementById(tab + "-targets").value;
+    return parseTarget(targets);
+}
+
+function kbParser() {
+    const kbAll = document.getElementById(tab + "-kb").value;
+    return parseKB(kbAll);
+}
+
+function domainsParser() {
+    const domains = document.getElementById(tab + "-domains").value;
+    return parseDomains(domains);
 }

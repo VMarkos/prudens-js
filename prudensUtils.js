@@ -22,7 +22,7 @@ function deepCopy(object) { // This is a level 1 deep copy --- i.e. if some valu
 function removeAll(list, toBeRemoved) {
     "use strict";
     // console.log(list, toBeRemoved);
-    if (toBeRemoved.length == 0) {
+    if (toBeRemoved.length === 0) {
         return list;
     }
     for (let i=0; i<list.length; i++) {
@@ -86,7 +86,10 @@ function arrayDeepEquals(x, y) { // x, y are arrays --- not used as of now!
 }
 
 function deepIncludes(object, list, stringHash = false) { //Re-implementation of Array.prototype.includes() that checks at depth=1 for equal objects. 
-    // "use strict"; // TODO Consider rewriting this or somehow map each object to it (hashed) string representation (it seems that this is what you actually need).
+    // "use strict"; // TODO Consider rewriting this or somehow map each object to its (hashed) string representation (it seems that this is what you actually need).
+    if (list === undefined) {
+		return false;
+	}
     if (stringHash) { // FIXME Too bad...
         // const stringLiteral = literalToString(object);
         // for (const entry of list) {

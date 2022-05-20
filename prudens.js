@@ -363,13 +363,56 @@ function applyToRule(sub, rule) {
     return subRule;
 }
 
-function getPriorities(kb) { // Linear order induced priorities.
-    priorities = {};
-    for (let i=0; i<kb.length; i++) {
-        // console.log(kb);
-        priorities[ruleToString(kb[i])] = kb.length - i - 1; // TODO Remember this is in reverse order!
+/*
+ * IMPORTANT NOTE!
+ * 		A priority function is supposed to return either boolean values or undefined. Namely, prior(x, y) should be true if
+ * 		x > y, false if y < x and undefined in case x and y are incomparable.
+ */
+
+function linearPriorities(rule1, rule2, kbObject, sub) { // true if rule1 is of HIGHER priority than rule2.
+    return kbObject["kb"].indexOf(rule1) > kbObject["kb"].indexOf(rule2);
+}
+
+function specificityPriorities(rule1, rule2, kbObject, sub) { // true if rule1 is of HIGHER priority than rule2.
+    const body1 = rule1["body"];
+    const body2 = rule2["body"];
+    // console.log("body1:", body1, "body2:", body2, "sub:", sub);
+    if (isMoreSpecific(body1, body2, sub)) {
+		return true;
+	}
+    if (isMoreSpecific(body2, body1, sub)) {
+		return false;
+	}
+	return undefined;
+}
+
+function isMoreSpecific(body1, body2, sub) { // true if body1 is more specific than body2, false otherwise.
+	let included, unifiable;
+	for (const literal2 of body2) {
+        included = false;
+        for (const literal1 of body1) {
+            unifiable = unify(applyToLiteral(sub, literal1), applyToLiteral(sub, literal2));
+            // console.log("unifier:", unifiable);
+            if (unifiable) {
+				// console.log("Why here?");
+                included = true;
+                break;
+            }
+        }
+        if (!included) {
+			// console.log("false");
+			return false;
+        }
     }
-    return priorities;
+    return true;
+}
+
+function customPrioritiesFunction(rule1, rule2, kbObject, sub) { // true if rule1 is of HIGHER priority than rule2.
+    const priorities = kbObject["customPriorities"];
+    if (!Object.keys(priorities).includes(rule1["name"]) || !Object.keys(priorities).includes(rule2["name"])) {
+        return undefined;
+    }
+    return priorities[rule1["name"]] > priorities[rule2["name"]];
 }
 
 /* Test case that fails!
@@ -381,12 +424,21 @@ R3 :: h(X) implies -f(X);
 Context: g(b); h(b);
 */
 
-function updateGraph(inferredHead, newRule, graph, facts, priorities, deletedRules, sub, constraints) { //TODO You may need to store the substitution alongside each rule, in case one needs to count how many time a rule has been triggered or so.
+/*
+ Dilemmas:
+	* Existing rule, r1, that infers z and new rule, r2, that infers -z;
+	* Current policy: Remove all rules that infer z and are of lower priority than r2;
+	* In case r2 beats every rule that infers z, then -z and r2 are added to the graph ONLY IF r2 is indeed of higher priority than
+		* all such rules. Otherwise, we merely keep track of the agent's dilemmas.
+ * */
+
+function updateGraph(inferredHead, newRule, graph, facts, priorityFunction, deletedRules, sub, constraints, kbObject, dilemmas) { //TODO You may need to store the substitution alongside each rule, in case one needs to count how many time a rule has been triggered or so.
     let inferred = false;
     // console.log("inferredHead:", inferredHead);
     // console.log("facts:", facts);
     // debugger;
-    if (deepIncludes(inferredHead, facts)) {
+    const headInDilemma = isInDilemma(newRule, dilemmas)
+    if (deepIncludes(inferredHead, facts) && !headInDilemma) {
         // console.log("Includes inferredHead");
         if (!Object.keys(graph).includes(literalToString(inferredHead))) {
             graph[literalToString(inferredHead)] = [newRule]; // TODO Newly added code, check for potentially unexpected behaviours!
@@ -421,6 +473,7 @@ function updateGraph(inferredHead, newRule, graph, facts, priorities, deletedRul
     }
     // console.log("key:", key, "\nconflicts:", conflicts);
     let includesConflict = false;
+    let isPrior, beatsAll;
     for (const oppositeHead of conflicts) {
         // console.log("Here");
         if (deepIncludes(oppositeHead, facts, true)) {
@@ -430,15 +483,24 @@ function updateGraph(inferredHead, newRule, graph, facts, priorities, deletedRul
             // console.log("facts:", facts);
             // console.log("graph:", graph);
             // console.log("lit:", oppositeHead);
+            beatsAll = true;
             for (const rule of graph[literalToString(oppositeHead)]) {
-                if (priorities[ruleToString(rule)] > priorities[ruleToString(newRule)]) {
+				isPrior = priorityFunction(newRule, rule, kbObject, sub);
+                if (isPrior === undefined || isPrior) {
                     toBeRemoved.push(rule);
-                    if (!deepIncludes(rule, deletedRules)); {
+                    if (!deepIncludes(rule, deletedRules)) {
                         deletedRules.push(rule);
                     }
                     inferred = true;
                     // console.log("Includes opposite head and not rule.");
                     // debugger;
+                    if (isPrior === undefined) {
+						if (!deepIncludes([rule, newRule, sub], dilemmas) && !deepIncludes([newRule, rule, sub])) {
+							dilemmas.push([rule, newRule, sub]);
+						}
+						beatsAll = false;
+						inferred = false;
+					}
                 }
             }
             if (graph[literalToString(oppositeHead)].length === toBeRemoved.length) {
@@ -446,10 +508,12 @@ function updateGraph(inferredHead, newRule, graph, facts, priorities, deletedRul
                 delete graph[literalToString(oppositeHead)];
                 // console.log("graph:", graph);
                 // debugger;
-                graph[literalToString(inferredHead)] = [newRule];
-                // console.log("Facts prior to pushing: ", facts);
-                // debugger;
-                facts.push(inferredHead);
+                if (beatsAll) {
+					graph[literalToString(inferredHead)] = [newRule];
+					// console.log("Facts prior to pushing: ", facts);
+					// debugger;
+					facts.push(inferredHead);
+				}
                 // console.log("Facts prior to splicing: ", facts, "\nIndex of opposite head: " + deepIndexOf(facts, oppositeHead));
                 // debugger;
                 // facts = facts.splice(deepIndexOf(facts, oppositeHead), 1); // FIXME .indexOf() returns -1 because, guess what, it does not work with lists of objects... Create a deep alternative.
@@ -461,7 +525,7 @@ function updateGraph(inferredHead, newRule, graph, facts, priorities, deletedRul
             }
         }
     }
-    if (!includesConflict) {
+    if (!includesConflict && !headInDilemma) {
         // console.log("No conflict");
         facts.push(inferredHead);
         graph[literalToString(inferredHead)] = [newRule];
@@ -474,10 +538,23 @@ function updateGraph(inferredHead, newRule, graph, facts, priorities, deletedRul
         facts: facts,
         inferred: inferred,
         deletedRules: deletedRules,
+        dilemmas: dilemmas,
     };
 }
 
-function forwardChaining(kbObject, context) { //FIXME Huge inconsistency with DOCS! You need to change that from [rule1, ...] to KBObject.
+function isInDilemma(rule, dilemmas) {
+    if (dilemmas === undefined) {
+        return false;
+    }
+	for (const dilemma of dilemmas) {
+		if (deepIncludes(rule, dilemma.slice(1))) {
+			return true;
+		}
+	}
+	return false;
+}
+
+function forwardChaining(kbObject, context, priorityFunction=specificityPriorities) { //FIXME Huge inconsistency with DOCS! You need to change that from [rule1, ...] to KBObject.
     let facts = deepCopy(context);
     facts.push({
         name: "true",
@@ -494,9 +571,14 @@ function forwardChaining(kbObject, context) { //FIXME Huge inconsistency with DO
     let inferred = false;
     let graph = {};
     let deletedRules = [];
+    let dilemmas = [];
     // console.log(kbObject);
     const code = kbObject["code"];
-    const priorities = getPriorities(kb);
+    const customPriorities = kbObject["customPriorities"];
+    if (Object.keys(customPriorities).length > 0) {
+        priorityFunction = customPrioritiesFunction;
+    }
+    // const priorities = priorityFunction(kb);
     // let i = 0;
     do {
         inferred = false;
@@ -517,10 +599,11 @@ function forwardChaining(kbObject, context) { //FIXME Huge inconsistency with DO
                 // console.log("Rule head:");
                 // console.log(rule["head"]);
                 const inferredHead = applyToLiteral(sub, rule["head"]);
-                const updatedGraph = updateGraph(inferredHead, rule, graph, facts, priorities, deletedRules, sub, kbObject["constraints"]);
+                const updatedGraph = updateGraph(inferredHead, rule, graph, facts, priorityFunction, deletedRules, sub, kbObject["constraints"], kbObject, dilemmas);
                 // console.log(updatedGraph);
                 graph = updatedGraph["graph"]; // You could probably push the entire graph Object!
                 facts = updatedGraph["facts"];
+                dilemmas = updatedGraph["dilemmas"];
                 deletedRules = updatedGraph["deletedRules"];
                 if (!inferred) {
                     inferred = updatedGraph["inferred"];
@@ -535,6 +618,7 @@ function forwardChaining(kbObject, context) { //FIXME Huge inconsistency with DO
         context: context,
         facts: facts,
         graph: graph,
+        dilemmas: dilemmas,
     }
 }
 
