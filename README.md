@@ -160,6 +160,7 @@ In case `kb` passes all syntactical checks then an object like the following one
     type: "output",
     kb: [rule1, rule2,..., ruleN],
     code: "codeString",
+    customPriorities: {ruleName1: int1,..., ruleNameN: intN}
     imports: "importsString",
     warnings: [warning1, warning2,..., warningN],
 }
