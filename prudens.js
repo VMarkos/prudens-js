@@ -454,6 +454,7 @@ function updateGraph(inferredHead, newRule, graph, facts, priorityFunction, dele
             facts: facts,
             inferred: inferred,
             deletedRules: deletedRules,
+            dilemmas: dilemmas,
         };
     }
     const casualConflict = {}
