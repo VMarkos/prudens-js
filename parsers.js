@@ -21,11 +21,6 @@ f: {[a, b, c], [a, b]}
 g: {[a, b,c, d ], [a, c,d ]}
 */
 
-function domainsParser() {
-    const domains = document.getElementById(tab + "-domains").value;
-    return parseDomains(domains);
-}
-
 function parseDomains(domainsString) {
     const syntaxCheck = /(\s*\w+\s*:\s*\{\s*(\[(\s*\w+\s*,)*\s*\s+\s*\]\s*,)*\[(\s*\w+\s*,)*\s*\s+\s*\]\s*\}\s*)*/;
     if (!syntaxCheck.test(domainsString)) {
@@ -65,36 +60,6 @@ function parseValues(values) {
     return argumentValues;
 }
 
-function contextParser() {
-    const context = document.getElementById(tab + "-context").value;
-    const contextList = parseContext(context);
-    // console.log(contextList);
-    if (contextList["type"] === "error") {
-        return contextList;
-    }
-    // contextList["context"].push({
-    //     name: "true",
-    //     sign: true,
-    //     isJS: false,
-    //     isEquality: false,
-    //     isInequality: false,
-    //     isAction: false,
-    //     args: undefined,
-    //     arity: 0,
-    // });
-    return contextList;
-}
-
-function targetParser() {
-    const targets = document.getElementById(tab + "-targets").value;
-    return parseTarget(targets);
-}
-
-function kbParser() {
-    const kbAll = document.getElementById(tab + "-kb").value;
-    return parseKB(kbAll);
-}
-
 function parseContext(context) {
     "use strict";
     if (context === undefined || context === "") {
@@ -104,7 +69,7 @@ function parseContext(context) {
         }
     }
     const spacingRe = /(\t|\r|\n|\v|\f|\s)*/;
-    const varNameRe = /(([a-zA-Z0-9]\w*)|(\d+[.]?\d*)|(\[(\s*\w+,\s*)*\s*\w+\s*\]))/; // FIXME This has been altered recently, allowing for variables in contexts!
+    const varNameRe = /(([a-zA-Z0-9]\w*)|(-?\d+[.]?\d*)|(\[(\s*\w+,\s*)*\s*\w+\s*\]))/; // FIXME This has been altered recently, allowing for variables in contexts!
     const predicateNameRe = /-?[a-z]\w*/;
     const casualPredicateRe = RegExp(predicateNameRe.source + String.raw`\((\s*` + varNameRe.source + String.raw`\s*,)*\s*` + varNameRe.source + String.raw`\s*\)`);
     const propositionalPredicateRe = /-?[a-z]\w*/;
@@ -192,6 +157,10 @@ function parseList(listString) { // Input is of the form arg1, arg2, ..., argN, 
     return getLiteralArguments(listString); // TODO Just rename the function below and make sure everything is up to date.
 }
 
+function parseConflicts() { // TODO You are here!
+
+}
+
 function getLiteralArguments(argumentsString) {
     "use strict";
     const splitDelim = /(?<!(?:\[(?:\s*\w+\s*,)*\s*\w+\s*))(?:,)/;
@@ -204,7 +173,8 @@ function getLiteralArguments(argumentsString) {
         let muted = false;
         const argument = argumentsArray[i].trim();
         const isVar = /[A-Z_]/;
-        const isAssigned = !isVar.test(argument.charAt(0)) || /[^\w]/.test(argument);
+        const isExpression = /[^\w]/.test(argument);
+        const isAssigned = !isVar.test(argument.charAt(0)) || isExpression;
         const isList = /\[.+\]/.test(argument); // TODO This may need to be further specified.
         let list = undefined;
         if (isList) {
@@ -232,6 +202,7 @@ function getLiteralArguments(argumentsString) {
             muted: muted,
             isList: isList,
             list: list,
+            isExpression: isExpression,
         });
     }
     return args;
@@ -352,7 +323,7 @@ function kbToObject(kb) {
     return kbObject;
 }
 
-function parseKB(kbAll) { // TODO Add an error here about rules with the same name.
+function parseKB(kbAll) {
     "use strict";
     const warnings = [];
     if (!kbAll.includes("@KnowledgeBase")){
@@ -400,7 +371,7 @@ function parseKB(kbAll) { // TODO Add an error here about rules with the same na
     if (kbTest["type"] === "error") {
         return kbTest;
     }
-    const duplicate = containsDuplicates(kb);
+    const duplicate = containsDuplicates(kbTest["rules"]);
     if (duplicate) {
         return {
             type: "error",
@@ -410,8 +381,10 @@ function parseKB(kbAll) { // TODO Add an error here about rules with the same na
     }
     return {
         type: "output",
-        kb: kbToObject(kb),
+        kb: kbToObject(kbTest["rules"]),
+        constraints: parseConstraints(kbTest["constraints"]),
         code: codeToObject(code),
+        customPriorities: kbTest["customPriorities"],
         imports: imports,
         warnings: warnings,
     };
@@ -426,7 +399,7 @@ function kbCheck(kb) {
     const headTailListRe = RegExp(String.raw`(\[(\s*\w+\s*,)*\s*\w+\s*\|\s*(([A-Z_]\w*)|` + simpleListRe.source + String.raw`)\s*\])`); // CHECKED!
     const listRe = RegExp(String.raw`(` + simpleListRe.source + String.raw`|` + headTailListRe.source + String.raw`)`); // CHECKED!
     // const varNameRe = RegExp(String.raw`(([a-zA-z]\w*)|(\d+[.]?\d*)|_|` + listRe.source + String.raw`)`); // CHECKED!
-    const varNameRe = RegExp(String.raw`(([a-zA-z]\w*)|(\d+[.]?\d*)|_)`); // CHECKED!
+    const varNameRe = RegExp(String.raw`(([a-zA-z]\w*)|(-?\d+[.]?\d*)|_)`); // CHECKED!
     // const varNameRe = /(([a-zA-z]\w*)|(\d+[.]?\d*)|_|)/; // CHECKED!
     const ruleName = RegExp(spacingRe.source + String.raw`\w+`); // CHECKED!
     const casualPredicateRe = RegExp(String.raw`(` + predicateNameRe.source + String.raw`\((\s*` + varNameRe.source + String.raw`\s*,)*\s*` + varNameRe.source + String.raw`\s*\))`); // CHECKED!
@@ -441,14 +414,29 @@ function kbCheck(kb) {
     // console.log(bodyRe.source);
     const headRe = RegExp(String.raw`((` + casualHeadRe.source + String.raw`)|(` + propositionalHeadRe.source + String.raw`))`); // CHECKED!
     // console.log(headRe.source);
+    const priorityRe = /(\s*\|\s*-?\d+)?/;
     // const kbRe = RegExp(String.raw`(` + ruleName.source + String.raw`\s+::\s+` + bodyRe.source + String.raw`\s+implies\s+` + headRe.source + String.raw`\s*;` + spacingRe.source + String.raw`)+`); // CHECKED!
-    const ruleRe = RegExp(String.raw`(` + ruleName.source + String.raw`\s+::\s+` + bodyRe.source + String.raw`\s+implies\s+` + headRe.source + String.raw`\s*;` + spacingRe.source + String.raw`)`);
+    const ruleRe = RegExp(String.raw`(` + ruleName.source + String.raw`\s*::\s*(` + bodyRe.source + String.raw`)?\s+implies\s+` + headRe.source + priorityRe.source + String.raw`\s*;` + spacingRe.source + String.raw`)`);
+    const constrainRe = RegExp(String.raw`(` + ruleName.source + String.raw`\s+::\s+` + predicateRe.source + String.raw`\s+#\s+` + predicateRe.source + String.raw`\s*;` + spacingRe.source + String.raw`)`);
     const ruleStrings = kb.split(";").filter(Boolean);
-    console.log(ruleStrings);
+    let rules = "", constraints = "", customPriorities = {}, rulesObject;
+    // console.log(ruleStrings);
     for (let i=0; i<ruleStrings.length; i++) {
         const ruleString = ruleStrings[i] + ";";
         const ruleMatch = ruleString.match(ruleRe);
-        if (!ruleMatch || ruleMatch[0] !== ruleString) {
+        const constraintMatch = ruleString.match(constrainRe);
+        if (ruleMatch && ruleMatch[0] === ruleString) {
+            rulesObject = stripePriorityFromRule(ruleString);
+            rules += rulesObject["rule"];
+            if (rulesObject["priority"] !== undefined) {
+                customPriorities[rulesObject["rule"].split("::")[0].trim()] = rulesObject["priority"];
+            }
+        }
+        else if (constraintMatch && constraintMatch[0] === ruleString) {
+            constraints += ruleString;
+            // console.log("constraints:", constraints);
+        }
+        else {
             return {
                 type: "error",
                 name: "KnowledgeBaseSyntaxError",
@@ -458,7 +446,21 @@ function kbCheck(kb) {
     }
     return {
         type: "valid", // FIXME Well, better phrasing would be... better.
+        rules: rules,
+        constraints: constraints,
+        customPriorities: customPriorities,
     }
+}
+
+function stripePriorityFromRule(ruleString) {
+    if (!ruleString.includes("|")) {
+        return {rule: ruleString, priority: undefined};
+    }
+    const splitRule = ruleString.split("|").filter(Boolean);
+    return {
+        rule: splitRule[0].trim() + ";",
+        priority: parseInt(splitRule[1].trim()),
+    };
 }
 
 function containsDuplicates(kbString) {
@@ -472,6 +474,40 @@ function containsDuplicates(kbString) {
         ruleNames.push(newRuleName);
     }
     return undefined;
+}
+
+function parseConstraints(constraintsString) {
+    const constraints = new Map();
+    let item;
+    for (const constraint of constraintsString.split(";").filter(Boolean)) {
+        item = parseConstraint(constraint);
+        if (constraints.has(item["key1"])) {
+            constraints.get(item["key1"])["constraints"].push(item["constraint1"]);
+        } else {
+            constraints.set(item["key1"], {constraints: [item["constraint1"]], keyObject: item["constraint2"]});
+        }
+        if (constraints.has(item["key2"])) {
+            constraints.get(item["key2"])["constraints"].push(item["constraint2"]);
+        } else {
+            constraints.set(item["key2"], {constraints: [item["constraint2"]], keyObject: item["constraint1"]});
+        }
+    }
+    return constraints;
+}
+
+function parseConstraint(constraintString) {
+    // console.log("constraintsString:", constraintString);
+    const predicates = constraintString.split("::")[1].split("#");
+    // console.log("predicates:", predicates);
+    // .split("#");
+    const leftPredicate = parseLiteral(predicates[0]);
+    const rightPredicate = parseLiteral(predicates[1]);
+    return {
+        key1: ((leftPredicate["sign"])? "" : "-") + leftPredicate["name"] + leftPredicate["arity"],
+        constraint1: rightPredicate,
+        key2: ((rightPredicate["sign"])? "" : "-") + rightPredicate["name"] + rightPredicate["arity"],
+        constraint2: leftPredicate,
+    }
 }
 
 function codeToObject(code) { // TODO You need to take care of errors here like defining the same function twice etc and create appropriate messages!
@@ -636,6 +672,9 @@ function listOfLiteralsToString(list) {
 }
 
 function graphToString(graph) {
+    if (Object.keys(graph).length === undefined || Object.keys(graph).length === 0) {
+        return "\{\}";
+    }
     let graphString = "\{\n";
     for (const key of Object.keys(graph)) {
         // console.log(key);
@@ -650,6 +689,34 @@ function graphToString(graph) {
     }
     graphString += "}";
     return graphString;
+}
+
+function dilemmasToString(dilemmas) {
+	if (dilemmas === undefined) {
+		return "\{\}";
+	}
+	let dilemmasString = "\{\n";
+	let dilemma;
+	for (let i=0; i<dilemmas.length; i++) { // TODO define subToString!
+		dilemma = dilemmas[i];
+		dilemmasString += "[" + ruleToString(dilemma[0]) + ", " + ruleToString(dilemma[1]) + ", " + subToString(dilemma[2]) + "]\n";
+	}
+	return dilemmasString + "\}";
+}
+
+function subToString(sub) {
+    if (sub === undefined) {
+        return "\{\}";
+    }
+	let variable, subString = "\{";
+	for (let i=0; i<Object.keys(sub).length; i++) {
+		variable = Object.keys(sub)[i];
+		if (variable === "undefined") {
+			continue;
+		}	
+		subString += variable + " -> " + sub[variable] + ", ";
+	}
+	return subString.substring(0, subString.length - 2) + "}";
 }
 
 function abductiveProofsToString(proofs) {

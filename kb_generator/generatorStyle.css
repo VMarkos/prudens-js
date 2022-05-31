@@ -1,0 +1,100 @@
+html, body {
+    height: 100%;
+    padding: 0px;
+    margin: 0px;
+    background-color: whitesmoke;
+    overflow: hidden;
+}
+
+.body-container {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.navbar-container {
+    display: flex;
+    justify-content: center;
+    background-color: #ae52d4;
+}
+
+.navbar-max-width {
+    width: 1280px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo-container {
+    padding: 10px;
+}
+
+.logo-text {
+    font-family: monospace;
+    font-size: xx-large;
+    color: whitesmoke;
+}
+
+.button-container {
+    padding: 10px;
+}
+
+.generate-button {
+    background-color: none;
+    border-radius: 5px;
+    border: #fdd835 solid 2px;
+    padding: 5px;
+    font-family: Arial, Helvetica, sans-serif;
+    color: #fdd835;
+    font-size: x-large;
+    cursor: pointer;
+    transition-duration: 200ms;
+}
+
+.generate-button:hover {
+    background-color: #fdd835;
+    color: #ae52d4;
+}
+
+.sketch-plane-container {
+    height: 100%;
+}
+
+.svg {
+    position: fixed;
+    left: 0px;
+    top: 0px;
+    width: 100%;
+    height: auto;
+}
+
+.node {
+    padding: 5px;
+    border: #5c007a solid 2px;
+    border-radius: 50%;
+    background-color: #ffc4ff;
+    box-shadow: 2px 2px 4px 4px;
+    font-family: monospace;
+    font-size: larger;
+    color: #12005e;
+}
+
+.context-menu {
+    background-color: white;
+    position: fixed;
+    box-shadow: 1px 1px 2px 2px rgba(0,0,0,0.5);
+}
+
+.context-menu-item-container {
+    padding-left: 4px;
+    padding-right: 4px;
+    padding-top: 2px;
+    padding-bottom: 2px;
+    font-family: monospace;
+    font-size: medium;
+    cursor: pointer;
+}
+
+.context-menu-item-container:hover {
+    background-color: #ffc4ff;
+}

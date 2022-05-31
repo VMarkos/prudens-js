@@ -22,11 +22,11 @@ function deepCopy(object) { // This is a level 1 deep copy --- i.e. if some valu
 function removeAll(list, toBeRemoved) {
     "use strict";
     // console.log(list, toBeRemoved);
-    if (toBeRemoved.length == 0) {
+    if (toBeRemoved.length === 0) {
         return list;
     }
     for (let i=0; i<list.length; i++) {
-        if (deepIncludes(list[i], toBeRemoved)) { // Shallow check, might need revision!
+        if (deepIncludes(list[i], toBeRemoved, true)) { // Shallow check, might need revision!
             // console.log("List pre-splice in removeAll: ", list, "\nList[i]: ", list[i]);
             list.splice(i, 1);
             // console.log("List post splicing: ", list);
@@ -85,8 +85,25 @@ function arrayDeepEquals(x, y) { // x, y are arrays --- not used as of now!
     return true;
 }
 
-function deepIncludes(object, list) { //Re-implementation of Array.prototype.includes() that checks at depth=1 for equal objects.
-    "use strict";
+function deepIncludes(object, list, stringHash = false) { //Re-implementation of Array.prototype.includes() that checks at depth=1 for equal objects. 
+    // "use strict"; // TODO Consider rewriting this or somehow map each object to its (hashed) string representation (it seems that this is what you actually need).
+    if (list === undefined) {
+		return false;
+	}
+    if (stringHash) { // FIXME Too bad...
+        // const stringLiteral = literalToString(object);
+        // for (const entry of list) {
+        //     if (literalToString(entry) == stringLiteral) {
+        //         return true;
+        //     }
+        // }
+        for (const entry of list) {
+            if (unify(object, entry) !== undefined) {
+                return true;
+            }
+        }
+        return false;
+    }
     for (const entry of list) {
         if (deepEquals(object, entry)) {
             return true;
@@ -137,5 +154,6 @@ function removeSupersets(listOfLists, list) {
 
 
 function isVarString(string) { // Is this really needed?
-    return /[A-Z]/.test(string.charAt(0));
+    // console.log("string:", string);
+    return /[A-Z]/.test(("" + string).charAt(0));
 }

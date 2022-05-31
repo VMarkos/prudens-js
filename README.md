@@ -20,6 +20,9 @@ A variable is a JSON object of the following form:
     isAssignued: true/false,
     value: "valueString",
     muted: true/false,
+    isExpression: true/false,
+    isList: [beta feature],
+    list: [beta feature],
 }
 ```
 In the above, `index` corresponds to the index in the arguments' list of a predicate in which the corresponding variable appears. `name` and `value` correspond to the strings that serve as the name and, possibly, the value of the variable, while `isAssigned` is a boolean field which is `true` in case `value` is not `undefined` or `null`. Lastly, `muted` is another boolean parameter which corresponds to whether a variable has been declared as redundant in some case - i.e., using the `_` symbol in Prudens's syntax.
@@ -336,3 +339,6 @@ Each of the lists presented above consists a distinct abductive proof of `finalT
 
 # Induction
 Regarding induction, we again adhere to the learning protocol declared [here](https://www.internetofus.eu/wp-content/uploads/sites/38/2021/05/Michael_2019_MachineCoaching.pdf), so induction within the context of Prudens JS consists to merely appending rules to a knowledge base taking care of updating priorities properly - hence, there are no built-in functionalities regarding induction.
+
+# Known Bugs
+- [ ] Relatively large and complex knowledge bases (e.g., about 460 rules large with an average body size of 10-15) fail to pass syntax checks. This is a known bug of the knowledge base parser (`parseKB()`) and is not related to knowledge bases that are passed diretly as JSON objects to the deduction or abduction functions.
