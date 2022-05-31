@@ -71,22 +71,22 @@ function getSubstitutions(body, facts, code) {
         if (substitutions.includes(undefined)) {
             substitutions = extendByFacts(literal, facts);
         }
-        console.log("Subs, ln 74:", substitutions);
+        // console.log("Subs, ln 74:", substitutions);
         // debugger;
         // console.log("body:", body);
         const toBeRemoved = [];
         const toBePushed = [];
         for (const sub of substitutions) {
-            console.log("Sub:");
-            console.log(sub);
+            //console.log("Sub:");
+            // console.log(sub);
             const instance = {};
             for (const key of Object.keys(literal)) {
                 instance[key] = literal[key];
                 // console.log("key:", key, instance[key]);
             }
-            console.log("literal:", literal, "\n(pre-apply) body:", instance);
-            instance["args"] = apply(sub, literal["args"]);
-            console.log("(post-apply) body:", instance);
+            // console.log("literal:", literal, "\n(pre-apply) body:", instance);
+            // instance["args"] = apply(sub, literal["args"]);
+            // console.log("(post-apply) body:", instance);
             // debugger;
             // let instance = {
             //     name: body[i]["name"],
@@ -117,9 +117,9 @@ function getSubstitutions(body, facts, code) {
                     time(12,00);
                     event(09,00,13,00,army,yearly,9,5);
                     */
-                    console.log("sub:", sub, "\nextension:", extension);
+                    // console.log("sub:", sub, "\nextension:", extension);
                     extended = true;
-                    debugger;
+                    // debugger;
                     if (extension !== undefined) {
                         toBePushed.push(extension);
                         // extended = true;
@@ -157,7 +157,7 @@ function extendByFacts(literal, facts) {
     for (const fact of facts) {
         if (fact["arity"] !== 0) {
             const unifier = unify(literal, fact);
-            console.log("unifier:", unifier);
+            // console.log("unifier:", unifier);
             (unifier !== undefined) && subs.push(unifier);
         }
     }
@@ -241,12 +241,16 @@ function unify(x, y) { // x, y are literals. Assymetric unification since y is a
     for (let i=0; i<x["arity"]; i++) {
         let xArg = xArgs[i];
         let yArg = yArgs[i];
-        if (xArg["isAssigned"] && yArg["isAssigned"] && xArg["value"] !== yArg["value"]) {
-            // console.log("Here?");
-            // console.log(xArg);
-            // console.log(yArg);
-            // debugger;
-            return undefined;
+        if (xArg["isAssigned"] && yArg["isAssigned"]) {
+			if (xArg["value"] !== yArg["value"]) {
+				// console.log("Here?");
+				// console.log(xArg);
+				// console.log(yArg);
+				// debugger;
+				return undefined;
+			} else {
+				continue;
+			}
         }
         if (xArg["muted"] || yArg["muted"] || (xArg["name"] === undefined && yArg["name"] === undefined)) {
             // console.log("xArg:", xArg, "\nyArg:", yArg);
@@ -303,9 +307,9 @@ function extend(sub, unifier) {
     "use strict";
     // console.log("sub:", sub);
     // console.log("Unifier in extend():");
-    // console.log(unifier);
+    // console.log("Unifier (in extend):", unifier);
     const extendedSub = deepCopy(sub);
-    // console.log("Sub:");
+    // console.log("Sub (in extend):");
     // console.log(extendedSub);
     for (const key of Object.keys(unifier)) {
         if (Object.keys(extendedSub).includes(key) && extendedSub[key] !== unifier[key] && !isVarString(extendedSub[key])) {
