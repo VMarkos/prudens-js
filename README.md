@@ -160,6 +160,7 @@ In case `kb` passes all syntactical checks then an object like the following one
     type: "output",
     kb: [rule1, rule2,..., ruleN],
     code: "codeString",
+    customPriorities: {ruleName1: int1,..., ruleNameN: intN}
     imports: "importsString",
     warnings: [warning1, warning2,..., warningN],
 }
@@ -288,23 +289,30 @@ Given a list of rules, `kb`, this function returns a dictionary (JSON object) in
 ```
 In fact, the above representation is the inverse of the input array, `kb`, in order to facilitate object search in O(1) time, given that all string representations of rules are pairwise different.
 
-### `updateGraph(newLiteralString, newLiteralRule, oldLiteralString, graph, priorities)`
-This function updates the inference graph structure with a new literal in case it conflicts some of the already inferred ones. Namely, given an inference graph, `graph`, a string representation of literal already included in `graph`, `oldLiteralString`, a string representation of a literal conflicting with `oldLiteralString`, `newLiteralString`, the rule that has led to it, `newLiteralRule`, and the priorities of the rules contained in tha knowledge base, `priorities`, it returns an updated version of the graph with all conflicts resolved. For more regarding the structure of a graph object, see [here](#data-structure).
+### `updateGraph(inferredHead, newRule, graph, facts, priorityFunction, deletedRules, sub, constraints, kbObject, dilemmas)`
+This function updates the inference graph structure with a new literal in case it conflicts some of the already inferred ones. Namely, `inferredHead` is a newly inferred literal, `newRule` is the rule that has inferred `inferredHead`, `graph` is a graph object, `facts` is a list of all facts inferred so far, `priorityFunction` is a priority function, `deletedRules` is a list of all rules deleted so far, `sub` is a substitution object, `constraints` is a constraints map, `kbObject` is a knowledge base object and `dilemmas` is a list of dilemmas. For more regarding the structure of a graph object, see [here](#data-structure).
 
-### `forwardChaining(kb, context)`
+### `forwardChaining(kb, context, priorityFunction=linearPriorities)`
 Given a knowledge base, `kb`, and a set of grounded literals, `context`, this function deduces anything that may be deduced using the reasoning algorithm presented [here](https://www.internetofus.eu/wp-content/uploads/sites/38/2021/05/Michael_2019_MachineCoaching.pdf). The output has the following form:
 ```javascript
 {
-    facts: [f1, f2,..., fN],
+    context: [c1, c2,..., cK],
+    facts: [f1, f2,..., fM],
     graph: {
         f1: [rule11, rule12,..., rule1n],
         f2: [rule21, rule22,..., rule2m],
         ...,
         fN: [ruleN1, ruleN2,..., ruleNz],
     },
+    dilemmas: [
+        [r11, r12, sub1],
+        [r21, r22, sub2],
+        ...,
+        [rn1, rn2, subn],
+    ]
 }
 ```
-In the above, `facts` is a list of grounded literals containing all literals that have been inferred as well as the initial context while `graph` is a graph object with all inferred literals as keys and lists of all rules that have led to these literals.
+In the above, `context` is the initial context, `facts` is a list of grounded literals containing all literals that have been inferred as well as the initial context, `graph` is a graph object with all inferred literals as keys and lists of all rules that have led to these literals while `dilemmas` is a list of lists, each of which constists of two rules (the first two elements of the list) and a substitution object.
 
 # Abduction
 ```diff

@@ -368,7 +368,6 @@ function parseKB(kbAll) {
     // if (!kb.match(kbRe) || kb.match(kbRe)[0] !== kb) {
     // TODO In order to allow for comments you have to simply wipe our anything in a line after {//} or between {/* */}
     // console.log("kb (pre):", kb);
-    const oldKb = kb;
     kb = stripeComments(kb);
     // console.log("kb (post):", kb);
     // console.log(oldKb.length, kb.length);
@@ -396,6 +395,7 @@ function parseKB(kbAll) {
         warnings: warnings,
     };
 }
+
 
 function stripeComments(kbString) { // Stripes out anything after // or between /* */, including delimiters.
     const kbLines = kbString.match(/[^\r\n]+/g);

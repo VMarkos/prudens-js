@@ -71,8 +71,6 @@ function getSubstitutions(body, facts, code) {
         if (substitutions.includes(undefined)) {
             substitutions = extendByFacts(literal, facts);
         }
-        // console.log("Subs, ln 74:", substitutions);
-        // debugger;
         // console.log("body:", body);
         const toBeRemoved = [];
         const toBePushed = [];
@@ -84,10 +82,8 @@ function getSubstitutions(body, facts, code) {
                 instance[key] = literal[key];
                 // console.log("key:", key, instance[key]);
             }
-            // console.log("literal:", literal, "\n(pre-apply) body:", instance);
-            // instance["args"] = apply(sub, literal["args"]);
+            instance["args"] = apply(sub, literal["args"]);
             // console.log("(post-apply) body:", instance);
-            // debugger;
             // let instance = {
             //     name: body[i]["name"],
             //     sign: body[i]["sign"],
