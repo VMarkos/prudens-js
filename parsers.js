@@ -158,7 +158,7 @@ function parseList(listString) { // Input is of the form arg1, arg2, ..., argN, 
 }
 
 function parseConflicts() { // TODO You are here!
-
+    return;
 }
 
 function getLiteralArguments(argumentsString) {
@@ -366,6 +366,13 @@ function parseKB(kbAll) {
     // console.log(kb.match(kbRe));
     // console.log(kbToObject(kb));
     // if (!kb.match(kbRe) || kb.match(kbRe)[0] !== kb) {
+    // TODO In order to allow for comments you have to simply wipe our anything in a line after {//} or between {/* */}
+    // console.log("kb (pre):", kb);
+    const oldKb = kb;
+    kb = stripeComments(kb);
+    // console.log("kb (post):", kb);
+    // console.log(oldKb.length, kb.length);
+    // console.log("equals?", kb === oldKb);
     const kbTest = kbCheck(kb);
     // console.log(kbTest);
     if (kbTest["type"] === "error") {
@@ -390,6 +397,40 @@ function parseKB(kbAll) {
     };
 }
 
+function stripeComments(kbString) { // Stripes out anything after // or between /* */, including delimiters.
+    const kbLines = kbString.match(/[^\r\n]+/g);
+    // console.log(kbLines);
+    let stripedLines = "";
+    let multilineComment = false;
+    for (const line of kbLines) {
+        // console.log("line:", line);
+        if (multilineComment) {
+            if (line.includes("*/")) {
+                // console.log("p:", stripedLines);
+                stripedLines += line.substring(line.lastIndexOf("*/") + 2).trim();// + "\n";
+                // console.log("P:", stripedLines);
+                multilineComment = false;
+            }
+            continue;
+        }
+        if (line.includes("//")) {
+            stripedLines += line.substring(0, line.indexOf("//")).trim();// + "\n";
+            continue;
+        }
+        if (line.includes("/*")) {
+            stripedLines += line.substring(0, line.indexOf("/*")).trim();// + "\n";
+            multilineComment = true;
+            continue;
+        }
+        stripedLines += line.trim();
+    }
+    // console.log("final:", stripedLines);
+    if (stripedLines === "") {
+        return kbString;
+    }
+    return stripedLines;
+}
+
 function kbCheck(kb) {
     const spacingRe = /\s*/; // CHECKED!
     const predicateNameRe = /(-?\??[a-z]\w*)/; // CHECKED!
@@ -399,7 +440,7 @@ function kbCheck(kb) {
     const headTailListRe = RegExp(String.raw`(\[(\s*\w+\s*,)*\s*\w+\s*\|\s*(([A-Z_]\w*)|` + simpleListRe.source + String.raw`)\s*\])`); // CHECKED!
     const listRe = RegExp(String.raw`(` + simpleListRe.source + String.raw`|` + headTailListRe.source + String.raw`)`); // CHECKED!
     // const varNameRe = RegExp(String.raw`(([a-zA-z]\w*)|(\d+[.]?\d*)|_|` + listRe.source + String.raw`)`); // CHECKED!
-    const varNameRe = RegExp(String.raw`(([a-zA-z]\w*)|(-?\d+[.]?\d*)|_)`); // CHECKED!
+    const varNameRe = RegExp(String.raw`(([a-zA-z]\w*)|(-?\d+[.]?\d*)|_|.+)`); // CHECKED!
     // const varNameRe = /(([a-zA-z]\w*)|(\d+[.]?\d*)|_|)/; // CHECKED!
     const ruleName = RegExp(spacingRe.source + String.raw`\w+`); // CHECKED!
     const casualPredicateRe = RegExp(String.raw`(` + predicateNameRe.source + String.raw`\((\s*` + varNameRe.source + String.raw`\s*,)*\s*` + varNameRe.source + String.raw`\s*\))`); // CHECKED!

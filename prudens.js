@@ -104,7 +104,7 @@ function getSubstitutions(body, facts, code) {
                 // console.log("literal/Fact:");
                 // console.log(instance);
                 // console.log(fact);
-                const unifier = unify(instance, fact);
+                const unifier = unify(instance, fact, sub);
                 // console.log("Unifier:");
                 // console.log(unifier);
                 if (unifier !== undefined) {
@@ -229,18 +229,23 @@ function listUnification(list1, list2, unifier) {
     return unifier;
 }
 
-function unify(x, y) { // x, y are literals. Assymetric unification since y is assumed to be known/part of some set of inferred facts!
-    "use strict";
+function unify(x, y, sub=undefined) { // x, y are literals. Assymetric unification since y is assumed to be known/part of some set of inferred facts!
     if (x["name"] !== y["name"] || x["arity"] !== y["arity"] || x["sign"] !== y["sign"]) {
         return undefined;
     }
     const xArgs = x["args"];
     const yArgs = y["args"];
     const unifier = {};
+    const expressionIndices = [];
+    let xArg, yArg;
     // console.log("x:", x, "\ny:", y);
     for (let i=0; i<x["arity"]; i++) {
-        let xArg = xArgs[i];
-        let yArg = yArgs[i];
+        xArg = xArgs[i];
+        yArg = yArgs[i];
+        if (xArg["isExpression"] || yArg["isExpression"]) {
+            expressionIndices.push(i);
+            continue;
+        }
         if (xArg["isAssigned"] && yArg["isAssigned"]) {
 			if (xArg["value"] !== yArg["value"]) {
 				// console.log("Here?");
@@ -282,6 +287,33 @@ function unify(x, y) { // x, y are literals. Assymetric unification since y is a
             unifier[yArg["name"]] = xArg["value"];
             // console.log("Four", unifier);
         }
+    }
+    if (expressionIndices.length === 0) {
+        return unifier;
+    }
+    let extendedSub;
+    if (sub === undefined) {
+        extendedSub = unifier;
+    } else {
+        extendedSub = extend(sub, unifier);
+    }
+    let val;
+    for (const i of expressionIndices) {
+        xArg = xArgs[i];
+        yArg = yArgs[i];
+        if (xArg["isExpression"]) {
+            val = numParser(applyToString(xArg["value"], extendedSub)).call();
+            if (parseFloat(val) !== parseFloat(yArg["value"])) {
+                return undefined;
+            }
+            unifier[yArg["name"]] = val;
+            continue;
+        }
+        val = numParser(applyToString(yArg["value"], extendedSub)).call();
+        if (parseFloat(val) !== parseFloat(xArg["value"])) {
+            return undefined;
+        }
+        unifier[xArg["name"]] = val;
     }
     return unifier;
 }
@@ -407,7 +439,7 @@ function isMoreSpecific(body1, body2, sub) { // true if body1 is more specific t
 	for (const literal2 of body2) {
         included = false;
         for (const literal1 of body1) {
-            unifiable = unify(applyToLiteral(sub, literal1), applyToLiteral(sub, literal2));
+            unifiable = unify(applyToLiteral(sub, literal1), applyToLiteral(sub, literal2), sub);
             // console.log("unifier:", unifiable);
             if (unifiable) {
 				// console.log("Why here?");
@@ -484,7 +516,7 @@ function updateGraph(inferredHead, newRule, graph, facts, priorityFunction, dele
     if (constraints.has(key)) {
         const keyObject = constraints.get(key)["keyObject"];
         for (const conflict of constraints.get(key)["constraints"]) {
-            const constraintUnifier = unify(keyObject, inferredHead);
+            const constraintUnifier = unify(keyObject, inferredHead, sub);
             conflicts.push(applyToLiteral(sub, applyToLiteral(constraintUnifier, conflict)));
         }
     }
