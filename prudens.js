@@ -529,10 +529,11 @@ function updateGraph(inferredHead, newRule, graph, facts, priorityFunction, dele
             // console.log("indludes:", oppositeHead);
             includesConflict = true;
             const toBeRemoved = [];
-            // console.log("facts:", facts);
-            // console.log("graph:", graph);
-            // console.log("lit:", oppositeHead);
-            beatsAll = true;
+            console.log("facts:", facts);
+            console.log("graph:", graph);
+            console.log("lit:", oppositeHead);
+            // debugger;
+            beatsAll = true; // FIXME in case an ungrounded variable appears on the head (i.e., one that *DOES NOT* appear in the rule's body, it should through a runtime error --- or, better, catch this on parsing?)
             for (const rule of graph[literalToString(oppositeHead)]) {
 				isPrior = priorityFunction(newRule, rule, kbObject, sub);
                 if (isPrior === undefined || isPrior) {

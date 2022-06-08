@@ -368,8 +368,9 @@ function parseKB(kbAll) {
     // if (!kb.match(kbRe) || kb.match(kbRe)[0] !== kb) {
     // TODO In order to allow for comments you have to simply wipe our anything in a line after {//} or between {/* */}
     // console.log("kb (pre):", kb);
-    const oldKb = kb;
+    // const oldKb = kb;
     kb = stripeComments(kb);
+    // console.log(oldKb, kb);
     // console.log("kb (post):", kb);
     // console.log(oldKb.length, kb.length);
     // console.log("equals?", kb === oldKb);
@@ -441,11 +442,14 @@ function kbCheck(kb) {
     const listRe = RegExp(String.raw`(` + simpleListRe.source + String.raw`|` + headTailListRe.source + String.raw`)`); // CHECKED!
     // const varNameRe = RegExp(String.raw`(([a-zA-z]\w*)|(\d+[.]?\d*)|_|` + listRe.source + String.raw`)`); // CHECKED!
     const varNameRe = RegExp(String.raw`(([a-zA-z]\w*)|(-?\d+[.]?\d*)|_|.+)`); // CHECKED!
+    const oldVarNameRe = RegExp(String.raw`(([a-zA-z]\w*)|(-?\d+[.]?\d*)|_)`);
     // const varNameRe = /(([a-zA-z]\w*)|(\d+[.]?\d*)|_|)/; // CHECKED!
     const ruleName = RegExp(spacingRe.source + String.raw`\w+`); // CHECKED!
     const casualPredicateRe = RegExp(String.raw`(` + predicateNameRe.source + String.raw`\((\s*` + varNameRe.source + String.raw`\s*,)*\s*` + varNameRe.source + String.raw`\s*\))`); // CHECKED!
+    const oldCasualPredicateRe = RegExp(String.raw`(` + predicateNameRe.source + String.raw`\((\s*` + oldVarNameRe.source + String.raw`\s*,)*\s*` + oldVarNameRe.source + String.raw`\s*\))`);
     const propositionalPredicateRe = /(-?[a-z]\w*)/; // CHECKED!
     const predicateRe = RegExp(String.raw`((` + casualPredicateRe.source + String.raw`)|(` + mathPredicateRe.source + String.raw`)|(` + propositionalPredicateRe.source + String.raw`))`); // CHECKED!
+    const oldPredicateRe = RegExp(String.raw`((` + oldCasualPredicateRe.source + String.raw`)|(` + mathPredicateRe.source + String.raw`)|(` + propositionalPredicateRe.source + String.raw`))`); // CHECKED!
     // console.log(predicateRe.source);
     const casualHeadRe = RegExp(headNameRe.source + String.raw`\((\s*` + varNameRe.source + String.raw`\s*,)*\s*` + varNameRe.source + String.raw`\s*\)`); // CHECKED!
     const propositionalHeadRe = /(-?!?[a-z]\w*)/; // CHECKED!
@@ -458,12 +462,12 @@ function kbCheck(kb) {
     const priorityRe = /(\s*\|\s*-?\d+)?/;
     // const kbRe = RegExp(String.raw`(` + ruleName.source + String.raw`\s+::\s+` + bodyRe.source + String.raw`\s+implies\s+` + headRe.source + String.raw`\s*;` + spacingRe.source + String.raw`)+`); // CHECKED!
     const ruleRe = RegExp(String.raw`(` + ruleName.source + String.raw`\s*::\s*(` + bodyRe.source + String.raw`)?\s+implies\s+` + headRe.source + priorityRe.source + String.raw`\s*;` + spacingRe.source + String.raw`)`);
-    const constrainRe = RegExp(String.raw`(` + ruleName.source + String.raw`\s+::\s+` + predicateRe.source + String.raw`\s+#\s+` + predicateRe.source + String.raw`\s*;` + spacingRe.source + String.raw`)`);
+    const constrainRe = RegExp(String.raw`(` + ruleName.source + String.raw`\s*::\s*` + oldPredicateRe.source + String.raw`\s+#\s+` + oldPredicateRe.source + String.raw`\s*;` + spacingRe.source + String.raw`)`, "i");
     const ruleStrings = kb.split(";").filter(Boolean);
     let rules = "", constraints = "", customPriorities = {}, rulesObject;
     // console.log(ruleStrings);
     for (let i=0; i<ruleStrings.length; i++) {
-        const ruleString = ruleStrings[i] + ";";
+        const ruleString = ruleStrings[i].trim() + ";";
         const ruleMatch = ruleString.match(ruleRe);
         const constraintMatch = ruleString.match(constrainRe);
         if (ruleMatch && ruleMatch[0] === ruleString) {
