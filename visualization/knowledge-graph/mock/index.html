@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <link rel="stylesheet" type="text/css" href="./css/style.css" media="screen"/>
+        <script type="text/javascript" src="./scripts/main.js"></script>
+        <title>
+            Prudens Visualization Moch-up
+        </title>
+    </head>
+    <body>
+        <div class="navbar-container">
+            <div class="policy-container">
+<pre>@KnowledgeBase
+r1 :: a, b implies e;
+r2 :: c, d implies -z;
+r3 :: d, e implies z;
+
+Context: a; b; c; d;</pre>
+            </div>
+            <div class="legend-container">
+                <h2>Legend</h2>
+                <div class="legend-grid-container">
+                    <div class="legend-rule-node undermines"></div>
+                    <div>Undermining rule</div>
+                    <div class="legend-rule-node supports"></div>
+                    <div>Supporting rule</div>
+                    <div class="fact-node inferred"></div>
+                    <div>Inferred fact</div>
+                    <div class="fact-node context"></div>
+                    <div>Context fact</div>
+                </div>
+            </div>
+        </div>
+        <div class="svg-container">
+            <svg id="g" viewBox="0 0 1000 700" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <marker id="support-arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path stroke="#53bf9d" fill="#53bf9d" d="M 0 0 L 10 5 L 0 10 L 3 5 z"/>
+                    </marker>
+                    <marker id="undermine-arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                        <path stroke="#f94c66" fill="#f94c66" d="M 0 0 L 10 5 L 0 10 L 3 5 z"/>
+                    </marker>
+                </defs>
+                <circle id="z" cx="500" cy="100" r="20" class="casual-node"/>
+                <text id="z-label" x="500" y="100" class="node-label casual">z</text>
+                <circle id="c" cx="300" cy="300" r="20" class="fact-node"/>
+                <text id="c-label" x="300" y="300" class="node-label">c</text>
+                <circle id="d" cx="500" cy="300" r="20" class="fact-node"/>
+                <text id="d-label" x="500" y="300" class="node-label">d</text>
+                <circle id="e" cx="700" cy="300" r="20" class="casual-node"/>
+                <text id="e-label" x="700" y="300" class="node-label casual">e</text>
+                <rect id="r2" x="375" y="180" width="50" height="40" rx="15" class="rule-node undermines"></rect>
+                <text id="r2-label" x="400" y="200" class="rule-label">r2</text>
+                <rect id="r3" x="575" y="180" width="50" height="40" rx="15" class="rule-node supports"></rect>
+                <text id="r3-label" x="600" y="200" class="rule-label">r3</text>
+                <circle id="a" cx="600" cy="500" r="20" class="fact-node"/>
+                <text id="a-label" x="600" y="500" class="node-label">a</text>
+                <circle id="b" cx="800" cy="500" r="20" class="fact-node"/>
+                <text id="b-label" x="800" y="500" class="node-label casual">b</text>
+                <rect id="r1" x="675" y="380" width="50" height="40" rx="15" class="rule-node supports"></rect>
+                <text id="r1-label" x="700" y="400" class="rule-label">r1</text>
+                <line id="r2-z" marker-end="url(#undermine-arrow)" x1="420" y1="180" x2="478" y2="122" class="undermine-line"/>
+                <line id="r3-z" marker-end="url(#support-arrow)" x1="580" y1="180" x2="522" y2="122" class="support-line"/>
+                <line id="c-r2" marker-end="url(#undermine-arrow)" x1="318" y1="282" x2="374" y2="226" class="undermine-line"/>
+                <line id="d-r2" marker-end="url(#undermine-arrow)" x1="482" y1="282" x2="426" y2="226" class="undermine-line"/>
+                <line id="d-r3" marker-end="url(#support-arrow)" x1="518" y1="282" x2="574" y2="226" class="support-line"/>
+                <line id="e-r3" marker-end="url(#support-arrow)" x1="682" y1="282" x2="626" y2="226" class="support-line"/>
+                <line id="a-r1" marker-end="url(#support-arrow)" x1="618" y1="482" x2="674" y2="426" class="support-line"/>
+                <line id="b-r1" marker-end="url(#support-arrow)" x1="782" y1="482" x2="726" y2="426" class="support-line"/>
+                <line id="r1-e" marker-end="url(#support-arrow)" x1="700" y1="374" x2="700" y2="332" class="support-line"/>
+            </svg>
+        </div>
+    </body>
+</html>

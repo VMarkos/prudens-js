@@ -1,0 +1,139 @@
+html, body {
+    margin: 0px;
+    padding: 0px;
+}
+
+body {
+    background: #ffc54d;
+}
+
+/* Navbar */
+
+.navbar-container {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 20px 0px 20px 0px;
+    gap: 20px;
+}
+
+.policy-container {
+    background: #aa7916;
+    border-radius: 20px;
+    color: white;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 16pt;
+    padding: 0px 10px 0px 10px;
+}
+
+.legend-container {
+    display: flex;
+    flex-direction: column;
+    background: #aa7916;
+    border-radius: 20px;
+    color: white;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    padding: 0px 10px 10px 10px;
+}
+
+.legend-container h2 {
+    color: white;
+    font-size: 20pt;
+}
+
+.legend-grid-container {
+    font-size: 16pt;
+    display: grid;
+    grid-template-columns: 1fr 4fr 1fr 4fr;
+    gap: 10px;
+    align-items: center;
+}
+
+.legend-rule-node {
+    width: 50px;
+    height: 40px;
+    border-radius: 15px;
+    border: 3px solid black;
+}
+
+.legend-rule-node.undermines {
+    background: #f94c66;
+}
+
+.legend-rule-node.supports {
+    background: #53bf9d;
+}
+
+.fact-node {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: #bd4891;
+}
+
+.fact-node.inferred {
+    border: 3px solid black;
+}
+
+.fact-node.context {
+    border: 3px dashed black;
+}
+
+/* SVG */
+
+.svg-container {
+    display: flex;
+}
+
+/* Nodes */
+
+.casual-node {
+    fill: #bd4891;
+    stroke: black;
+    stroke-width: 3;
+    cursor: help;
+}
+
+.fact-node {
+    fill: #bd4891;
+    stroke: black;
+    stroke-width: 3;
+    stroke-dasharray: 8, 8;
+}
+
+.node-label, .rule-label {
+    fill: white;
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 24pt;
+    text-anchor: middle;
+    dominant-baseline: middle;
+}
+
+.node-label.casual {
+    cursor: help;
+}
+
+.rule-node {
+    stroke: black;
+    stroke-width: 3;
+}
+
+.rule-node.supports {
+    fill: #53bf9d;
+}
+
+.rule-node.undermines {
+    fill: #f94c66;
+}
+
+/* Lines */
+
+.support-line {
+    stroke: #53bf9d;
+    stroke-width: 3;
+}
+
+.undermine-line {
+    stroke: #f94c66;
+    stroke-width: 3;
+}
