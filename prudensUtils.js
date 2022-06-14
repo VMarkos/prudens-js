@@ -1,5 +1,8 @@
 function deepCopy(object) { // This is a level 1 deep copy --- i.e. if some value is itself another JS-object, it will be copied in a shallow manner.
     "use strict";
+    if (object === undefined) {
+        return {}; // REMEMBER this always returns an object!
+    }
     let copycat;
     if (Array.isArray(object)) {
         copycat = [];

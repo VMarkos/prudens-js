@@ -108,15 +108,7 @@ function getSubstitutions(body, facts, code) {
                 // console.log("Unifier:");
                 // console.log(unifier);
                 if (unifier !== undefined) {
-                    const extension = extend(sub, unifier); // FIXME There's some issue with extend. Check this:
-                    /* 
-                    @KnowledgeBase
-                    PR_5 :: month(Mo), day(D), event(SH, SM, EH, EM, L, yearly, Mo, D) implies at(SH);
-
-                    day(5);month(9);year(2021);
-                    time(12,00);
-                    event(09,00,13,00,army,yearly,9,5);
-                    */
+                    const extension = extend(sub, unifier);
                     // console.log("sub:", sub, "\nextension:", extension);
                     extended = true;
                     // debugger;
@@ -457,7 +449,7 @@ function isMoreSpecific(body1, body2, sub) { // true if body1 is more specific t
 
 function customPrioritiesFunction(rule1, rule2, kbObject, sub) { // true if rule1 is of HIGHER priority than rule2.
     const priorities = kbObject["customPriorities"];
-    if (!Object.keys(priorities).includes(rule1["name"]) || !Object.keys(priorities).includes(rule2["name"])) {
+    if (!Object.keys(priorities).includes(rule1["name"]) || !Object.keys(priorities).includes(rule2["name"]) || priorities[rule1["name"]] === priorities[rule2["name"]]) {
         return undefined;
     }
     return priorities[rule1["name"]] > priorities[rule2["name"]];
@@ -489,7 +481,7 @@ function updateGraph(inferredHead, newRule, graph, facts, priorityFunction, dele
     if (deepIncludes(inferredHead, facts) && !headInDilemma) {
         // console.log("Includes inferredHead");
         if (!Object.keys(graph).includes(literalToString(inferredHead))) {
-            graph[literalToString(inferredHead)] = [newRule]; // TODO Newly added code, check for potentially unexpected behaviours!
+            graph[literalToString(inferredHead)] = [newRule];
             inferred = true;
         }
         if (!deepIncludes(newRule, graph[literalToString(inferredHead)]) && !deepIncludes(newRule, deletedRules)) {
@@ -529,13 +521,16 @@ function updateGraph(inferredHead, newRule, graph, facts, priorityFunction, dele
             // console.log("indludes:", oppositeHead);
             includesConflict = true;
             const toBeRemoved = [];
-            console.log("facts:", facts);
-            console.log("graph:", graph);
-            console.log("lit:", oppositeHead);
+            // console.log("facts:", facts);
+            // console.log("graph:", graph);
+            // console.log("lit:", oppositeHead);
             // debugger;
             beatsAll = true; // FIXME in case an ungrounded variable appears on the head (i.e., one that *DOES NOT* appear in the rule's body, it should through a runtime error --- or, better, catch this on parsing?)
             for (const rule of graph[literalToString(oppositeHead)]) {
 				isPrior = priorityFunction(newRule, rule, kbObject, sub);
+                // console.log(newRule, rule);
+                // console.log("isPrior:", isPrior);
+                // debugger;
                 if (isPrior === undefined || isPrior) {
                     toBeRemoved.push(rule);
                     if (!deepIncludes(rule, deletedRules)) {
@@ -604,7 +599,7 @@ function isInDilemma(rule, dilemmas) {
 	return false;
 }
 
-function forwardChaining(kbObject, context, priorityFunction=specificityPriorities) { //FIXME Huge inconsistency with DOCS! You need to change that from [rule1, ...] to KBObject.
+function forwardChaining(kbObject, context, priorityFunction=linearPriorities) { //FIXME Huge inconsistency with DOCS! You need to change that from [rule1, ...] to KBObject.
     let facts = deepCopy(context);
     facts.push({
         name: "true",
@@ -628,6 +623,7 @@ function forwardChaining(kbObject, context, priorityFunction=specificityPrioriti
     if (Object.keys(customPriorities).length > 0) {
         priorityFunction = customPrioritiesFunction;
     }
+    // console.log(priorityFunction);
     // const priorities = priorityFunction(kb);
     // let i = 0;
     do {
@@ -638,8 +634,7 @@ function forwardChaining(kbObject, context, priorityFunction=specificityPrioriti
                 continue;
             }
             // console.log(rule);
-            // FIXME You have to fix the relational version in the same manner as the propositional!
-            const subs = getSubstitutions(rule["body"], facts, code); // FIXME Not computing all substitutions --- actually none for: @KnowledgeBase
+            const subs = getSubstitutions(rule["body"], facts, code);
             // console.log(subs);
             // debugger;
             for (let i=0; i<subs.length; i++) {
@@ -730,7 +725,7 @@ function equalityCheck(literal, sub) {
     // console.log(leftArg);
     // console.log(rightArg);
     // console.log(rightArg["name"].match(jsRE));
-    if (!leftArg["isAssigned"] && Object.keys(sub).includes(leftArg["name"])) {
+    if (!leftArg["isAssigned"] && sub && Object.keys(sub).includes(leftArg["name"])) {
         leftArg = {
             index: leftArg["index"],
             name: leftArg["name"],
@@ -740,7 +735,7 @@ function equalityCheck(literal, sub) {
         };
         // console.log("Assgn left");
     }
-    if (!rightArg["isAssigned"] && Object.keys(sub).includes(rightArg["name"])) {
+    if (!rightArg["isAssigned"] && sub && Object.keys(sub).includes(rightArg["name"])) {
         rightArg = {
             index: rightArg["index"],
             name: rightArg["name"],
@@ -767,21 +762,22 @@ function equalityCheck(literal, sub) {
     }
     if (leftArg["isAssigned"]) {
         const unifier = {};
-        unifier[rightArg["name"]] = numParser(applyToString(leftArg["value"], sub)).call();
+        unifier[rightArg["name"]] = numParser(evalExpression(leftArg, sub)).call();
         // console.log(unifier);
         return {
-            isValid: true,
+            isValid: true, // FIXME At this point, you should return a RUNTIME error in case sign === false (which is pointless).
             unifier: unifier,
         };
     }
     const unifier = {};
     // console.log("Here!");
-    unifier[leftArg["name"]] = numParser(applyToString(rightArg["value"], sub)).call();
-    // console.log("Equality sub:"); // TODO update equality so as to allow for operations with variables.
+    unifier[leftArg["name"]] = numParser(evalExpression(rightArg, sub)).call();
+    // unifier[leftArg["name"]] = numParser(applyToString(rightArg["value"], sub)).call();
+    // console.log("Equality sub:");
     // console.log(sub);
     // console.log(unifier);
     return {
-        isValid: true,
+        isValid: true, // FIXME At this point, you should return a RUNTIME error in case sign === false (which is pointless).
         unifier: unifier,
     };
 }
@@ -864,7 +860,7 @@ function jsCheck(literal, sub, code) {
 
 function numParser(string) {
     // console.log("numParser:", string);
-    return Function('"use strict"; return (' + string + ');');
+    return Function('return (' + string + ');');
 }
 
 function applyToString(string, sub) {
@@ -886,8 +882,9 @@ function applyToString(string, sub) {
 }
 
 function evalExpression(expression, sub) {
+    // console.log(expression["value"], sub);
     if (!expression["isExpression"]) {
-        return expression["value"];
+        return "'" + expression["value"] + "'";
     }
     // console.log("expression:", expression, "sub:", sub);
     return applyToString(expression["value"], sub);
