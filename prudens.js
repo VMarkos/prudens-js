@@ -107,14 +107,15 @@ function getSubstitutions(body, facts, code) {
                 const unifier = unify(instance, fact, sub);
                 // console.log("Unifier:");
                 // console.log(unifier);
+                // debugger;
                 if (unifier !== undefined) {
                     const extension = extend(sub, unifier);
                     // console.log("sub:", sub, "\nextension:", extension);
-                    extended = true;
+                    // extended = true;
                     // debugger;
                     if (extension !== undefined) {
                         toBePushed.push(extension);
-                        // extended = true;
+                        extended = true; // This should be here and not outside that "if".
                         if (!toBeRemoved.includes(sub)) {
                             toBeRemoved.push(sub);
                         }
@@ -639,7 +640,7 @@ function forwardChaining(kbObject, context, priorityFunction=linearPriorities) {
             // debugger;
             for (let i=0; i<subs.length; i++) {
                 const sub = subs[i];
-                // console.log(sub);
+                // console.log("sub:", sub);
                 // console.log(code);
                 // console.log("Rule head:");
                 // console.log(rule["head"]);
@@ -724,6 +725,7 @@ function equalityCheck(literal, sub) {
     // console.log("Args:");
     // console.log(leftArg);
     // console.log(rightArg);
+    // console.log("sub:", sub);   
     // console.log(rightArg["name"].match(jsRE));
     if (!leftArg["isAssigned"] && sub && Object.keys(sub).includes(leftArg["name"])) {
         leftArg = {
@@ -755,6 +757,8 @@ function equalityCheck(literal, sub) {
     }
     if (leftArg["isAssigned"] && rightArg["isAssigned"]) {
         // console.log(leftArg["value"] + " === " + rightArg["value"]);
+        // console.log(leftArg["value"] + " === " + rightArg["value"]);
+        // console.log("Here!");
         return {
             isValid: sign === numParser(evalExpression(leftArg, sub) + " === " + evalExpression(rightArg, sub)).call(), // TODO Consider unifying evalExpression() and applyToString() to a single function if it actually makes sense.
             unifier: undefined,
@@ -864,6 +868,7 @@ function numParser(string) {
 }
 
 function applyToString(string, sub) {
+    // console.log("applyToString:", string, sub);
     if (sub === undefined || Object.keys(sub).length === 0) {
         return "false";
     }
@@ -884,7 +889,7 @@ function applyToString(string, sub) {
 function evalExpression(expression, sub) {
     // console.log(expression["value"], sub);
     if (!expression["isExpression"]) {
-        return "'" + expression["value"] + "'";
+        return "" + expression["value"];
     }
     // console.log("expression:", expression, "sub:", sub);
     return applyToString(expression["value"], sub);

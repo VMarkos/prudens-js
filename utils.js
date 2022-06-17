@@ -63,6 +63,7 @@ function deduce() {
     // console.log(kbObject);
     // console.log(contextObject); // TODO fix some context parsing issue (in propositional cases it includes the semicolon into the name of the prop)
     const output = forwardChaining(kbObject, contextObject["context"]);
+    // console.log(output);
     const inferences = output["facts"];
     const graph = output["graph"];
     // console.log("Inferences:");

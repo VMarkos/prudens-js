@@ -40,7 +40,7 @@ function parseDomains(domainsString) {
         }
         const nameSplit = predicateDomain.trim().split(/\s*:\s*{\s*/);
         // console.log(nameSplit);
-        predicates[nameSplit[0]] = parseValues(nameSplit[1]); // FIXME
+        predicates[nameSplit[0]] = parseValues(nameSplit[1]);
     }
     // console.log(predicates);
     return {
@@ -60,7 +60,7 @@ function parseValues(values) {
     return argumentValues;
 }
 
-function parseContext(context) {
+function parseContext(context) { // FIXME There is some issue here, parsing seems to be way to lenient.
     "use strict";
     if (context === undefined || context === "") {
         return {
