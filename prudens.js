@@ -660,6 +660,12 @@ function forwardChaining(kbObject, context, priorityFunction=linearPriorities) {
         // i++;
         // console.log(i);
     } while (inferred);
+    console.log({
+        context: context,
+        facts: facts,
+        graph: graph,
+        dilemmas: dilemmas,
+    });
     return {
         context: context,
         facts: facts,
