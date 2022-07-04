@@ -441,7 +441,7 @@ function kbCheck(kb) {
     const headTailListRe = RegExp(String.raw`(\[(\s*\w+\s*,)*\s*\w+\s*\|\s*(([A-Z_]\w*)|` + simpleListRe.source + String.raw`)\s*\])`); // CHECKED!
     const listRe = RegExp(String.raw`(` + simpleListRe.source + String.raw`|` + headTailListRe.source + String.raw`)`); // CHECKED!
     // const varNameRe = RegExp(String.raw`(([a-zA-z]\w*)|(\d+[.]?\d*)|_|` + listRe.source + String.raw`)`); // CHECKED!
-    const varNameRe = RegExp(String.raw`(([a-zA-z]\w*)|(-?\d+[.]?\d*)|_|.+)`); // CHECKED!
+    const varNameRe = RegExp(String.raw`((^[a-zA-z]\w*)|(^-?\d+[.]?\d*)|^_|.+)`); // CHECKED!
     const oldVarNameRe = RegExp(String.raw`(([a-zA-z]\w*)|(-?\d+[.]?\d*)|_)`);
     // const varNameRe = /(([a-zA-z]\w*)|(\d+[.]?\d*)|_|)/; // CHECKED!
     const ruleName = RegExp(spacingRe.source + String.raw`\w+`); // CHECKED!
@@ -461,7 +461,7 @@ function kbCheck(kb) {
     // console.log(headRe.source);
     const priorityRe = /(\s*\|\s*-?\d+)?/;
     // const kbRe = RegExp(String.raw`(` + ruleName.source + String.raw`\s+::\s+` + bodyRe.source + String.raw`\s+implies\s+` + headRe.source + String.raw`\s*;` + spacingRe.source + String.raw`)+`); // CHECKED!
-    const ruleRe = RegExp(String.raw`(` + ruleName.source + String.raw`\s*::\s*(` + bodyRe.source + String.raw`)?\s+implies\s+` + headRe.source + priorityRe.source + String.raw`\s*;` + spacingRe.source + String.raw`)`);
+    const ruleRe = RegExp(String.raw`(^` + ruleName.source + String.raw`\s*::\s*(` + bodyRe.source + String.raw`)?\s+implies\s+` + headRe.source + priorityRe.source + String.raw`\s*;` + spacingRe.source + String.raw`$)`);
     const constrainRe = RegExp(String.raw`(` + ruleName.source + String.raw`\s*::\s*` + oldPredicateRe.source + String.raw`\s+#\s+` + oldPredicateRe.source + String.raw`\s*;` + spacingRe.source + String.raw`)`, "i");
     const ruleStrings = kb.split(";").filter(Boolean);
     let rules = "", constraints = "", customPriorities = {}, rulesObject;
