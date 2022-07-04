@@ -1,4 +1,5 @@
 let tab = "deduce-tab";
+let currentOutput;
 
 function initialize() {
     document.getElementById("exec-button").value = "Deduce!";
@@ -63,6 +64,7 @@ function deduce() {
     // console.log(kbObject);
     // console.log(contextObject); // TODO fix some context parsing issue (in propositional cases it includes the semicolon into the name of the prop)
     const output = forwardChaining(kbObject, contextObject["context"]);
+    currentOutput = output;
     // console.log(output);
     const inferences = output["facts"];
     const graph = output["graph"];
@@ -83,14 +85,14 @@ function consoleOutput() {
     "use strict";
     let newText;
     // if (document.getElementById("exec-button").innerHTML != "Deduce!") {
-    newText = "I am currently not working - wait for some next update!\n\nThanks for your patience! :)";
+    newText = "I am quite buggy at the moment - wait for some future update!\n\nThanks for your patience! :)";
     // } else {
     newText = infer();
     // }
     const previous = document.getElementById(tab + "-console").value;
     document.getElementById(tab + "-console").value = previous + newText + "\n~$ ";
     if (document.getElementById("download-checkbox").checked) {
-        download("output.txt", newText);
+        download("output.json", JSON.stringify(currentOutput, null, 2));
     }
 }
 

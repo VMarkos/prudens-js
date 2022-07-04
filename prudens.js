@@ -473,7 +473,7 @@ Context: g(b); h(b);
 		* all such rules. Otherwise, we merely keep track of the agent's dilemmas.
  * */
 
-function updateGraph(inferredHead, newRule, graph, facts, priorityFunction, deletedRules, sub, constraints, kbObject, dilemmas) { //TODO You may need to store the substitution alongside each rule, in case one needs to count how many time a rule has been triggered or so.
+function updateGraph(inferredHead, newRule, graph, facts, priorityFunction, deletedRules, sub, constraints, kbObject, dilemmas, defeatedRules) { //TODO You may need to store the substitution alongside each rule, in case one needs to count how many time a rule has been triggered or so.
     let inferred = false;
     // console.log("inferredHead:", inferredHead);
     // console.log("facts:", facts);
@@ -496,9 +496,10 @@ function updateGraph(inferredHead, newRule, graph, facts, priorityFunction, dele
             inferred: inferred,
             deletedRules: deletedRules,
             dilemmas: dilemmas,
+            defeatedRules: defeatedRules,
         };
     }
-    const casualConflict = {}
+    const casualConflict = {};
     for (const key of Object.keys(inferredHead)) {
         casualConflict[key] = inferredHead[key];
     }
@@ -534,6 +535,11 @@ function updateGraph(inferredHead, newRule, graph, facts, priorityFunction, dele
                 // debugger;
                 if (isPrior === undefined || isPrior) {
                     toBeRemoved.push(rule);
+                    defeatedRules.push({
+                        "defeated": rule,
+                        "by": newRule,
+                        "sub": sub,
+                    });
                     if (!deepIncludes(rule, deletedRules)) {
                         deletedRules.push(rule);
                     }
@@ -585,6 +591,7 @@ function updateGraph(inferredHead, newRule, graph, facts, priorityFunction, dele
         inferred: inferred,
         deletedRules: deletedRules,
         dilemmas: dilemmas,
+        defeatedRules: defeatedRules,
     };
 }
 
@@ -617,6 +624,7 @@ function forwardChaining(kbObject, context, priorityFunction=linearPriorities) {
     let inferred = false;
     let graph = {};
     let deletedRules = [];
+    let defeatedRules = [];
     let dilemmas = [];
     // console.log(kbObject);
     const code = kbObject["code"];
@@ -645,12 +653,13 @@ function forwardChaining(kbObject, context, priorityFunction=linearPriorities) {
                 // console.log("Rule head:");
                 // console.log(rule["head"]);
                 const inferredHead = applyToLiteral(sub, rule["head"]);
-                const updatedGraph = updateGraph(inferredHead, rule, graph, facts, priorityFunction, deletedRules, sub, kbObject["constraints"], kbObject, dilemmas);
+                const updatedGraph = updateGraph(inferredHead, rule, graph, facts, priorityFunction, deletedRules, sub, kbObject["constraints"], kbObject, dilemmas, defeatedRules);
                 // console.log(updatedGraph);
                 graph = updatedGraph["graph"]; // You could probably push the entire graph Object!
                 facts = updatedGraph["facts"];
                 dilemmas = updatedGraph["dilemmas"];
                 deletedRules = updatedGraph["deletedRules"];
+                defeatedRules = updatedGraph["defeatedRules"];
                 if (!inferred) {
                     inferred = updatedGraph["inferred"];
                 }
@@ -665,12 +674,14 @@ function forwardChaining(kbObject, context, priorityFunction=linearPriorities) {
         facts: facts,
         graph: graph,
         dilemmas: dilemmas,
+        defeatedRules: defeatedRules,
     });
     return {
         context: context,
         facts: facts,
         graph: graph,
         dilemmas: dilemmas,
+        defeatedRules: defeatedRules,
     }
 }
 
