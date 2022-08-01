@@ -250,8 +250,92 @@ function isVarString(string) { // Is this really needed?
     return /[A-Z]/.test(("" + string).charAt(0));
 }
 
+function apply(sub, args) { // FIXME Redefine apply so as to check whether a value is not a constant but actually another variable!
+    "use strict";
+    if (args === undefined) {
+        return undefined;
+    }
+    // console.log(args);
+    // console.log(sub);
+    const localArguments = [];
+    for (const argument of args) {
+        if (!argument["isAssigned"] && Object.keys(sub).includes(argument["name"])) {
+            let tempArg = argument["name"];
+            let tempVal = sub[tempArg];
+            const visitedArgs = [tempArg];
+            while (isVarString(tempVal) && Object.keys(sub).includes(tempVal) && !visitedArgs.includes(tempVal)) { // While the sub maps a variable to a variable that is also in the sub...
+                tempArg = tempVal; // ...move to the next variable.
+                tempVal = sub[tempArg];
+                visitedArgs.push(tempVal);
+            }
+            // if (visitedArgs.includes(tempVal)) { // In case we have an infinite loop like X/Y, Y/Z, Z/X...
+            //     console.log("Messed up...");
+            //     return undefined; // ...return undefined.
+            // }
+            if (isVarString(tempVal)) {
+                localArguments.push({
+                    index: argument["index"],
+                    name: tempVal,
+                    isAssigned: false,
+                    value: undefined,
+                    muted: argument["muted"],    
+                });
+            } else {
+                localArguments.push({
+                    index: argument["index"],
+                    name: argument["name"],
+                    isAssigned: true,
+                    value: tempVal,
+                    muted: argument["muted"],
+                });
+            }
+        } else {
+            localArguments.push(argument);
+        }
+    }
+    return localArguments;
+}
+function extend(sub, unifier) {
+    "use strict";
+    // console.log("sub:", sub);
+    // console.log("Unifier in extend():");
+    // console.log("Unifier (in extend):", unifier);
+    const extendedSub = deepCopy(sub);
+    // console.log("Sub (in extend):");
+    // console.log(extendedSub);
+    for (const key of Object.keys(unifier)) {
+        if (Object.keys(extendedSub).includes(key) && extendedSub[key] !== unifier[key] && !isVarString(extendedSub[key])) {
+            // console.log("key:", key, "extendedSub[key]:", extendedSub[key]);
+            // console.log("ext includes?", Object.keys(extendedSub).includes(key));
+            // console.log("Var?", isVarString(extendedSub[key]));
+            return undefined;
+        } else if (!Object.keys(extendedSub).includes(key)) {
+            extendedSub[key] = unifier[key];
+        }
+    }
+    for (const key of Object.keys(extendedSub)) {
+        // console.log("key:", key);
+        if (isVarString(extendedSub[key]) && Object.keys(unifier).includes(extendedSub[key])) { // In case some variable is unified with another variable included in the unifier...
+            let tempKey = key;
+            let tempVal = extendedSub[key];
+            const visitedKeys = [tempKey];
+            while (isVarString(tempVal) && Object.keys(unifier).includes(tempVal) && !visitedKeys.includes(tempVal)) {
+                tempKey = tempVal;
+                tempVal = unifier[tempVal];
+                visitedKeys.push(tempVal);
+            }
+            extendedSub[key] = tempVal;
+        }
+    }
+    return extendedSub;
+}
+
+
 module.exports = {
     deepIncludes,
     deepCopy,
     unify,
+    apply,
+    extend,
+    removeAll,
 }

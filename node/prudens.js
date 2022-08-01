@@ -88,7 +88,7 @@ function getSubstitutions(body, facts, code) {
                 // console.log("key:", key, instance[key]);
             }
             // console.log("literal:", literal, "\n(pre-apply) body:", instance);
-            // instance["args"] = apply(sub, literal["args"]);
+            // instance["args"] = utils.apply\(sub, literal["args"]);
             // console.log("(post-apply) body:", instance);
             // debugger;
             // let instance = {
@@ -97,7 +97,7 @@ function getSubstitutions(body, facts, code) {
             //     isJS: body[i]["isJS"],
             //     isEquality: body[i]["isEquality"],
             //     isInequality: body[i]["isInequality"],
-            //     args: apply(sub, body[i]["args"]),
+            //     args: utils.apply\(sub, body[i]["args"]),
             //     arity: body[i]["arity"],
             // }
             // console.log("Substituted literal:");
@@ -112,7 +112,7 @@ function getSubstitutions(body, facts, code) {
                 // console.log(unifier);
                 // debugger;
                 if (unifier !== undefined) {
-                    const extension = extend(sub, unifier);
+                    const extension = utils.extend(sub, unifier);
                     // console.log("sub:", sub, "\nextension:", extension);
                     // extended = true;
                     // debugger;
@@ -129,7 +129,7 @@ function getSubstitutions(body, facts, code) {
                 toBeRemoved.push(sub);
             }
         }
-        substitutions = removeAll(substitutions, toBeRemoved);
+        substitutions = utils.removeAll(substitutions, toBeRemoved);
         substitutions.push(...toBePushed);
         if (substitutions.length === 0) {
             // console.log("Zero length");
@@ -161,52 +161,6 @@ function extendByFacts(literal, facts) {
 }
 
 // Substitution = {varname1: val1, varname2: val2, ...}
-
-function apply(sub, args) { // FIXME Redefine apply so as to check whether a value is not a constant but actually another variable!
-    "use strict";
-    if (args === undefined) {
-        return undefined;
-    }
-    // console.log(args);
-    // console.log(sub);
-    const localArguments = [];
-    for (const argument of args) {
-        if (!argument["isAssigned"] && Object.keys(sub).includes(argument["name"])) {
-            let tempArg = argument["name"];
-            let tempVal = sub[tempArg];
-            const visitedArgs = [tempArg];
-            while (isVarString(tempVal) && Object.keys(sub).includes(tempVal) && !visitedArgs.includes(tempVal)) { // While the sub maps a variable to a variable that is also in the sub...
-                tempArg = tempVal; // ...move to the next variable.
-                tempVal = sub[tempArg];
-                visitedArgs.push(tempVal);
-            }
-            // if (visitedArgs.includes(tempVal)) { // In case we have an infinite loop like X/Y, Y/Z, Z/X...
-            //     console.log("Messed up...");
-            //     return undefined; // ...return undefined.
-            // }
-            if (isVarString(tempVal)) {
-                localArguments.push({
-                    index: argument["index"],
-                    name: tempVal,
-                    isAssigned: false,
-                    value: undefined,
-                    muted: argument["muted"],    
-                });
-            } else {
-                localArguments.push({
-                    index: argument["index"],
-                    name: argument["name"],
-                    isAssigned: true,
-                    value: tempVal,
-                    muted: argument["muted"],
-                });
-            }
-        } else {
-            localArguments.push(argument);
-        }
-    }
-    return localArguments;
-}
 
 /*
 List unification cases:
@@ -242,41 +196,6 @@ g(X, b): [R :: f(X, Y) implies g(X, Y);]
 This may not be a bug in the sense that if the developer has chosen different var names then they may want to highlight something.
 */
 
-function extend(sub, unifier) {
-    "use strict";
-    // console.log("sub:", sub);
-    // console.log("Unifier in extend():");
-    // console.log("Unifier (in extend):", unifier);
-    const extendedSub = utils.deepCopy(sub);
-    // console.log("Sub (in extend):");
-    // console.log(extendedSub);
-    for (const key of Object.keys(unifier)) {
-        if (Object.keys(extendedSub).includes(key) && extendedSub[key] !== unifier[key] && !isVarString(extendedSub[key])) {
-            // console.log("key:", key, "extendedSub[key]:", extendedSub[key]);
-            // console.log("ext includes?", Object.keys(extendedSub).includes(key));
-            // console.log("Var?", isVarString(extendedSub[key]));
-            return undefined;
-        } else if (!Object.keys(extendedSub).includes(key)) {
-            extendedSub[key] = unifier[key];
-        }
-    }
-    for (const key of Object.keys(extendedSub)) {
-        // console.log("key:", key);
-        if (isVarString(extendedSub[key]) && Object.keys(unifier).includes(extendedSub[key])) { // In case some variable is unified with another variable included in the unifier...
-            let tempKey = key;
-            let tempVal = extendedSub[key];
-            const visitedKeys = [tempKey];
-            while (isVarString(tempVal) && Object.keys(unifier).includes(tempVal) && !visitedKeys.includes(tempVal)) {
-                tempKey = tempVal;
-                tempVal = unifier[tempVal];
-                visitedKeys.push(tempVal);
-            }
-            extendedSub[key] = tempVal;
-        }
-    }
-    return extendedSub;
-}
-
 /*
 Inference algorithm:
 Facts = list of certain inferences;
@@ -300,7 +219,7 @@ function applyToLiteral(sub, literal) {
     const subLiteral = utils.deepCopy(literal);
     // console.log("Sub-Literal:");
     // console.log(subLiteral);
-    subLiteral["args"] = apply(sub, literal["args"])
+    subLiteral["args"] = utils.apply(sub, literal["args"])
     return subLiteral;
 }
 
@@ -483,11 +402,11 @@ function updateGraph(inferredHead, newRule, graph, facts, priorityFunction, dele
                 // console.log("Facts prior to splicing: ", facts, "\nIndex of opposite head: " + deepIndexOf(facts, oppositeHead));
                 // debugger;
                 // facts = facts.splice(deepIndexOf(facts, oppositeHead), 1); // FIXME .indexOf() returns -1 because, guess what, it does not work with lists of objects... Create a deep alternative.
-                facts = removeAll(facts, [oppositeHead]);
+                facts = utils.removeAll(facts, [oppositeHead]);
                 // console.log("Facts post splicing: ", facts);
                 // debugger;
             } else {
-                graph[parsers.literalToString(oppositeHead)] = removeAll(graph[parsers.literalToString(oppositeHead)], toBeRemoved);
+                graph[parsers.literalToString(oppositeHead)] = utils.removeAll(graph[parsers.literalToString(oppositeHead)], toBeRemoved);
             }
         }
     }
@@ -633,7 +552,7 @@ function jsEvaluation(body, sub, code) { // Checks whether, given a substitution
             // console.log("Equality:");
             // console.log(equality);
             if (equality["unifier"]) {
-                sub = extend(sub, equality["unifier"]);
+                sub = utils.extend(sub, equality["unifier"]);
             }
             isValid = isValid && equality["isValid"];
         } else if (literal["isInequality"]) {
