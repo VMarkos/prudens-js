@@ -31,7 +31,7 @@ in case the policy string is syntactically valid. Otherwise, it returns a JSON o
     message: "ErrorMessage",
 }
 ```
-For more on Prudens's internal data structures, see [https://github.com/VMarkos/prudens-js#data-structure](here).
+For more on Prudens's internal data structures, see [here](https://github.com/VMarkos/prudens-js#data-structure).
 
 ### `parseContext(contextString)`
 Accepts a context string and returns a context JSON object of the following form:
@@ -49,7 +49,7 @@ in case the context string is syntactically valid. Otherwise, it returns a JSON 
     message: "ErrorMessage",
 }
 ```
-Again, for more on Prudens's internal data structures, see [https://github.com/VMarkos/prudens-js#data-structure](here).
+Again, for more on Prudens's internal data structures, see [here](https://github.com/VMarkos/prudens-js#data-structure).
 
 ## Deduction
 `prudens` provides one main forward reasoning function and two complementary functions, as described below.
@@ -79,12 +79,12 @@ In the above:
 ### `linearPriorities(rule1, rule2, kbObject, sub)`
 Accepts two rules, a policy object and a substitution object and returns `true` if and only if `rule1` appears after `rule2` in `kbObject`. This function is used as the default priority function in `forwardChaining`.
 
-For more on custom priority functions, see [https://github.com/VMarkos/prudens-js/releases/tag/v0.8.3](here).
+For more on custom priority functions, see [here](https://github.com/VMarkos/prudens-js/releases/tag/v0.8.3).
 
 ### `specificityPriorities(rule1, rule2, kbObject, sub)`
 Accepts two rules, a policy object and a substitution object and returns `true` if and only if `rule1` has a more specific body that `rule2` under `sub`. If the inverse is true, it returns `false`, otherwise it returns `undefined`.
 
-Again, for more on custom priority functions, see [https://github.com/VMarkos/prudens-js/releases/tag/v0.8.3](here).
+Again, for more on custom priority functions, see [here](https://github.com/VMarkos/prudens-js/releases/tag/v0.8.3).
 
 ## A Toy Example
 The following script demonstrates a simple case of use of `prudens`'s basic functions:
