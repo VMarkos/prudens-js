@@ -3,7 +3,7 @@ A full implementation of Prudens in Javascript alongside a simple UI and the cor
 
 For the corresponding UI: https://vmarkos.github.io/prudens-js/index.html
 
-For the `npm` package documentation, see [](here).
+For the `npm` package documentation, see [https://github.com/VMarkos/prudens-js/blob/main/NODE_README.md](here).
 
 # TL;DR
 1. Deduction: see [this function](#forwardChainingkb-context).
