@@ -629,12 +629,15 @@ function forwardChaining(kbObject, context, priorityFunction=linearPriorities, l
     // console.log(kbObject);
     const code = kbObject["code"];
     const customPriorities = kbObject["customPriorities"];
-    const logs = [{
-        facts: facts,
-        graph: graph,
-        dilemmas: dilemmas,
-        defeatedRules: defeatedRules,
-    }];
+    const logs = [];
+    if (logging) {
+        logs.push({
+            facts: facts,
+            graph: graph,
+            dilemmas: dilemmas,
+            defeatedRules: defeatedRules,
+        });
+    }
     if (Object.keys(customPriorities).length > 0) {
         priorityFunction = customPrioritiesFunction;
     }
