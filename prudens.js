@@ -607,7 +607,7 @@ function isInDilemma(rule, dilemmas) {
 	return false;
 }
 
-function forwardChaining(kbObject, context, priorityFunction=linearPriorities) { //FIXME Huge inconsistency with DOCS! You need to change that from [rule1, ...] to KBObject.
+function forwardChaining(kbObject, context, priorityFunction=linearPriorities, logging = false) { //FIXME Huge inconsistency with DOCS! You need to change that from [rule1, ...] to KBObject.
     let facts = deepCopy(context);
     facts.push({
         name: "true",
@@ -629,6 +629,12 @@ function forwardChaining(kbObject, context, priorityFunction=linearPriorities) {
     // console.log(kbObject);
     const code = kbObject["code"];
     const customPriorities = kbObject["customPriorities"];
+    const logs = [{
+        facts: facts,
+        graph: graph,
+        dilemmas: dilemmas,
+        defeatedRules: defeatedRules,
+    }];
     if (Object.keys(customPriorities).length > 0) {
         priorityFunction = customPrioritiesFunction;
     }
@@ -666,22 +672,32 @@ function forwardChaining(kbObject, context, priorityFunction=linearPriorities) {
                 // console.log(graph);
             }
         }
+        if (logging) {
+            logs.push({
+                facts: facts,
+                graph: graph,
+                dilemmas: dilemmas,
+                defeatedRules: defeatedRules,
+            });
+        }
         // i++;
         // console.log(i);
     } while (inferred);
-    console.log({
-        context: context,
-        facts: facts,
-        graph: graph,
-        dilemmas: dilemmas,
-        defeatedRules: defeatedRules,
-    });
+    // console.log({
+    //     context: context,
+    //     facts: facts,
+    //     graph: graph,
+    //     dilemmas: dilemmas,
+    //     defeatedRules: defeatedRules,
+    //     logs: logs,
+    // });
     return {
         context: context,
         facts: facts,
         graph: graph,
         dilemmas: dilemmas,
         defeatedRules: defeatedRules,
+        logs: logs,
     }
 }
 
