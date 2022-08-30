@@ -441,7 +441,7 @@ function kbCheck(kb) {
     const headTailListRe = RegExp(String.raw`(\[(\s*\w+\s*,)*\s*\w+\s*\|\s*(([A-Z_]\w*)|` + simpleListRe.source + String.raw`)\s*\])`); // CHECKED!
     const listRe = RegExp(String.raw`(` + simpleListRe.source + String.raw`|` + headTailListRe.source + String.raw`)`); // CHECKED!
     // const varNameRe = RegExp(String.raw`(([a-zA-z]\w*)|(\d+[.]?\d*)|_|` + listRe.source + String.raw`)`); // CHECKED!
-    const varNameRe = RegExp(String.raw`((^[a-zA-z]\w*)|(^-?\d+[.]?\d*)|^_|.+)`); // CHECKED!
+    const varNameRe = RegExp(String.raw`(([a-zA-z]\w*)|(-?\d+[.]?\d*)|_|([\+\-\*\/\(\)\da-zA-Z]+))`); // FIXME Add more sophistication in the validity of mathematical expressions.
     const oldVarNameRe = RegExp(String.raw`(([a-zA-z]\w*)|(-?\d+[.]?\d*)|_)`);
     // const varNameRe = /(([a-zA-z]\w*)|(\d+[.]?\d*)|_|)/; // CHECKED!
     const ruleName = RegExp(spacingRe.source + String.raw`\w+`); // CHECKED!
