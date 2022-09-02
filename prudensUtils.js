@@ -1,5 +1,6 @@
 function deepCopy(object) { // This is a level 1 deep copy --- i.e. if some value is itself another JS-object, it will be copied in a shallow manner.
     "use strict";
+    // console.log("deepCopy:", object);
     if (object === undefined) {
         return {}; // REMEMBER this always returns an object!
     }
@@ -20,6 +21,21 @@ function deepCopy(object) { // This is a level 1 deep copy --- i.e. if some valu
         }
     }
     return copycat;
+}
+
+function dummyDeepCopy(object) {
+    return JSON.parse(JSON.stringify(object));
+}
+
+function setConcat(X, Y) {
+    const xORy = deepCopy(X);
+    for (const y of Y) {
+        // console.log(y, xORy);
+        if (!deepIncludes(y, xORy)) {
+            xORy.push(y);
+        }
+    }
+    return xORy;
 }
 
 function removeAll(list, toBeRemoved) {
@@ -88,7 +104,7 @@ function arrayDeepEquals(x, y) { // x, y are arrays --- not used as of now!
     return true;
 }
 
-function deepIncludes(object, list, stringHash = false) { //Re-implementation of Array.prototype.includes() that checks at depth=1 for equal objects. 
+function deepIncludes(object, list, stringHash = false) { // Re-implementation of Array.prototype.includes() that checks at depth=1 for equal objects. 
     // "use strict"; // TODO Consider rewriting this or somehow map each object to its (hashed) string representation (it seems that this is what you actually need).
     if (list === undefined) {
 		return false;
