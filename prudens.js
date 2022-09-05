@@ -889,7 +889,12 @@ function jsCheck(literal, sub, code) {
 
 function numParser(string) {
     // console.log("numParser:", string);
-    return Function('return (' + string + ');');
+    return Function(`try {
+            return ( ${string} );
+        } catch (e) {
+            console.log("JavaScript Error:\\n" + new Error().stack);
+            return false;
+        }`);
 }
 
 function applyToString(string, sub) {
@@ -914,6 +919,9 @@ function applyToString(string, sub) {
 function evalExpression(expression, sub) {
     // console.log(expression["value"], sub);
     if (!expression["isExpression"]) {
+        if (/[a-z]\w*/.test(expression["value"])) {
+            return '"' + expression["value"] + '"';
+        }
         return "" + expression["value"];
     }
     // console.log("expression:", expression, "sub:", sub);

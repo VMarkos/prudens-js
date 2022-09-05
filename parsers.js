@@ -326,34 +326,34 @@ function kbToObject(kb) {
 function parseKB(kbAll) {
     "use strict";
     const warnings = [];
-    if (!kbAll.includes("@KnowledgeBase")){
+    if (!kbAll.includes("@KnowledgeBase") && !kbAll.includes("@Knowledge")){
         return {
             type: "error",
             name: "KnowledgeBaseDecoratorNotFound",
-            message: "I found no @KnowledgeBase decorator. Enter a single @KnowledgeBase below your imports (if any) and prior to your knowledge base's rules.",
+            message: "I found no @Knowledge decorator. Enter a single @Knowledge below your imports (if any) and prior to your knowledge base's rules.",
         };
     }
-    const kbNoCode = kbAll.split("@KnowledgeBase");
+    const kbNoCode = kbAll.split(/\@KnowledgeBase|\@Knowledge/);
     if (kbNoCode.length > 2){
         return {
             type: "error",
             name: "MultipleKnowledgeBaseDecorators",
-            message: "Found more than two (2) @KnowledgeBase decorators. Enter a single @KnowledgeBase below your imports (if any) and prior to your knowledge base's rules.",
+            message: "Found more than two (2) @Knowledge decorators. Enter a single @Knowledge below your imports (if any) and prior to your knowledge base's rules.",
         };
     }
     const imports = kbNoCode[0].trim() //You need some exception handling here as well...
     const kbWithCode = kbNoCode[1].trim();
     let kb;
     let code;
-    if (kbWithCode.includes("@Code")) {
-        const finalSplit = kbWithCode.split("@Code");
+    if (kbWithCode.includes("@Code") || kbWithCode.includes("@Procedures")) {
+        const finalSplit = kbWithCode.split(/\@Code|\@Procedures/);
         kb = finalSplit[0].trim();
         code = finalSplit[1].trim();
         if (code.length === 0) {
             warnings.push({
                 type: "warning",
                 name: "CodeNotFound",
-                message: "I found no code under the @Code decorator. While I have no issue with that, as a kind reminder, @Code is used strictly below your knowledge base's rules to declare any custom Javascript predicates."
+                message: "I found no code under the @Procedures decorator. While I have no issue with that, as a kind reminder, @Procedures is used strictly below your knowledge base's rules to declare any custom Javascript predicates."
             });
         }
     } else {
