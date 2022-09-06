@@ -462,7 +462,7 @@ function kbCheck(kb) {
     const priorityRe = /(\s*\|\s*-?\d+)?/;
     // const kbRe = RegExp(String.raw`(` + ruleName.source + String.raw`\s+::\s+` + bodyRe.source + String.raw`\s+implies\s+` + headRe.source + String.raw`\s*;` + spacingRe.source + String.raw`)+`); // CHECKED!
     const ruleRe = RegExp(String.raw`(^` + ruleName.source + String.raw`\s*::\s*(` + bodyRe.source + String.raw`)?\s+implies\s+` + headRe.source + priorityRe.source + String.raw`\s*;` + spacingRe.source + String.raw`$)`);
-    const constrainRe = RegExp(String.raw`(` + ruleName.source + String.raw`\s*::\s*` + oldPredicateRe.source + String.raw`\s+#\s+` + oldPredicateRe.source + String.raw`\s*;` + spacingRe.source + String.raw`)`, "i");
+    const constrainRe = RegExp(String.raw`(` + ruleName.source + String.raw`\s*::\s*(` + oldPredicateRe.source + String.raw`|` + headRe.source + String.raw`)\s+#\s+(` + oldPredicateRe.source + String.raw`|` + headRe.source + String.raw`)\s*;` + spacingRe.source + String.raw`)`, "i");
     const ruleStrings = kb.split(";").filter(Boolean);
     let rules = "", constraints = "", customPriorities = {}, rulesObject;
     // console.log(ruleStrings);
