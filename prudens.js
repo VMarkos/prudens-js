@@ -53,6 +53,17 @@ Get all substitutions:
     b. If substitutions is empty and it is not the first iteration, return [];
 */
 
+const TRUE_PREDICATE = {
+    name: "true",
+    sign: true,
+    isJS: false,
+    isEquality: false,
+    isInequality: false,
+    isAction: false,
+    args: undefined,
+    arity: 0,
+};
+
 function getSubstitutions(body, facts, code) {
     let substitutions = [undefined]; // If it contains only undefined in the end, then all body literals are propositional symbols and are all included in facts.
     const jsLiterals = [];
@@ -411,10 +422,22 @@ function applyToRule(sub, rule) {
  */
 
 function linearPriorities(rule1, rule2, kbObject, sub) { // true if rule1 is of HIGHER priority than rule2.
+    if (rule1["name"][0] === "$") {
+        return true;
+    }
+    if (rule2["name"][0] === "$") {
+        return false;
+    }
     return kbObject["kb"].indexOf(rule1) > kbObject["kb"].indexOf(rule2);
 }
 
 function specificityPriorities(rule1, rule2, kbObject, sub) { // true if rule1 is of HIGHER priority than rule2.
+    if (rule1["name"][0] === "$") {
+        return true;
+    }
+    if (rule2["name"][0] === "$") {
+        return false;
+    }
     const body1 = rule1["body"];
     const body2 = rule2["body"];
     // console.log("body1:", body1, "body2:", body2, "sub:", sub);
@@ -449,6 +472,12 @@ function isMoreSpecific(body1, body2, sub) { // true if body1 is more specific t
 }
 
 function customPrioritiesFunction(rule1, rule2, kbObject, sub) { // true if rule1 is of HIGHER priority than rule2.
+    if (rule1["name"][0] === "$") {
+        return true;
+    }
+    if (rule2["name"][0] === "$") {
+        return false;
+    }
     const priorities = kbObject["customPriorities"];
     if (!Object.keys(priorities).includes(rule1["name"]) || !Object.keys(priorities).includes(rule2["name"]) || priorities[rule1["name"]] === priorities[rule2["name"]]) {
         return undefined;
@@ -473,7 +502,7 @@ Context: g(b); h(b);
 		* all such rules. Otherwise, we merely keep track of the agent's dilemmas.
  * */
 
-function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded, factsToBeRemoved, priorityFunction, deletedRules, sub, constraints, kbObject, dilemmas, defeatedRules) { //TODO You may need to store the substitution alongside each rule, in case one needs to count how many time a rule has been triggered or so.
+function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded, factsToBeRemoved, priorityFunction, deletedRules, sub, constraints, kbObject, dilemmas, defeatedRules, context) { //TODO You may need to store the substitution alongside each rule, in case one needs to count how many time a rule has been triggered or so.
     let inferred = false;
     // console.log("inferredHead:", inferredHead);
     // console.log("facts:", facts);
@@ -520,7 +549,25 @@ function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded
     let includesConflict = false;
     let isPrior, beatsAll;
     for (const oppositeHead of conflicts) {
-        // console.log("Here");
+        // console.log("Here", oppositeHead);
+        if (deepIncludes(oppositeHead, context)) { // Should we consider dilemmas in the case of contexts?
+            // console.log("Context");
+            defeatedRules.push({
+                "defeated": newRule,
+                "by": undefined, // Undefined means context.
+                "sub": sub,
+            });
+            deletedRules.push(newRule);
+            return {
+                graph: graph,
+                factsToBeRemoved: factsToBeRemoved,
+                factsToBeAdded: factsToBeAdded,
+                inferred: inferred,
+                deletedRules: deletedRules,
+                dilemmas: dilemmas,
+                defeatedRules: defeatedRules,
+            };
+        }
         if (deepIncludes(oppositeHead, facts, true)) {
             // console.log("indludes:", oppositeHead);
             includesConflict = true;
@@ -611,23 +658,24 @@ function isInDilemma(rule, dilemmas) {
 	return false;
 }
 
+function initializeGraph(context) {
+    const graph = {};
+    let literal;
+    for (let i = 0; i < context.length; i++) {
+        literal = context[i]
+        graph[literalToString(literal)] = [{name: `\$${i}`, head: literal, body: TRUE_PREDICATE}];
+    }
+    return graph;
+}
+
 function forwardChaining(kbObject, context, priorityFunction=linearPriorities, logging = true) { //FIXME Huge inconsistency with DOCS! You need to change that from [rule1, ...] to KBObject.
     let previousFacts = deepCopy(context);
-    previousFacts.push({
-        name: "true",
-        sign: true,
-        isJS: false,
-        isEquality: false,
-        isInequality: false,
-        isAction: false,
-        args: undefined,
-        arity: 0,
-    });
+    previousFacts.push(TRUE_PREDICATE);
     let factsToBeAdded = [], factsToBeRemoved = [];
     const kb = kbObject["kb"];
     // console.log(facts);
     let inferred = false;
-    let graph = {};
+    let graph = initializeGraph(context);
     let deletedRules = [];
     let defeatedRules = [];
     let dilemmas = [];
