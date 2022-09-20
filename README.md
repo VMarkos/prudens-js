@@ -51,7 +51,7 @@ A rule is a JSON object of the following form:
 {
     name: "nameString",
     body: [lit1, lit2,..., litN],
-    head: haedLiteral,
+    head: headLiteral,
 }
 ```
 In the above, `name` is a string containing the rule's name, `body` is a list of literals as described above and `head` is a single literal corresponding to the rule's head.
@@ -79,13 +79,45 @@ Both `val` and `var` are strings that correspond to the value and the name of a 
 A graph is a JSON object that corresponds to an Inference Graph and has the following form:
 ```javascript
 {
-    f1: [rule11, rule12,..., rule1n],
-    f2: [rule21, rule22,..., rule2m],
-    ...,
-    fN: [ruleN1, ruleN2,..., ruleNz],
+    graph: {
+        f1: [rule11, rule12,..., rule1n],
+        f2: [rule21, rule22,..., rule2m],
+        ...,
+        fN: [ruleN1, ruleN2,..., ruleNz],
+    },
+    context: [lit1, lit2,..., litN],
+    facts: [lit1, lit2,..., litN],
+    dilemmas: [
+        [rule11, rule12, sub1],
+        [rule21, rule22, sub2],
+        ...,
+        [ruleN1, ruleN2, subN],
+    ],
+    defeatedRules: [
+        {"defeated": rule11, "by": rule12, "sub": sub1},
+        {"defeated": rule21, "by": rule22, "sub": sub2},
+        ...,
+        {"defeated": ruleN1, "by": ruleN2, "sub": subN},
+    ],
 }
 ```
-In the above, `f`'s are all string representations of literals and each one of them is assigned a list of rules that infer them in an inference graph. Actually, a graph is a dictionary representing a graph with its node's as keys and the directed edges terminating to these nodes as values. It is important to nore that rules in the aforementioned lists are included as strings and not as JSON objects - this may not persist through next releases.
+In the above, `f`'s are all string representations of literals and each one of them is assigned a list of rules that infer them in an inference graph. Actually, the `graph` field of a graph is a dictionary representing a graph with its node's as keys and the directed edges terminating to these nodes as values. It is important to nore that rules in the aforementioned lists are included as strings and not as JSON objects &mdash; this may not persist through next releases.
+
+Next, the `context` field correspond to the initial context provided to Prudens while `facts` correspond to the full list of inferred facts. `dilemmas` is an array of arrays of the form:
+
+```javascript
+[rule1, rule2, sub]
+```
+
+implying that `rule1` and `rule2`, when `sub` is applied, lead to a dilemma &mdash; of course, `sub` concerns only first order rules.
+
+Finally, `defeatedRules` corresponds to a list of rules that have been activated and defeated by rules of higher priority during the reasoning process. Is is an array of JSON objects of the following form:
+
+```javascript
+{"defeated": rule1, "by": rule2, "sub": sub}
+```
+
+As indicated by the corresponding field names, the above is interpreted as "`rule2` defeats `rule1` under `sub`".
 
 # Utility functions
 `prudensUtils.js` provides a set of Prudens-specific functions that are used in most other scripts. Almost all of them allow for easier and more sound computations using Prudens's native data structures while they also provide some deeper level functionality that vanilla javascript does not support.
@@ -290,54 +322,16 @@ Given a list of rules, `kb`, this function returns a dictionary (JSON object) in
 ```
 In fact, the above representation is the inverse of the input array, `kb`, in order to facilitate object search in O(1) time, given that all string representations of rules are pairwise different.
 
-### `updateGraph(newLiteralString, newLiteralRule, oldLiteralString, graph, priorities)`
-This function updates the inference graph structure with a new literal in case it conflicts some of the already inferred ones. Namely, given an inference graph, `graph`, a string representation of literal already included in `graph`, `oldLiteralString`, a string representation of a literal conflicting with `oldLiteralString`, `newLiteralString`, the rule that has led to it, `newLiteralRule`, and the priorities of the rules contained in tha knowledge base, `priorities`, it returns an updated version of the graph with all conflicts resolved. For more regarding the structure of a graph object, see [here](#data-structure).
+### `updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded, factsToBeRemoved, priorityFunction, deletedRules, sub, constraints, kbObject, dilemmas, defeatedRules, context)`
+This function updates the inference graph structure with a new literal in case it conflicts some of the already inferred ones. Namely, given a literal to be examined, `inferredHead`, the rule that inferred that literal, `newRule`, an inference graph, `graph`, the list of previously inferred facts, `previousFacts` a list of facts that are to be added `factsToBeAdded`, a list of facts that are to be removed in this iteration, `factsToBeRemoved`, a priority function, `priorityFunction`, a list of all deleted rules so far, `deletedRules`, the current sub, `sub`, any compatibility constraints, `constraints`, a KB object, `kbObject`, an array of dilemmas, `dilemmas`, an array of defeated rules so far, `defeatedRules` and the current context, `context`,, it returns an updated version of the graph with all conflicts resolved. For more regarding the structure of the above, see [here](#data-structure).
 
-### `forwardChaining(kb, context)`
-Given a knowledge base, `kb`, and a set of grounded literals, `context`, this function deduces anything that may be deduced using the reasoning algorithm presented [here](https://www.internetofus.eu/wp-content/uploads/sites/38/2021/05/Michael_2019_MachineCoaching.pdf). The output has the following form:
-```javascript
-{
-    facts: [f1, f2,..., fN],
-    graph: {
-        f1: [rule11, rule12,..., rule1n],
-        f2: [rule21, rule22,..., rule2m],
-        ...,
-        fN: [ruleN1, ruleN2,..., ruleNz],
-    },
-}
-```
-In the above, `facts` is a list of grounded literals containing all literals that have been inferred as well as the initial context while `graph` is a graph object with all inferred literals as keys and lists of all rules that have led to these literals.
+### `forwardChaining(kb, context, priorityFunction?, logging?)`
+Given a knowledge base, `kb`, and a set of grounded literals, `context`, this function deduces anything that may be deduced using the reasoning algorithm presented [here](https://www.internetofus.eu/wp-content/uploads/sites/38/2021/05/Michael_2019_MachineCoaching.pdf).
 
-# Abduction
-```diff
-@@ Dependencies @@
-! prudensUtils.js
-! prudens.js
-```
 
-Regarding abduction, the current version of Prudens JS supports only a propositional version which adheres to the deduction process described [here](https://www.internetofus.eu/wp-content/uploads/sites/38/2021/05/Michael_2019_MachineCoaching.pdf). That is, any abductive proof provided by Prudens JS consists of any missing facts that could lead to a given target, _t_, using the aforementioned deduction algorithm.
-
-### `propositionalAbduction(kb, context, finalTarget)`
-Given a knowledge base, `kb`, a list of grounded literals, `context`, and a target literal, `finalTarget`, it computes all abductive proofs that could be generated *ignoring priorities and conflicts*. It returns `undefined` in case no such proof exists or a list of lists of propositional symbols of the following form:
-```javascript
-[
-    [p1, p2,..., pN],
-    ...,
-    [q1, q2,..., qM],
-]
-```
-Each of the lists presented above consists a distinct abductive proof of `finalTarget` given `kb` and `context`. In this function, `context` may well be empty.
-
-### `prioritizedPropositionalAbduction(kb, context, finalTarget)`
-Given a knowledge base, `kb`, a list of grounded literals, `context`, and a target literal, `finalTarget`, it computes all abductive proofs that could be generated *taking into account priorities and conflicts*. It returns `undefined` in case no such proof exists or a list of lists of propositional symbols of the following form:
-```javascript
-[
-    [p1, p2,..., pN],
-    ...,
-    [q1, q2,..., qM],
-]
-```
-Each of the lists presented above consists a distinct abductive proof of `finalTarget` given `kb` and `context`. In this function, `context` may well be empty.
+We shall note at this point that there are also two optional arguments that may be provided to this function, namely:
+1. `priorityFunction`, which determines the priority function to be used. By default, this is set to `linearPriorities`. Another built-in option one could use is `specificityPriorities`, as explained [here](https://github.com/VMarkos/prudens-js/releases/tag/v0.8.3). 
+2. `logging`, which determines whether logs of each iteration should be kept or not. By default, this is set to `true`.
 
 # Induction
 Regarding induction, we again adhere to the learning protocol declared [here](https://www.internetofus.eu/wp-content/uploads/sites/38/2021/05/Michael_2019_MachineCoaching.pdf), so induction within the context of Prudens JS consists to merely appending rules to a knowledge base taking care of updating priorities properly - hence, there are no built-in functionalities regarding induction.
