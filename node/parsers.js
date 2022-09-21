@@ -1,26 +1,3 @@
-// TODO add to all items a 'string' field which will correspond to its string representation, so as to avoid all these conversion functions (is this useful?)
-
-/*
-Domains Syntax Exm:
-pred1: {
-    [\w+, \w+, ...],
-    [\w+, \w+, ...],
-}
-pred2: {
-    [\w+, \w+, ...],
-    [\w+, \w+, ...],
-}
-
-@KnowledgeBase
-R :: f(X, Y), g(X, Z) implies h(X);
-
-Target: h(a);
-
-Domains:
-f: {[a, b, c], [a, b]}
-g: {[a, b,c, d ], [a, c,d ]}
-*/
-
 function parseDomains(domainsString) {
     const syntaxCheck = /(\s*\w+\s*:\s*\{\s*(\[(\s*\w+\s*,)*\s*\s+\s*\]\s*,)*\[(\s*\w+\s*,)*\s*\s+\s*\]\s*\}\s*)*/;
     if (!syntaxCheck.test(domainsString)) {
@@ -326,34 +303,34 @@ function kbToObject(kb) {
 function parseKB(kbAll) {
     "use strict";
     const warnings = [];
-    if (!kbAll.includes("@KnowledgeBase")){
+    if (!kbAll.includes("@KnowledgeBase") && !kbAll.includes("@Knowledge")){
         return {
             type: "error",
             name: "KnowledgeBaseDecoratorNotFound",
-            message: "I found no @KnowledgeBase decorator. Enter a single @KnowledgeBase below your imports (if any) and prior to your knowledge base's rules.",
+            message: "I found no @Knowledge decorator. Enter a single @Knowledge below your imports (if any) and prior to your knowledge base's rules.",
         };
     }
-    const kbNoCode = kbAll.split("@KnowledgeBase");
+    const kbNoCode = kbAll.split(/\@KnowledgeBase|\@Knowledge/);
     if (kbNoCode.length > 2){
         return {
             type: "error",
             name: "MultipleKnowledgeBaseDecorators",
-            message: "Found more than two (2) @KnowledgeBase decorators. Enter a single @KnowledgeBase below your imports (if any) and prior to your knowledge base's rules.",
+            message: "Found more than two (2) @Knowledge decorators. Enter a single @Knowledge below your imports (if any) and prior to your knowledge base's rules.",
         };
     }
     const imports = kbNoCode[0].trim() //You need some exception handling here as well...
     const kbWithCode = kbNoCode[1].trim();
     let kb;
     let code;
-    if (kbWithCode.includes("@Code")) {
-        const finalSplit = kbWithCode.split("@Code");
+    if (kbWithCode.includes("@Code") || kbWithCode.includes("@Procedures")) {
+        const finalSplit = kbWithCode.split(/\@Code|\@Procedures/);
         kb = finalSplit[0].trim();
         code = finalSplit[1].trim();
         if (code.length === 0) {
             warnings.push({
                 type: "warning",
                 name: "CodeNotFound",
-                message: "I found no code under the @Code decorator. While I have no issue with that, as a kind reminder, @Code is used strictly below your knowledge base's rules to declare any custom Javascript predicates."
+                message: "I found no code under the @Procedures decorator. While I have no issue with that, as a kind reminder, @Procedures is used strictly below your knowledge base's rules to declare any custom Javascript predicates."
             });
         }
     } else {
@@ -441,7 +418,7 @@ function kbCheck(kb) {
     const headTailListRe = RegExp(String.raw`(\[(\s*\w+\s*,)*\s*\w+\s*\|\s*(([A-Z_]\w*)|` + simpleListRe.source + String.raw`)\s*\])`); // CHECKED!
     const listRe = RegExp(String.raw`(` + simpleListRe.source + String.raw`|` + headTailListRe.source + String.raw`)`); // CHECKED!
     // const varNameRe = RegExp(String.raw`(([a-zA-z]\w*)|(\d+[.]?\d*)|_|` + listRe.source + String.raw`)`); // CHECKED!
-    const varNameRe = RegExp(String.raw`((^[a-zA-z]\w*)|(^-?\d+[.]?\d*)|^_|.+)`); // CHECKED!
+    const varNameRe = RegExp(String.raw`(([a-zA-z]\w*)|(-?\d+[.]?\d*)|_|([\+\-\*\/\(\)\da-zA-Z]+))`); // FIXME Add more sophistication in the validity of mathematical expressions.
     const oldVarNameRe = RegExp(String.raw`(([a-zA-z]\w*)|(-?\d+[.]?\d*)|_)`);
     // const varNameRe = /(([a-zA-z]\w*)|(\d+[.]?\d*)|_|)/; // CHECKED!
     const ruleName = RegExp(spacingRe.source + String.raw`\w+`); // CHECKED!
@@ -462,7 +439,7 @@ function kbCheck(kb) {
     const priorityRe = /(\s*\|\s*-?\d+)?/;
     // const kbRe = RegExp(String.raw`(` + ruleName.source + String.raw`\s+::\s+` + bodyRe.source + String.raw`\s+implies\s+` + headRe.source + String.raw`\s*;` + spacingRe.source + String.raw`)+`); // CHECKED!
     const ruleRe = RegExp(String.raw`(^` + ruleName.source + String.raw`\s*::\s*(` + bodyRe.source + String.raw`)?\s+implies\s+` + headRe.source + priorityRe.source + String.raw`\s*;` + spacingRe.source + String.raw`$)`);
-    const constrainRe = RegExp(String.raw`(` + ruleName.source + String.raw`\s*::\s*` + oldPredicateRe.source + String.raw`\s+#\s+` + oldPredicateRe.source + String.raw`\s*;` + spacingRe.source + String.raw`)`, "i");
+    const constrainRe = RegExp(String.raw`(` + ruleName.source + String.raw`\s*::\s*(` + oldPredicateRe.source + String.raw`|` + headRe.source + String.raw`)\s+#\s+(` + oldPredicateRe.source + String.raw`|` + headRe.source + String.raw`)\s*;` + spacingRe.source + String.raw`)`, "i");
     const ruleStrings = kb.split(";").filter(Boolean);
     let rules = "", constraints = "", customPriorities = {}, rulesObject;
     // console.log(ruleStrings);

@@ -89,6 +89,7 @@ function unify(x, y, sub=undefined) { // x, y are literals. Assymetric unificati
 
 function deepCopy(object) { // This is a level 1 deep copy --- i.e. if some value is itself another JS-object, it will be copied in a shallow manner.
     "use strict";
+    // console.log("deepCopy:", object);
     if (object === undefined) {
         return {}; // REMEMBER this always returns an object!
     }
@@ -109,6 +110,21 @@ function deepCopy(object) { // This is a level 1 deep copy --- i.e. if some valu
         }
     }
     return copycat;
+}
+
+function dummyDeepCopy(object) {
+    return JSON.parse(JSON.stringify(object));
+}
+
+function setConcat(X, Y) {
+    const xORy = deepCopy(X);
+    for (const y of Y) {
+        // console.log(y, xORy);
+        if (!deepIncludes(y, xORy)) {
+            xORy.push(y);
+        }
+    }
+    return xORy;
 }
 
 function removeAll(list, toBeRemoved) {
@@ -177,7 +193,7 @@ function arrayDeepEquals(x, y) { // x, y are arrays --- not used as of now!
     return true;
 }
 
-function deepIncludes(object, list, stringHash = false) { //Re-implementation of Array.prototype.includes() that checks at depth=1 for equal objects. 
+function deepIncludes(object, list, stringHash = false) { // Re-implementation of Array.prototype.includes() that checks at depth=1 for equal objects. 
     // "use strict"; // TODO Consider rewriting this or somehow map each object to its (hashed) string representation (it seems that this is what you actually need).
     if (list === undefined) {
 		return false;
@@ -295,12 +311,13 @@ function apply(sub, args) { // FIXME Redefine apply so as to check whether a val
     }
     return localArguments;
 }
+
 function extend(sub, unifier) {
     "use strict";
     // console.log("sub:", sub);
-    // console.log("Unifier in extend():");
+    // console.log("Unifier in utils.extend():");
     // console.log("Unifier (in extend):", unifier);
-    const extendedSub = deepCopy(sub);
+    const extendedSub = utils.deepCopy(sub);
     // console.log("Sub (in extend):");
     // console.log(extendedSub);
     for (const key of Object.keys(unifier)) {
@@ -331,6 +348,7 @@ function extend(sub, unifier) {
 }
 
 
+
 module.exports = {
     deepIncludes,
     deepCopy,
@@ -338,4 +356,5 @@ module.exports = {
     apply,
     extend,
     removeAll,
+    setConcat,
 }
