@@ -83,7 +83,7 @@ function getSubstitutions(body, facts, code) {
             substitutions = extendByFacts(literal, facts);
         }
         // console.log("Subs, ln 74:", substitutions);
-        // debugger;
+        debugger;
         // console.log("body:", body);
         const toBeRemoved = [];
         const toBePushed = [];
@@ -118,7 +118,7 @@ function getSubstitutions(body, facts, code) {
                 const unifier = unify(instance, fact, sub);
                 // console.log("Unifier:");
                 // console.log(unifier);
-                // debugger;
+                debugger;
                 if (unifier !== undefined) {
                     const extension = extend(sub, unifier);
                     // console.log("sub:", sub, "\nextension:", extension);
@@ -307,17 +307,21 @@ function unify(x, y, sub=undefined) { // x, y are literals. Assymetric unificati
         yArg = yArgs[i];
         if (xArg["isExpression"]) {
             val = numParser(applyToString(xArg["value"], extendedSub)).call();
+            // console.log("val:", val);
             if (parseFloat(val) !== parseFloat(yArg["value"])) {
                 return undefined;
             }
-            unifier[yArg["name"]] = val;
+            // console.log("names:", xArg["name"], yArg["name"]);
+            // unifier[yArg["name"]] = val;
+            unifier[xArg["value"]] = val;
             continue;
         }
         val = numParser(applyToString(yArg["value"], extendedSub)).call();
         if (parseFloat(val) !== parseFloat(xArg["value"])) {
             return undefined;
         }
-        unifier[xArg["name"]] = val;
+        // unifier[xArg["name"]] = val;
+        unifier[yArg["value"]] = val;
     }
     return unifier;
 }
@@ -703,7 +707,7 @@ function forwardChaining(kbObject, context, priorityFunction=linearPriorities, l
             }
             const subs = getSubstitutions(rule["body"], previousFacts, code);
             // console.log(rule, subs, previousFacts);
-            // debugger;
+            debugger;
             for (let i=0; i<subs.length; i++) {
                 const sub = subs[i];
                 const inferredHead = applyToLiteral(sub, rule["head"]);
