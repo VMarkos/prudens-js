@@ -83,7 +83,7 @@ function getSubstitutions(body, facts, code) {
             substitutions = extendByFacts(literal, facts);
         }
         // console.log("Subs, ln 74:", substitutions);
-        debugger;
+        // debugger;
         // console.log("body:", body);
         const toBeRemoved = [];
         const toBePushed = [];
@@ -118,7 +118,7 @@ function getSubstitutions(body, facts, code) {
                 const unifier = unify(instance, fact, sub);
                 // console.log("Unifier:");
                 // console.log(unifier);
-                debugger;
+                // debugger;
                 if (unifier !== undefined) {
                     const extension = extend(sub, unifier);
                     // console.log("sub:", sub, "\nextension:", extension);
@@ -581,6 +581,9 @@ function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded
             // console.log("lit:", oppositeHead);
             // debugger;
             beatsAll = true; // FIXME in case an ungrounded variable appears on the head (i.e., one that *DOES NOT* appear in the rule's body, it should through a runtime error --- or, better, catch this on parsing?)
+            if (!Object.keys(graph).includes(literalToString(oppositeHead))) {
+                continue;
+            }
             for (const rule of graph[literalToString(oppositeHead)]) {
 				isPrior = priorityFunction(newRule, rule, kbObject, sub);
                 // console.log(newRule, rule);
@@ -707,7 +710,7 @@ function forwardChaining(kbObject, context, priorityFunction=linearPriorities, l
             }
             const subs = getSubstitutions(rule["body"], previousFacts, code);
             // console.log(rule, subs, previousFacts);
-            debugger;
+            // debugger;
             for (let i=0; i<subs.length; i++) {
                 const sub = subs[i];
                 const inferredHead = applyToLiteral(sub, rule["head"]);
