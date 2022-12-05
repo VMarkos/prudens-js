@@ -554,8 +554,10 @@ function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded
     let isPrior, beatsAll;
     for (const oppositeHead of conflicts) {
         // console.log("Here", oppositeHead);
+        // console.log("context:", context);
         if (deepIncludes(oppositeHead, context)) { // Should we consider dilemmas in the case of contexts?
             // console.log("Context");
+            // console.log(context, literalToString(inferredHead));
             defeatedRules.push({
                 "defeated": newRule,
                 "by": undefined, // Undefined means context.
@@ -573,14 +575,14 @@ function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded
             };
         }
         if (deepIncludes(oppositeHead, facts, true)) {
-            // console.log("indludes:", oppositeHead);
+            // console.log("includes:", oppositeHead);
             includesConflict = true;
             const toBeRemoved = [];
             // console.log("facts:", facts);
             // console.log("graph:", graph);
             // console.log("lit:", oppositeHead);
             // debugger;
-            beatsAll = true; // FIXME in case an ungrounded variable appears on the head (i.e., one that *DOES NOT* appear in the rule's body, it should through a runtime error --- or, better, catch this on parsing?)
+            beatsAll = true; // FIXME in case an ungrounded variable appears on the head (i.e., one that *DOES NOT* appear in the rule's body, it should throw a runtime error --- or, better, catch this on parsing?)
             if (!Object.keys(graph).includes(literalToString(oppositeHead))) {
                 continue;
             }
@@ -609,6 +611,12 @@ function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded
 						beatsAll = false;
 						inferred = false;
 					}
+                } else { // TODO Check this again!
+                    defeatedRules.push({
+                        "defeated": newRule,
+                        "by": rule,
+                        "sub": sub,
+                    });
                 }
             }
             if (graph[literalToString(oppositeHead)].length === toBeRemoved.length) {
@@ -709,7 +717,7 @@ function forwardChaining(kbObject, context, priorityFunction=linearPriorities, l
                 continue;
             }
             const subs = getSubstitutions(rule["body"], previousFacts, code);
-            // console.log(rule, subs, previousFacts);
+            // console.log("debug:", rule, subs, previousFacts);
             // debugger;
             for (let i=0; i<subs.length; i++) {
                 const sub = subs[i];
