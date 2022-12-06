@@ -374,7 +374,7 @@ function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded
     if (constraints.has(key)) {
         const keyObject = constraints.get(key)["keyObject"];
         for (const conflict of constraints.get(key)["constraints"]) {
-            const constraintUnifier = unify(keyObject, inferredHead, sub);
+            const constraintUnifier = utils.unify(keyObject, inferredHead, sub);
             conflicts.push(applyToLiteral(sub, applyToLiteral(constraintUnifier, conflict)));
         }
     }
@@ -462,12 +462,12 @@ function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded
                 // console.log("Facts prior to splicing: ", facts, "\nIndex of opposite head: " + deepIndexOf(facts, oppositeHead));
                 // debugger;
                 // facts = facts.splice(deepIndexOf(facts, oppositeHead), 1); // FIXME .indexOf() returns -1 because, guess what, it does not work with lists of objects... Create a deep alternative.
-                factsToBeAdded = removeAll(factsToBeAdded, [oppositeHead]);
+                factsToBeAdded = utils.removeAll(factsToBeAdded, [oppositeHead]);
                 factsToBeRemoved.push(oppositeHead);
                 // console.log("Facts post splicing: ", facts);
                 // debugger;
             } else {
-                graph[parsers.literalToString(oppositeHead)] = removeAll(graph[parsers.literalToString(oppositeHead)], toBeRemoved);
+                graph[parsers.literalToString(oppositeHead)] = utils.removeAll(graph[parsers.literalToString(oppositeHead)], toBeRemoved);
             }
         }
     }
