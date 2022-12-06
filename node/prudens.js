@@ -341,15 +341,15 @@ function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded
     // console.log("facts:", facts);
     // debugger;
     const headInDilemma = isInDilemma(newRule, dilemmas)
-    const facts = setConcat(previousFacts, factsToBeAdded);
-    if (deepIncludes(inferredHead, facts) && !headInDilemma) {
+    const facts = utils.setConcat(previousFacts, factsToBeAdded);
+    if (utils.deepIncludes(inferredHead, facts) && !headInDilemma) {
         // console.log("Includes inferredHead");
-        if (!Object.keys(graph).includes(literalToString(inferredHead))) {
-            graph[literalToString(inferredHead)] = [newRule];
+        if (!Object.keys(graph).includes(parsers.literalToString(inferredHead))) {
+            graph[parsers.literalToString(inferredHead)] = [newRule];
             inferred = true;
         }
-        if (!deepIncludes(newRule, graph[literalToString(inferredHead)]) && !deepIncludes(newRule, deletedRules)) {
-            graph[literalToString(inferredHead)].push(newRule);
+        if (!utils.deepIncludes(newRule, graph[parsers.literalToString(inferredHead)]) && !utils.deepIncludes(newRule, deletedRules)) {
+            graph[parsers.literalToString(inferredHead)].push(newRule);
             inferred = true;
             // console.log("Includes head and not rule.");
         }
@@ -384,7 +384,7 @@ function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded
     for (const oppositeHead of conflicts) {
         // console.log("Here", oppositeHead);
         // console.log("context:", context);
-        if (deepIncludes(oppositeHead, context)) { // Should we consider dilemmas in the case of contexts?
+        if (utils.deepIncludes(oppositeHead, context)) { // Should we consider dilemmas in the case of contexts?
             // console.log("Context");
             // console.log(context, literalToString(inferredHead));
             defeatedRules.push({
@@ -403,7 +403,7 @@ function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded
                 defeatedRules: defeatedRules,
             };
         }
-        if (deepIncludes(oppositeHead, facts, true)) {
+        if (utils.deepIncludes(oppositeHead, facts, true)) {
             // console.log("includes:", oppositeHead);
             includesConflict = true;
             const toBeRemoved = [];
@@ -412,10 +412,10 @@ function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded
             // console.log("lit:", oppositeHead);
             // debugger;
             beatsAll = true; // FIXME in case an ungrounded variable appears on the head (i.e., one that *DOES NOT* appear in the rule's body, it should throw a runtime error --- or, better, catch this on parsing?)
-            if (!Object.keys(graph).includes(literalToString(oppositeHead))) {
+            if (!Object.keys(graph).includes(parsers.literalToString(oppositeHead))) {
                 continue;
             }
-            for (const rule of graph[literalToString(oppositeHead)]) {
+            for (const rule of graph[parsers.literalToString(oppositeHead)]) {
                 isPrior = priorityFunction(newRule, rule, kbObject, sub);
                 // console.log(newRule, rule);
                 // console.log("isPrior:", isPrior);
@@ -427,14 +427,14 @@ function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded
                         "by": newRule,
                         "sub": sub,
                     });
-                    if (!deepIncludes(rule, deletedRules)) {
+                    if (!utils.deepIncludes(rule, deletedRules)) {
                         deletedRules.push(rule);
                     }
                     inferred = true;
                     // console.log("Includes opposite head and not rule.");
                     // debugger;
                     if (isPrior === undefined) {
-                        if (!deepIncludes([rule, newRule, sub], dilemmas) && !deepIncludes([newRule, rule, sub])) {
+                        if (!utils.deepIncludes([rule, newRule, sub], dilemmas) && !utils.deepIncludes([newRule, rule, sub])) {
                             dilemmas.push([rule, newRule, sub]);
                         }
                         beatsAll = false;
@@ -448,13 +448,13 @@ function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded
                     });
                 }
             }
-            if (graph[literalToString(oppositeHead)].length === toBeRemoved.length) {
+            if (graph[parsers.literalToString(oppositeHead)].length === toBeRemoved.length) {
                 // console.log("Delete opp");
-                delete graph[literalToString(oppositeHead)];
+                delete graph[parsers.literalToString(oppositeHead)];
                 // console.log("graph:", graph);
                 // debugger;
                 if (beatsAll) {
-                    graph[literalToString(inferredHead)] = [newRule];
+                    graph[parsers.literalToString(inferredHead)] = [newRule];
                     // console.log("Facts prior to pushing: ", facts);
                     // debugger;
                     factsToBeAdded.push(inferredHead);
@@ -467,14 +467,14 @@ function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded
                 // console.log("Facts post splicing: ", facts);
                 // debugger;
             } else {
-                graph[literalToString(oppositeHead)] = removeAll(graph[literalToString(oppositeHead)], toBeRemoved);
+                graph[parsers.literalToString(oppositeHead)] = removeAll(graph[parsers.literalToString(oppositeHead)], toBeRemoved);
             }
         }
     }
     if (!includesConflict && !headInDilemma) {
         // console.log("No conflict");
         factsToBeAdded.push(inferredHead);
-        graph[literalToString(inferredHead)] = [newRule];
+        graph[parsers.literalToString(inferredHead)] = [newRule];
         inferred = true;
     }
     // console.log("Includes neither head nor rule.");
