@@ -421,12 +421,19 @@ function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded
                 // console.log("isPrior:", isPrior);
                 // debugger;
                 if (isPrior === undefined || isPrior) {
+                    console.log("Here");
                     toBeRemoved.push(rule);
-                    defeatedRules.push({
+                    if (!utils.deepIncludes({
                         "defeated": rule,
                         "by": newRule,
                         "sub": sub,
-                    });
+                    }, defeatedRules)) {
+                        defeatedRules.push({
+                            "defeated": rule,
+                            "by": newRule,
+                            "sub": sub,
+                        });
+                    }
                     if (!utils.deepIncludes(rule, deletedRules)) {
                         deletedRules.push(rule);
                     }
@@ -441,11 +448,18 @@ function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded
                         inferred = false;
                     }
                 } else { // TODO Check this again!
-                    defeatedRules.push({
+                    // console.log("here")
+                    if (!utils.deepIncludes({
                         "defeated": newRule,
                         "by": rule,
                         "sub": sub,
-                    });
+                    }, defeatedRules)) {
+                        defeatedRules.push({
+                            "defeated": newRule,
+                            "by": rule,
+                            "sub": sub,
+                        });
+                    }
                 }
             }
             if (graph[parsers.literalToString(oppositeHead)].length === toBeRemoved.length) {
