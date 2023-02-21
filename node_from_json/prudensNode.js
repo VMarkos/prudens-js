@@ -198,7 +198,7 @@ function apply(sub, args) { // FIXME Redefine apply so as to check whether a val
                     name: tempVal,
                     isAssigned: false,
                     value: undefined,
-                    muted: argument["muted"],    
+                    muted: argument["muted"],
                 });
             } else {
                 localArguments.push({
@@ -233,7 +233,7 @@ function listUnification(list1, list2, unifier) {
     return unifier;
 }
 
-function unify(x, y, sub=undefined) { // x, y are literals. Assymetric unification since y is assumed to be known/part of some set of inferred facts!
+function unify(x, y, sub = undefined) { // x, y are literals. Assymetric unification since y is assumed to be known/part of some set of inferred facts!
     if (x["name"] !== y["name"] || x["arity"] !== y["arity"] || x["sign"] !== y["sign"]) {
         return undefined;
     }
@@ -243,7 +243,7 @@ function unify(x, y, sub=undefined) { // x, y are literals. Assymetric unificati
     const expressionIndices = [];
     let xArg, yArg;
     // console.log("x:", x, "\ny:", y);
-    for (let i=0; i<x["arity"]; i++) {
+    for (let i = 0; i < x["arity"]; i++) {
         xArg = xArgs[i];
         yArg = yArgs[i];
         if (xArg["isExpression"] || yArg["isExpression"]) {
@@ -251,15 +251,15 @@ function unify(x, y, sub=undefined) { // x, y are literals. Assymetric unificati
             continue;
         }
         if (xArg["isAssigned"] && yArg["isAssigned"]) {
-			if (xArg["value"] !== yArg["value"]) {
-				// console.log("Here?");
-				// console.log(xArg);
-				// console.log(yArg);
-				// debugger;
-				return undefined;
-			} else {
-				continue;
-			}
+            if (xArg["value"] !== yArg["value"]) {
+                // console.log("Here?");
+                // console.log(xArg);
+                // console.log(yArg);
+                // debugger;
+                return undefined;
+            } else {
+                continue;
+            }
         }
         if (xArg["muted"] || yArg["muted"] || (xArg["name"] === undefined && yArg["name"] === undefined)) {
             // console.log("xArg:", xArg, "\nyArg:", yArg);
@@ -446,30 +446,30 @@ function specificityPriorities(rule1, rule2, kbObject, sub) { // true if rule1 i
     const body2 = rule2["body"];
     // console.log("body1:", body1, "body2:", body2, "sub:", sub);
     if (isMoreSpecific(body1, body2, sub)) {
-		return true;
-	}
+        return true;
+    }
     if (isMoreSpecific(body2, body1, sub)) {
-		return false;
-	}
-	return undefined;
+        return false;
+    }
+    return undefined;
 }
 
 function isMoreSpecific(body1, body2, sub) { // true if body1 is more specific than body2, false otherwise.
-	let included, unifiable;
-	for (const literal2 of body2) {
+    let included, unifiable;
+    for (const literal2 of body2) {
         included = false;
         for (const literal1 of body1) {
             unifiable = unify(applyToLiteral(sub, literal1), applyToLiteral(sub, literal2), sub);
             // console.log("unifier:", unifiable);
             if (unifiable) {
-				// console.log("Why here?");
+                // console.log("Why here?");
                 included = true;
                 break;
             }
         }
         if (!included) {
-			// console.log("false");
-			return false;
+            // console.log("false");
+            return false;
         }
     }
     return true;
@@ -500,10 +500,10 @@ Context: g(b); h(b);
 
 /*
  Dilemmas:
-	* Existing rule, r1, that infers z and new rule, r2, that infers -z;
-	* Current policy: Remove all rules that infer z and are of lower priority than r2;
-	* In case r2 beats every rule that infers z, then -z and r2 are added to the graph ONLY IF r2 is indeed of higher priority than
-		* all such rules. Otherwise, we merely keep track of the agent's dilemmas.
+    * Existing rule, r1, that infers z and new rule, r2, that infers -z;
+    * Current policy: Remove all rules that infer z and are of lower priority than r2;
+    * In case r2 beats every rule that infers z, then -z and r2 are added to the graph ONLY IF r2 is indeed of higher priority than
+        * all such rules. Otherwise, we merely keep track of the agent's dilemmas.
  * */
 
 function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded, factsToBeRemoved, priorityFunction, deletedRules, sub, constraints, kbObject, dilemmas, defeatedRules, context) { //TODO You may need to store the substitution alongside each rule, in case one needs to count how many time a rule has been triggered or so.
@@ -541,7 +541,7 @@ function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded
     casualConflict["sign"] = !casualConflict["sign"];
     const conflicts = [applyToLiteral(sub, casualConflict)];
     // console.log("constraints:", constraints);
-    const key = ((inferredHead["sign"])? "": "-") + inferredHead["name"] + inferredHead["arity"];
+    const key = ((inferredHead["sign"]) ? "" : "-") + inferredHead["name"] + inferredHead["arity"];
     if (constraints.has(key)) {
         const keyObject = constraints.get(key)["keyObject"];
         for (const conflict of constraints.get(key)["constraints"]) {
@@ -587,7 +587,7 @@ function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded
                 continue;
             }
             for (const rule of graph[literalToString(oppositeHead)]) {
-				isPrior = priorityFunction(newRule, rule, kbObject, sub);
+                isPrior = priorityFunction(newRule, rule, kbObject, sub);
                 // console.log(newRule, rule);
                 // console.log("isPrior:", isPrior);
                 // debugger;
@@ -605,12 +605,12 @@ function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded
                     // console.log("Includes opposite head and not rule.");
                     // debugger;
                     if (isPrior === undefined) {
-						if (!deepIncludes([rule, newRule, sub], dilemmas) && !deepIncludes([newRule, rule, sub])) {
-							dilemmas.push([rule, newRule, sub]);
-						}
-						beatsAll = false;
-						inferred = false;
-					}
+                        if (!deepIncludes([rule, newRule, sub], dilemmas) && !deepIncludes([newRule, rule, sub])) {
+                            dilemmas.push([rule, newRule, sub]);
+                        }
+                        beatsAll = false;
+                        inferred = false;
+                    }
                 } else { // TODO Check this again!
                     defeatedRules.push({
                         "defeated": newRule,
@@ -625,11 +625,11 @@ function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded
                 // console.log("graph:", graph);
                 // debugger;
                 if (beatsAll) {
-					graph[literalToString(inferredHead)] = [newRule];
-					// console.log("Facts prior to pushing: ", facts);
-					// debugger;
-					factsToBeAdded.push(inferredHead);
-				}
+                    graph[literalToString(inferredHead)] = [newRule];
+                    // console.log("Facts prior to pushing: ", facts);
+                    // debugger;
+                    factsToBeAdded.push(inferredHead);
+                }
                 // console.log("Facts prior to splicing: ", facts, "\nIndex of opposite head: " + deepIndexOf(facts, oppositeHead));
                 // debugger;
                 // facts = facts.splice(deepIndexOf(facts, oppositeHead), 1); // FIXME .indexOf() returns -1 because, guess what, it does not work with lists of objects... Create a deep alternative.
@@ -665,12 +665,12 @@ function isInDilemma(rule, dilemmas) {
     if (dilemmas === undefined) {
         return false;
     }
-	for (const dilemma of dilemmas) {
-		if (deepIncludes(rule, dilemma.slice(1))) {
-			return true;
-		}
-	}
-	return false;
+    for (const dilemma of dilemmas) {
+        if (deepIncludes(rule, dilemma.slice(1))) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function initializeGraph(context) {
@@ -678,12 +678,12 @@ function initializeGraph(context) {
     let literal;
     for (let i = 0; i < context.length; i++) {
         literal = context[i]
-        graph[literalToString(literal)] = [{name: `\$${i}`, head: literal, body: TRUE_PREDICATE}];
+        graph[literalToString(literal)] = [{ name: `\$${i}`, head: literal, body: TRUE_PREDICATE }];
     }
     return graph;
 }
 
-function forwardChaining(kbObject, context, priorityFunction=linearPriorities, logging = true) { //FIXME Huge inconsistency with DOCS! You need to change that from [rule1, ...] to KBObject.
+function forwardChaining(kbObject, context, priorityFunction = linearPriorities, logging = true) { //FIXME Huge inconsistency with DOCS! You need to change that from [rule1, ...] to KBObject.
     let previousFacts = deepCopy(context);
     previousFacts.push(TRUE_PREDICATE);
     let factsToBeAdded = [], factsToBeRemoved = [];
@@ -712,7 +712,7 @@ function forwardChaining(kbObject, context, priorityFunction=linearPriorities, l
     }
     do {
         inferred = false;
-        for (let i=0; i<kb.length; i++) {
+        for (let i = 0; i < kb.length; i++) {
             const rule = kb[i];
             if (deepIncludes(rule, deletedRules)) {
                 continue;
@@ -720,7 +720,7 @@ function forwardChaining(kbObject, context, priorityFunction=linearPriorities, l
             const subs = getSubstitutions(rule["body"], previousFacts, code);
             // console.log("debug:", rule, subs, previousFacts);
             // debugger;
-            for (let i=0; i<subs.length; i++) {
+            for (let i = 0; i < subs.length; i++) {
                 const sub = subs[i];
                 const inferredHead = applyToLiteral(sub, rule["head"]);
                 const updatedGraph = updateGraph(inferredHead, rule, graph, previousFacts, factsToBeAdded, factsToBeRemoved, priorityFunction, deletedRules, sub, kbObject["constraints"], kbObject, dilemmas, defeatedRules);
@@ -757,6 +757,86 @@ function forwardChaining(kbObject, context, priorityFunction=linearPriorities, l
     }
 }
 
+function forwardChainingBT(kbObject, context, priorityFunction = linearPriorities, logging = true) { //FIXME Huge inconsistency with DOCS! You need to change that from [rule1, ...] to KBObject.
+    let previousFacts = deepCopy(context);
+    previousFacts.push(TRUE_PREDICATE);
+    let factsToBeAdded = [], factsToBeRemoved = [];
+    const kb = kbObject["kb_BT"];
+    // console.log(facts);
+    let inferred = false;
+    let graph = initializeGraph(context);
+    let deletedRules = [];
+    let defeatedRules = [];
+    let dilemmas = [];
+    // console.log(kbObject);
+    const code = kbObject["code"];
+    const customPriorities = kbObject["customPriorities"];
+    kbObject["constraints"] = new Map(Object.entries(kbObject["constraints"]));
+    const logs = [];
+    if (logging) {
+        logs.push({
+            facts: deepCopy(previousFacts),
+            graph: deepCopy(graph),
+            dilemmas: deepCopy(dilemmas),
+            defeatedRules: deepCopy(defeatedRules),
+        });
+    }
+    if (Object.keys(customPriorities).length > 0) {
+        priorityFunction = customPrioritiesFunction;
+    }
+    do {
+        inferred = false;
+        for (let i = 0; i < kb.length; i++) {
+            const rule = kb[i];
+            if (deepIncludes(rule, deletedRules)) {
+                continue;
+            }
+            const subs = getSubstitutions(rule["body"], previousFacts, code);
+            // console.log("debug:", rule, subs, previousFacts);
+            // debugger;
+            for (let i = 0; i < subs.length; i++) {
+                const sub = subs[i];
+                const inferredHead = applyToLiteral(sub, rule["head"]);
+                const updatedGraph = updateGraph(inferredHead, rule, graph, previousFacts, factsToBeAdded, factsToBeRemoved, priorityFunction, deletedRules, sub, kbObject["constraints"], kbObject, dilemmas, defeatedRules);
+                graph = updatedGraph["graph"]; // You could probably push the entire graph Object!
+                // previousFacts = updatedGraph["previousFacts"];
+                factsToBeAdded = updatedGraph["factsToBeAdded"];
+                factsToBeRemoved = updatedGraph["factsToBeRemoved"];
+                dilemmas = updatedGraph["dilemmas"];
+                deletedRules = updatedGraph["deletedRules"];
+                defeatedRules = updatedGraph["defeatedRules"];
+                if (!inferred) {
+                    inferred = updatedGraph["inferred"];
+                }
+            }
+        }
+        previousFacts = removeAll(previousFacts, factsToBeRemoved);
+        previousFacts = setConcat(previousFacts, factsToBeAdded);
+        if (logging) {
+            logs.push({
+                facts: deepCopy(previousFacts),
+                graph: deepCopy(graph),
+                dilemmas: deepCopy(dilemmas),
+                defeatedRules: deepCopy(defeatedRules),
+            });
+        }
+    } while (inferred);
+    let BehaviorTree;
+    Sequence = { "Sequence": {} };
+    BehaviorTree = { "BehaviorTree": { "_attributes": { "ID": "MainTree" }, context } };
+
+    return {
+        //        context: context,
+        version: { "_declaration": { "_attributes": { "version": "1.0", "encoding": "utf-8" } } },
+        root: BehaviorTree,
+        /*  facts: previousFacts,
+          graph: graph,
+          dilemmas: dilemmas,
+          defeatedRules: defeatedRules,
+          logs: logs,*/
+    }
+}
+
 function isConfictingWithList(x, facts) { // x is literal, facts is a list of literals.
     for (const fact of facts) {
         if (isConflicting(x, fact)) {
@@ -772,7 +852,7 @@ function isConflicting(x, y) { // x and y are literals.
     }
     const xArgs = x["args"];
     const yArgs = y["args"];
-    for (let i=0; i<x["arity"]; i++) {
+    for (let i = 0; i < x["arity"]; i++) {
         if (!xArgs[i]["isAssigned"] || !yArgs[i]["isAssigned"] || xArgs[i]["value"] != yArgs[i]["value"]) {
             return false;
         }
@@ -926,7 +1006,7 @@ function jsCheck(literal, sub, code) {
         return false;
     }
     let source = functionObject["source"];
-    for (let i=0; i<literal["args"].length; i++) {
+    for (let i = 0; i < literal["args"].length; i++) {
         const variable = literal["args"][i];
         // console.log(variable);
         // console.log(sub);
@@ -1038,7 +1118,7 @@ function removeAll(list, toBeRemoved) {
     if (toBeRemoved.length === 0) {
         return list;
     }
-    for (let i=0; i<list.length; i++) {
+    for (let i = 0; i < list.length; i++) {
         if (deepIncludes(list[i], toBeRemoved, true)) { // Shallow check, might need revision!
             // console.log("List pre-splice in removeAll: ", list, "\nList[i]: ", list[i]);
             list.splice(i, 1);
@@ -1051,7 +1131,7 @@ function removeAll(list, toBeRemoved) {
 }
 
 function deepIndexOf(list, item) { // Deep equivalent of Array.prototype.indexOf().
-    for (let i=0; i<list.length; i++) {
+    for (let i = 0; i < list.length; i++) {
         if (deepEquals(item, list[i])) {
             return i;
         }
@@ -1075,7 +1155,7 @@ function deepEquals(x, y) { // x, y are objects --- possibly restricted version 
     if (xKeys.length != yKeys.length) {
         return false;
     }
-    for (let i=0; i<xKeys.length; i++) {
+    for (let i = 0; i < xKeys.length; i++) {
         let xi = x[xKeys[i]];
         let yi = y[yKeys[i]];
         if (xKeys[i] != yKeys[i] || (typeof xi !== "object" && xi != yi) || !deepEquals(xi, yi)) {
@@ -1090,7 +1170,7 @@ function arrayDeepEquals(x, y) { // x, y are arrays --- not used as of now!
     if (x.length != y.length) {
         return false;
     }
-    for (let i=0; i<x.length; i++) {
+    for (let i = 0; i < x.length; i++) {
         if (!deepEquals(x[i], y[i])) {
             return false;
         }
@@ -1101,8 +1181,8 @@ function arrayDeepEquals(x, y) { // x, y are arrays --- not used as of now!
 function deepIncludes(object, list, stringHash = false) { // Re-implementation of Array.prototype.includes() that checks at depth=1 for equal objects. 
     // "use strict"; // TODO Consider rewriting this or somehow map each object to its (hashed) string representation (it seems that this is what you actually need).
     if (list === undefined) {
-		return false;
-	}
+        return false;
+    }
     if (stringHash) { // FIXME Too bad...
         // const stringLiteral = literalToString(object);
         // for (const entry of list) {
@@ -1228,7 +1308,7 @@ function parseValues(values) {
     // console.log(argumentValuesArray);
     const argumentValues = [];
     for (const argValues of argumentValuesArray) {
-        argumentValues.push(argValues.substring(1,argValues.length - 1).trim().split(/\s*,\s*/));
+        argumentValues.push(argValues.substring(1, argValues.length - 1).trim().split(/\s*,\s*/));
     }
     return argumentValues;
 }
@@ -1303,7 +1383,7 @@ function getList(argument) {
         const listArray = argument.split("|");
         let tail;
         if (tail.includes("[")) {
-            tail = parseList(listArray[1].trim().substring(1,length - 1));
+            tail = parseList(listArray[1].trim().substring(1, length - 1));
         } else {
             tail = {
                 name: listArray[1].trim(),
@@ -1340,7 +1420,7 @@ function getLiteralArguments(argumentsString) {
     const argumentsArray = argumentsString.split(splitDelim);
     // console.log(argumentsArray);
     const args = [];
-    for (let i=0; i<argumentsArray.length; i++) {
+    for (let i = 0; i < argumentsArray.length; i++) {
         let name;
         let value;
         let muted = false;
@@ -1386,11 +1466,11 @@ function getRuleBody(bodyString) {
     // const delim = /((?<=(?:\)\s*))(?:,))|((?<!(?:\([a-zA-Z0-9_,\s]+\)))(?:,))|(?:;)/; //This is added for the context. Originally, only /,/ is needed!
     const delim = /(?:;)|((?<=(?:\)\s*))(?:,))|((?<!(?:\(.*))(?:,))/;
     const bodyArray = bodyString.trim().split(delim);
-    if (bodyArray[bodyArray.length-1] === "") {
+    if (bodyArray[bodyArray.length - 1] === "") {
         bodyArray.pop();
     }
     // console.log(bodyArray);
-    for (let i=0; i<bodyArray.length; i++) {
+    for (let i = 0; i < bodyArray.length; i++) {
         const literal = bodyArray[i];
         if (literal === undefined || literal === "" || literal === "," || literal === ";") {
             bodyArray.splice(i, 1);
@@ -1482,7 +1562,7 @@ function kbToObject(kb) {
     "use strict";
     const rules = kb.split(";").filter(Boolean);
     const kbObject = [];
-    for (const rule of rules){
+    for (const rule of rules) {
         const delimiter = /(?:::)|(?:\simplies\s)/;
         const ruleSplit = rule.trim().split(delimiter); // 0 - name, 1 - body, 2 - head.
         const name = ruleSplit[0].trim();
@@ -1492,14 +1572,14 @@ function kbToObject(kb) {
             head: getRuleHead(ruleSplit[2].trim()),
         });
     }
-    
+
     return kbObject;
 }
 
 function parseKB(kbAll) {
     "use strict";
     const warnings = [];
-    if (!kbAll.includes("@KnowledgeBase") && !kbAll.includes("@Knowledge")){
+    if (!kbAll.includes("@KnowledgeBase") && !kbAll.includes("@Knowledge")) {
         return {
             type: "error",
             name: "KnowledgeBaseDecoratorNotFound",
@@ -1507,7 +1587,7 @@ function parseKB(kbAll) {
         };
     }
     const kbNoCode = kbAll.split(/\@KnowledgeBase|\@Knowledge/);
-    if (kbNoCode.length > 2){
+    if (kbNoCode.length > 2) {
         return {
             type: "error",
             name: "MultipleKnowledgeBaseDecorators",
@@ -1627,7 +1707,7 @@ function kbCheck(kb) {
     const casualHeadRe = RegExp(headNameRe.source + String.raw`\((\s*` + varNameRe.source + String.raw`\s*,)*\s*` + varNameRe.source + String.raw`\s*\)`); // CHECKED!
     const propositionalHeadRe = /(-?!?[a-z]\w*)/; // CHECKED!
     const orListRe = RegExp(String.raw`(\s*\(\s*` + predicateRe.source + String.raw`\s+or\s+` + predicateRe.source + String.raw`(\s+or\s+` + predicateRe.source + String.raw`\s*)*` + String.raw`\s*\)\s*)`); // OR structure "(predicate or predicate or ... )"
-    const bodyRe = RegExp(String.raw`((\s*` + String.raw`((` + predicateRe.source + String.raw`)|(` + orListRe.source + String.raw`))` + String.raw`\s*,)*\s*` + String.raw`(` + predicateRe.source  + String.raw`)|(` + orListRe.source + String.raw`))`); // CHECKED!
+    const bodyRe = RegExp(String.raw`((\s*` + String.raw`((` + predicateRe.source + String.raw`)|(` + orListRe.source + String.raw`))` + String.raw`\s*,)*\s*` + String.raw`(` + predicateRe.source + String.raw`)|(` + orListRe.source + String.raw`))`); // CHECKED!
     // const bodyRe = RegExp(String.raw`(\s*` + predicateRe.source + String.raw`\s*,)*\s*` + String.raw`(` + predicateRe.source + String.raw`)`); // CHECKED!
     // console.log(bodyRe.source);
     const headRe = RegExp(String.raw`((` + casualHeadRe.source + String.raw`)|(` + propositionalHeadRe.source + String.raw`))`); // CHECKED!
@@ -1639,7 +1719,7 @@ function kbCheck(kb) {
     const ruleStrings = kb.split(";").filter(Boolean);
     let rules = "", constraints = "", customPriorities = {}, rulesObject;
     // console.log(ruleStrings);
-    for (let i=0; i<ruleStrings.length; i++) {
+    for (let i = 0; i < ruleStrings.length; i++) {
         const ruleString = ruleStrings[i].trim() + ";";
         const ruleMatch = ruleString.match(ruleRe);
         const constraintMatch = ruleString.match(constrainRe);
@@ -1672,7 +1752,7 @@ function kbCheck(kb) {
 
 function stripePriorityFromRule(ruleString) {
     if (!ruleString.includes("|")) {
-        return {rule: ruleString, priority: undefined};
+        return { rule: ruleString, priority: undefined };
     }
     const splitRule = ruleString.split("|").filter(Boolean);
     return {
@@ -1702,12 +1782,12 @@ function parseConstraints(constraintsString) {
         if (constraints.has(item["key1"])) {
             constraints.get(item["key1"])["constraints"].push(item["constraint1"]);
         } else {
-            constraints.set(item["key1"], {constraints: [item["constraint1"]], keyObject: item["constraint2"]});
+            constraints.set(item["key1"], { constraints: [item["constraint1"]], keyObject: item["constraint2"] });
         }
         if (constraints.has(item["key2"])) {
             constraints.get(item["key2"])["constraints"].push(item["constraint2"]);
         } else {
-            constraints.set(item["key2"], {constraints: [item["constraint2"]], keyObject: item["constraint1"]});
+            constraints.set(item["key2"], { constraints: [item["constraint2"]], keyObject: item["constraint1"] });
         }
     }
     return constraints;
@@ -1721,9 +1801,9 @@ function parseConstraint(constraintString) {
     const leftPredicate = parseLiteral(predicates[0]);
     const rightPredicate = parseLiteral(predicates[1]);
     return {
-        key1: ((leftPredicate["sign"])? "" : "-") + leftPredicate["name"] + leftPredicate["arity"],
+        key1: ((leftPredicate["sign"]) ? "" : "-") + leftPredicate["name"] + leftPredicate["arity"],
         constraint1: rightPredicate,
-        key2: ((rightPredicate["sign"])? "" : "-") + rightPredicate["name"] + rightPredicate["arity"],
+        key2: ((rightPredicate["sign"]) ? "" : "-") + rightPredicate["name"] + rightPredicate["arity"],
         constraint2: leftPredicate,
     }
 }
@@ -1761,11 +1841,11 @@ function parseJsFunction(functionCode) {
     const functionName = functionHeaderArray[0];
     // console.log(functionHeaderArray);
     // debugger;
-    const argsArray = functionHeaderArray[1].trim().substring(0,functionHeaderArray[1].length - 1).split(",");
+    const argsArray = functionHeaderArray[1].trim().substring(0, functionHeaderArray[1].length - 1).split(",");
     // console.log(argsArray);
     argsArray[argsArray.length - 1] = argsArray[argsArray.length - 1].substring(0, argsArray[argsArray.length - 1].length - 1);
     // console.log(argsArray);
-    for (let i=0; i<argsArray.length; i++) {
+    for (let i = 0; i < argsArray.length; i++) {
         argsArray[i] = argsArray[i].trim();
     }
     let functionSource = functionCode.trim().substring(functionCode.indexOf("{") + 1, functionCode.length);
@@ -1804,7 +1884,7 @@ function literalToString(literal) {
         return literalString;
     }
     literalString += "(";
-    for (let i=0; i<args.length; i++) {
+    for (let i = 0; i < args.length; i++) {
         const arg = args[i];
         let val = arg["name"];
         if (arg["isAssigned"]) {
@@ -1828,7 +1908,7 @@ function ruleToString(rule) {
     // console.log(rule);
     // console.log(body);
     // debugger;
-    for (let i=0; i<body.length; i++) {
+    for (let i = 0; i < body.length; i++) {
         const literal = body[i];
         ruleString += literalToString(literal);
         // console.log(ruleString);
@@ -1845,7 +1925,7 @@ function kbToString(kb) {
         return undefined;
     }
     let kbString = "";
-    for (let i =0; i<kb.length; i++) {
+    for (let i = 0; i < kb.length; i++) {
         const rule = kb[i];
         kbString += ruleToString(rule);
         if (i < kb.length - 1) {
@@ -1860,7 +1940,7 @@ function contextToString(context) {
         return undefined;
     }
     let contextString = "";
-    for (let i=0; i<context.length; i++) {
+    for (let i = 0; i < context.length; i++) {
         const literal = context[i];
         contextString += literalToString(literal) + ";"
         if (i < context.length - 1) {
@@ -1897,7 +1977,7 @@ function graphToString(graph) {
     for (const key of Object.keys(graph)) {
         // console.log(key);
         graphString += key + ": [";
-        for (let i=0; i<graph[key].length; i++) {
+        for (let i = 0; i < graph[key].length; i++) {
             graphString += ruleToString(graph[key][i]);
             if (i < graph[key].length - 1) {
                 graphString += " ";
@@ -1910,31 +1990,31 @@ function graphToString(graph) {
 }
 
 function dilemmasToString(dilemmas) {
-	if (dilemmas === undefined) {
-		return "\{\}";
-	}
-	let dilemmasString = "\{\n";
-	let dilemma;
-	for (let i=0; i<dilemmas.length; i++) { // TODO define subToString!
-		dilemma = dilemmas[i];
-		dilemmasString += "[" + ruleToString(dilemma[0]) + ", " + ruleToString(dilemma[1]) + ", " + subToString(dilemma[2]) + "]\n";
-	}
-	return dilemmasString + "\}";
+    if (dilemmas === undefined) {
+        return "\{\}";
+    }
+    let dilemmasString = "\{\n";
+    let dilemma;
+    for (let i = 0; i < dilemmas.length; i++) { // TODO define subToString!
+        dilemma = dilemmas[i];
+        dilemmasString += "[" + ruleToString(dilemma[0]) + ", " + ruleToString(dilemma[1]) + ", " + subToString(dilemma[2]) + "]\n";
+    }
+    return dilemmasString + "\}";
 }
 
 function subToString(sub) {
     if (sub === undefined) {
         return "\{\}";
     }
-	let variable, subString = "\{";
-	for (let i=0; i<Object.keys(sub).length; i++) {
-		variable = Object.keys(sub)[i];
-		if (variable === "undefined") {
-			continue;
-		}	
-		subString += variable + " -> " + sub[variable] + ", ";
-	}
-	return subString.substring(0, subString.length - 2) + "}";
+    let variable, subString = "\{";
+    for (let i = 0; i < Object.keys(sub).length; i++) {
+        variable = Object.keys(sub)[i];
+        if (variable === "undefined") {
+            continue;
+        }
+        subString += variable + " -> " + sub[variable] + ", ";
+    }
+    return subString.substring(0, subString.length - 2) + "}";
 }
 
 function abductiveProofsToString(proofs) {
@@ -1962,6 +2042,8 @@ function proofToString(proof) {
 
 module.exports = {
     forwardChaining,
+    forwardChainingBT,
     parseKB,
     parseContext,
+    codeToObject,
 };

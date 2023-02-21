@@ -1,0 +1,1038 @@
+{
+  "context": [
+    {
+      "name": "bird",
+      "sign": true,
+      "isJS": false,
+      "isEquality": false,
+      "isInequality": false,
+      "isAction": false,
+      "arity": 0
+    },
+    {
+      "name": "penguin",
+      "sign": true,
+      "isJS": false,
+      "isEquality": false,
+      "isInequality": false,
+      "isAction": false,
+      "arity": 0
+    },
+    {
+      "name": "super",
+      "sign": true,
+      "isJS": false,
+      "isEquality": false,
+      "isInequality": false,
+      "isAction": false,
+      "arity": 0
+    }
+  ],
+  "facts": [
+    {
+      "name": "bird",
+      "sign": true,
+      "isJS": false,
+      "isEquality": false,
+      "isInequality": false,
+      "isAction": false,
+      "arity": 0
+    },
+    {
+      "name": "penguin",
+      "sign": true,
+      "isJS": false,
+      "isEquality": false,
+      "isInequality": false,
+      "isAction": false,
+      "arity": 0
+    },
+    {
+      "name": "super",
+      "sign": true,
+      "isJS": false,
+      "isEquality": false,
+      "isInequality": false,
+      "isAction": false,
+      "arity": 0
+    },
+    {
+      "name": "true",
+      "sign": true,
+      "isJS": false,
+      "isEquality": false,
+      "isInequality": false,
+      "isAction": false,
+      "arity": 0
+    },
+    {
+      "name": "flies",
+      "sign": true,
+      "isJS": false,
+      "isEquality": false,
+      "isInequality": false,
+      "isAction": false,
+      "arity": 0
+    }
+  ],
+  "graph": {
+    "bird": [
+      {
+        "name": "$0",
+        "head": {
+          "name": "bird",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        },
+        "body": {
+          "name": "true",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        }
+      }
+    ],
+    "penguin": [
+      {
+        "name": "$1",
+        "head": {
+          "name": "penguin",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        },
+        "body": {
+          "name": "true",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        }
+      }
+    ],
+    "super": [
+      {
+        "name": "$2",
+        "head": {
+          "name": "super",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        },
+        "body": {
+          "name": "true",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        }
+      }
+    ],
+    "flies": [
+      {
+        "name": "R3",
+        "body": [
+          {
+            "name": "bird",
+            "sign": true,
+            "isJS": false,
+            "isEquality": false,
+            "isInequality": false,
+            "isAction": false,
+            "arity": 0
+          },
+          {
+            "name": "penguin",
+            "sign": true,
+            "isJS": false,
+            "isEquality": false,
+            "isInequality": false,
+            "isAction": false,
+            "arity": 0
+          },
+          {
+            "name": "super",
+            "sign": true,
+            "isJS": false,
+            "isEquality": false,
+            "isInequality": false,
+            "isAction": false,
+            "arity": 0
+          }
+        ],
+        "head": {
+          "name": "flies",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        }
+      }
+    ]
+  },
+  "dilemmas": [],
+  "defeatedRules": [
+    {
+      "defeated": {
+        "name": "R1",
+        "body": [
+          {
+            "name": "bird",
+            "sign": true,
+            "isJS": false,
+            "isEquality": false,
+            "isInequality": false,
+            "isAction": false,
+            "arity": 0
+          }
+        ],
+        "head": {
+          "name": "flies",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        }
+      },
+      "by": {
+        "name": "R2",
+        "body": [
+          {
+            "name": "bird",
+            "sign": true,
+            "isJS": false,
+            "isEquality": false,
+            "isInequality": false,
+            "isAction": false,
+            "arity": 0
+          },
+          {
+            "name": "penguin",
+            "sign": true,
+            "isJS": false,
+            "isEquality": false,
+            "isInequality": false,
+            "isAction": false,
+            "arity": 0
+          }
+        ],
+        "head": {
+          "name": "flies",
+          "sign": false,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        }
+      }
+    },
+    {
+      "defeated": {
+        "name": "R2",
+        "body": [
+          {
+            "name": "bird",
+            "sign": true,
+            "isJS": false,
+            "isEquality": false,
+            "isInequality": false,
+            "isAction": false,
+            "arity": 0
+          },
+          {
+            "name": "penguin",
+            "sign": true,
+            "isJS": false,
+            "isEquality": false,
+            "isInequality": false,
+            "isAction": false,
+            "arity": 0
+          }
+        ],
+        "head": {
+          "name": "flies",
+          "sign": false,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        }
+      },
+      "by": {
+        "name": "R3",
+        "body": [
+          {
+            "name": "bird",
+            "sign": true,
+            "isJS": false,
+            "isEquality": false,
+            "isInequality": false,
+            "isAction": false,
+            "arity": 0
+          },
+          {
+            "name": "penguin",
+            "sign": true,
+            "isJS": false,
+            "isEquality": false,
+            "isInequality": false,
+            "isAction": false,
+            "arity": 0
+          },
+          {
+            "name": "super",
+            "sign": true,
+            "isJS": false,
+            "isEquality": false,
+            "isInequality": false,
+            "isAction": false,
+            "arity": 0
+          }
+        ],
+        "head": {
+          "name": "flies",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        }
+      }
+    }
+  ],
+  "logs": [
+    {
+      "facts": [
+        {
+          "name": "bird",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        },
+        {
+          "name": "penguin",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        },
+        {
+          "name": "super",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        },
+        {
+          "name": "true",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        }
+      ],
+      "graph": {
+        "bird": [
+          {
+            "name": "$0",
+            "head": {
+              "name": "bird",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            },
+            "body": {
+              "name": "true",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            }
+          }
+        ],
+        "penguin": [
+          {
+            "name": "$1",
+            "head": {
+              "name": "penguin",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            },
+            "body": {
+              "name": "true",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            }
+          }
+        ],
+        "super": [
+          {
+            "name": "$2",
+            "head": {
+              "name": "super",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            },
+            "body": {
+              "name": "true",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            }
+          }
+        ]
+      },
+      "dilemmas": [],
+      "defeatedRules": []
+    },
+    {
+      "facts": [
+        {
+          "name": "bird",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        },
+        {
+          "name": "penguin",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        },
+        {
+          "name": "super",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        },
+        {
+          "name": "true",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        },
+        {
+          "name": "flies",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        }
+      ],
+      "graph": {
+        "bird": [
+          {
+            "name": "$0",
+            "head": {
+              "name": "bird",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            },
+            "body": {
+              "name": "true",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            }
+          }
+        ],
+        "penguin": [
+          {
+            "name": "$1",
+            "head": {
+              "name": "penguin",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            },
+            "body": {
+              "name": "true",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            }
+          }
+        ],
+        "super": [
+          {
+            "name": "$2",
+            "head": {
+              "name": "super",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            },
+            "body": {
+              "name": "true",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            }
+          }
+        ],
+        "flies": [
+          {
+            "name": "R3",
+            "body": [
+              {
+                "name": "bird",
+                "sign": true,
+                "isJS": false,
+                "isEquality": false,
+                "isInequality": false,
+                "isAction": false,
+                "arity": 0
+              },
+              {
+                "name": "penguin",
+                "sign": true,
+                "isJS": false,
+                "isEquality": false,
+                "isInequality": false,
+                "isAction": false,
+                "arity": 0
+              },
+              {
+                "name": "super",
+                "sign": true,
+                "isJS": false,
+                "isEquality": false,
+                "isInequality": false,
+                "isAction": false,
+                "arity": 0
+              }
+            ],
+            "head": {
+              "name": "flies",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            }
+          }
+        ]
+      },
+      "dilemmas": [],
+      "defeatedRules": [
+        {
+          "defeated": {
+            "name": "R1",
+            "body": [
+              {
+                "name": "bird",
+                "sign": true,
+                "isJS": false,
+                "isEquality": false,
+                "isInequality": false,
+                "isAction": false,
+                "arity": 0
+              }
+            ],
+            "head": {
+              "name": "flies",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            }
+          },
+          "by": {
+            "name": "R2",
+            "body": [
+              {
+                "name": "bird",
+                "sign": true,
+                "isJS": false,
+                "isEquality": false,
+                "isInequality": false,
+                "isAction": false,
+                "arity": 0
+              },
+              {
+                "name": "penguin",
+                "sign": true,
+                "isJS": false,
+                "isEquality": false,
+                "isInequality": false,
+                "isAction": false,
+                "arity": 0
+              }
+            ],
+            "head": {
+              "name": "flies",
+              "sign": false,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            }
+          }
+        },
+        {
+          "defeated": {
+            "name": "R2",
+            "body": [
+              {
+                "name": "bird",
+                "sign": true,
+                "isJS": false,
+                "isEquality": false,
+                "isInequality": false,
+                "isAction": false,
+                "arity": 0
+              },
+              {
+                "name": "penguin",
+                "sign": true,
+                "isJS": false,
+                "isEquality": false,
+                "isInequality": false,
+                "isAction": false,
+                "arity": 0
+              }
+            ],
+            "head": {
+              "name": "flies",
+              "sign": false,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            }
+          },
+          "by": {
+            "name": "R3",
+            "body": [
+              {
+                "name": "bird",
+                "sign": true,
+                "isJS": false,
+                "isEquality": false,
+                "isInequality": false,
+                "isAction": false,
+                "arity": 0
+              },
+              {
+                "name": "penguin",
+                "sign": true,
+                "isJS": false,
+                "isEquality": false,
+                "isInequality": false,
+                "isAction": false,
+                "arity": 0
+              },
+              {
+                "name": "super",
+                "sign": true,
+                "isJS": false,
+                "isEquality": false,
+                "isInequality": false,
+                "isAction": false,
+                "arity": 0
+              }
+            ],
+            "head": {
+              "name": "flies",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            }
+          }
+        }
+      ]
+    },
+    {
+      "facts": [
+        {
+          "name": "bird",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        },
+        {
+          "name": "penguin",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        },
+        {
+          "name": "super",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        },
+        {
+          "name": "true",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        },
+        {
+          "name": "flies",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        }
+      ],
+      "graph": {
+        "bird": [
+          {
+            "name": "$0",
+            "head": {
+              "name": "bird",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            },
+            "body": {
+              "name": "true",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            }
+          }
+        ],
+        "penguin": [
+          {
+            "name": "$1",
+            "head": {
+              "name": "penguin",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            },
+            "body": {
+              "name": "true",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            }
+          }
+        ],
+        "super": [
+          {
+            "name": "$2",
+            "head": {
+              "name": "super",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            },
+            "body": {
+              "name": "true",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            }
+          }
+        ],
+        "flies": [
+          {
+            "name": "R3",
+            "body": [
+              {
+                "name": "bird",
+                "sign": true,
+                "isJS": false,
+                "isEquality": false,
+                "isInequality": false,
+                "isAction": false,
+                "arity": 0
+              },
+              {
+                "name": "penguin",
+                "sign": true,
+                "isJS": false,
+                "isEquality": false,
+                "isInequality": false,
+                "isAction": false,
+                "arity": 0
+              },
+              {
+                "name": "super",
+                "sign": true,
+                "isJS": false,
+                "isEquality": false,
+                "isInequality": false,
+                "isAction": false,
+                "arity": 0
+              }
+            ],
+            "head": {
+              "name": "flies",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            }
+          }
+        ]
+      },
+      "dilemmas": [],
+      "defeatedRules": [
+        {
+          "defeated": {
+            "name": "R1",
+            "body": [
+              {
+                "name": "bird",
+                "sign": true,
+                "isJS": false,
+                "isEquality": false,
+                "isInequality": false,
+                "isAction": false,
+                "arity": 0
+              }
+            ],
+            "head": {
+              "name": "flies",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            }
+          },
+          "by": {
+            "name": "R2",
+            "body": [
+              {
+                "name": "bird",
+                "sign": true,
+                "isJS": false,
+                "isEquality": false,
+                "isInequality": false,
+                "isAction": false,
+                "arity": 0
+              },
+              {
+                "name": "penguin",
+                "sign": true,
+                "isJS": false,
+                "isEquality": false,
+                "isInequality": false,
+                "isAction": false,
+                "arity": 0
+              }
+            ],
+            "head": {
+              "name": "flies",
+              "sign": false,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            }
+          }
+        },
+        {
+          "defeated": {
+            "name": "R2",
+            "body": [
+              {
+                "name": "bird",
+                "sign": true,
+                "isJS": false,
+                "isEquality": false,
+                "isInequality": false,
+                "isAction": false,
+                "arity": 0
+              },
+              {
+                "name": "penguin",
+                "sign": true,
+                "isJS": false,
+                "isEquality": false,
+                "isInequality": false,
+                "isAction": false,
+                "arity": 0
+              }
+            ],
+            "head": {
+              "name": "flies",
+              "sign": false,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            }
+          },
+          "by": {
+            "name": "R3",
+            "body": [
+              {
+                "name": "bird",
+                "sign": true,
+                "isJS": false,
+                "isEquality": false,
+                "isInequality": false,
+                "isAction": false,
+                "arity": 0
+              },
+              {
+                "name": "penguin",
+                "sign": true,
+                "isJS": false,
+                "isEquality": false,
+                "isInequality": false,
+                "isAction": false,
+                "arity": 0
+              },
+              {
+                "name": "super",
+                "sign": true,
+                "isJS": false,
+                "isEquality": false,
+                "isInequality": false,
+                "isAction": false,
+                "arity": 0
+              }
+            ],
+            "head": {
+              "name": "flies",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

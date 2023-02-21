@@ -101,5 +101,182 @@
   "constraints": {},
   "customPriorities": {},
   "imports": "",
-  "warnings": []
+  "warnings": [],
+  "kb_BT": [
+    {
+      "name": "R1",
+      "body": [
+        {
+          "name": "sequence",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "args": [
+            {
+              "index": 0,
+              "name": "Children",
+              "isAssigned": false,
+              "muted": false,
+              "isList": false,
+              "isExpression": false
+            }
+          ],
+          "arity": 1
+        },
+        {
+          "name": "?and",
+          "sign": true,
+          "isJS": true,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "args": [
+            {
+              "index": 0,
+              "name": "Children",
+              "isAssigned": false,
+              "muted": false,
+              "isList": false,
+              "isExpression": false
+            }
+          ],
+          "arity": 1
+        }
+      ],
+      "head": {
+        "name": "positive",
+        "sign": true,
+        "isJS": false,
+        "isEquality": false,
+        "isInequality": false,
+        "isAction": false,
+        "args": [
+          {
+            "index": 0,
+            "name": "Children",
+            "isAssigned": false,
+            "muted": false,
+            "isList": false,
+            "isExpression": false
+          }
+        ],
+        "arity": 1
+      }
+    },
+    {
+      "name": "R2",
+      "body": [
+        {
+          "name": "sequence",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "args": [
+            {
+              "index": 0,
+              "name": "Children",
+              "isAssigned": false,
+              "muted": false,
+              "isList": false,
+              "isExpression": false
+            }
+          ],
+          "arity": 1
+        },
+        {
+          "name": "?and",
+          "sign": false,
+          "isJS": true,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "args": [
+            {
+              "index": 0,
+              "name": "Children",
+              "isAssigned": false,
+              "muted": false,
+              "isList": false,
+              "isExpression": false
+            }
+          ],
+          "arity": 1
+        }
+      ],
+      "head": {
+        "name": "negative",
+        "sign": true,
+        "isJS": false,
+        "isEquality": false,
+        "isInequality": false,
+        "isAction": false,
+        "args": [
+          {
+            "index": 0,
+            "name": "Children",
+            "isAssigned": false,
+            "muted": false,
+            "isList": false,
+            "isExpression": false
+          }
+        ],
+        "arity": 1
+      }
+    },
+    {
+      "name": "R3",
+      "body": [
+        {
+          "name": "positive",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "args": [
+            {
+              "index": 0,
+              "name": "X",
+              "isAssigned": false,
+              "muted": false,
+              "isList": false,
+              "isExpression": false
+            }
+          ],
+          "arity": 1
+        }
+      ],
+      "head": {
+        "name": "wow",
+        "sign": true,
+        "isJS": false,
+        "isEquality": false,
+        "isInequality": false,
+        "isAction": false,
+        "args": [
+          {
+            "index": 0,
+            "name": "X",
+            "isAssigned": false,
+            "muted": false,
+            "isList": false,
+            "isExpression": false
+          }
+        ],
+        "arity": 1
+      }
+    }
+  ],
+  "code": {
+    "and": {
+      "args": [
+        "arr"
+      ],
+      "source": "\n    for (const x of arr) {\n         console.log(x);\n         if (x === \"0\") {\n             return false;\n         }\n    }\n    return true;\n"
+    }
+  }
 }

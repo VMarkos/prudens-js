@@ -55,7 +55,7 @@ function parseValues(values) {
     // console.log(argumentValuesArray);
     const argumentValues = [];
     for (const argValues of argumentValuesArray) {
-        argumentValues.push(argValues.substring(1,argValues.length - 1).trim().split(/\s*,\s*/));
+        argumentValues.push(argValues.substring(1, argValues.length - 1).trim().split(/\s*,\s*/));
     }
     return argumentValues;
 }
@@ -130,7 +130,7 @@ function getList(argument) {
         const listArray = argument.split("|");
         let tail;
         if (tail.includes("[")) {
-            tail = parseList(listArray[1].trim().substring(1,length - 1));
+            tail = parseList(listArray[1].trim().substring(1, length - 1));
         } else {
             tail = {
                 name: listArray[1].trim(),
@@ -167,7 +167,7 @@ function getLiteralArguments(argumentsString) {
     const argumentsArray = argumentsString.split(splitDelim);
     // console.log(argumentsArray);
     const args = [];
-    for (let i=0; i<argumentsArray.length; i++) {
+    for (let i = 0; i < argumentsArray.length; i++) {
         let name;
         let value;
         let muted = false;
@@ -213,11 +213,11 @@ function getRuleBody(bodyString) {
     // const delim = /((?<=(?:\)\s*))(?:,))|((?<!(?:\([a-zA-Z0-9_,\s]+\)))(?:,))|(?:;)/; //This is added for the context. Originally, only /,/ is needed!
     const delim = /(?:;)|((?<=(?:\)\s*))(?:,))|((?<!(?:\(.*))(?:,))/;
     const bodyArray = bodyString.trim().split(delim);
-    if (bodyArray[bodyArray.length-1] === "") {
+    if (bodyArray[bodyArray.length - 1] === "") {
         bodyArray.pop();
     }
     // console.log(bodyArray);
-    for (let i=0; i<bodyArray.length; i++) {
+    for (let i = 0; i < bodyArray.length; i++) {
         const literal = bodyArray[i];
         if (literal === undefined || literal === "" || literal === "," || literal === ";") {
             bodyArray.splice(i, 1);
@@ -309,7 +309,7 @@ function kbToObject(kb) {
     "use strict";
     const rules = kb.split(";").filter(Boolean);
     const kbObject = [];
-    for (const rule of rules){
+    for (const rule of rules) {
         const delimiter = /(?:::)|(?:\simplies\s)/;
         const ruleSplit = rule.trim().split(delimiter); // 0 - name, 1 - body, 2 - head.
         const name = ruleSplit[0].trim();
@@ -319,14 +319,14 @@ function kbToObject(kb) {
             head: getRuleHead(ruleSplit[2].trim()),
         });
     }
-    
+
     return kbObject;
 }
 
 function parseKB(kbAll) {
     "use strict";
     const warnings = [];
-    if (!kbAll.includes("@KnowledgeBase") && !kbAll.includes("@Knowledge")){
+    if (!kbAll.includes("@KnowledgeBase") && !kbAll.includes("@Knowledge")) {
         return {
             type: "error",
             name: "KnowledgeBaseDecoratorNotFound",
@@ -334,7 +334,7 @@ function parseKB(kbAll) {
         };
     }
     const kbNoCode = kbAll.split(/\@KnowledgeBase|\@Knowledge/);
-    if (kbNoCode.length > 2){
+    if (kbNoCode.length > 2) {
         return {
             type: "error",
             name: "MultipleKnowledgeBaseDecorators",
@@ -387,6 +387,15 @@ function parseKB(kbAll) {
             message: `You have provided at least two rules with the same name (${duplicate}).`,
         };
     }
+    download("policy.json", JSON.stringify({
+        type: "output",
+        kb: kbToObject(kbTest["rules"]),
+        constraints: parseConstraints(kbTest["constraints"]),
+        code: codeToObject(code),
+        customPriorities: kbTest["customPriorities"],
+        imports: imports,
+        warnings: warnings,
+    }, null, 2));
     return {
         type: "output",
         kb: kbToObject(kbTest["rules"]),
@@ -454,7 +463,7 @@ function kbCheck(kb) {
     const casualHeadRe = RegExp(headNameRe.source + String.raw`\((\s*` + varNameRe.source + String.raw`\s*,)*\s*` + varNameRe.source + String.raw`\s*\)`); // CHECKED!
     const propositionalHeadRe = /(-?!?[a-z]\w*)/; // CHECKED!
     const orListRe = RegExp(String.raw`(\s*\(\s*` + predicateRe.source + String.raw`\s+or\s+` + predicateRe.source + String.raw`(\s+or\s+` + predicateRe.source + String.raw`\s*)*` + String.raw`\s*\)\s*)`); // OR structure "(predicate or predicate or ... )"
-    const bodyRe = RegExp(String.raw`((\s*` + String.raw`((` + predicateRe.source + String.raw`)|(` + orListRe.source + String.raw`))` + String.raw`\s*,)*\s*` + String.raw`(` + predicateRe.source  + String.raw`)|(` + orListRe.source + String.raw`))`); // CHECKED!
+    const bodyRe = RegExp(String.raw`((\s*` + String.raw`((` + predicateRe.source + String.raw`)|(` + orListRe.source + String.raw`))` + String.raw`\s*,)*\s*` + String.raw`(` + predicateRe.source + String.raw`)|(` + orListRe.source + String.raw`))`); // CHECKED!
     // const bodyRe = RegExp(String.raw`(\s*` + predicateRe.source + String.raw`\s*,)*\s*` + String.raw`(` + predicateRe.source + String.raw`)`); // CHECKED!
     // console.log(bodyRe.source);
     const headRe = RegExp(String.raw`((` + casualHeadRe.source + String.raw`)|(` + propositionalHeadRe.source + String.raw`))`); // CHECKED!
@@ -466,7 +475,7 @@ function kbCheck(kb) {
     const ruleStrings = kb.split(";").filter(Boolean);
     let rules = "", constraints = "", customPriorities = {}, rulesObject;
     // console.log(ruleStrings);
-    for (let i=0; i<ruleStrings.length; i++) {
+    for (let i = 0; i < ruleStrings.length; i++) {
         const ruleString = ruleStrings[i].trim() + ";";
         const ruleMatch = ruleString.match(ruleRe);
         const constraintMatch = ruleString.match(constrainRe);
@@ -499,7 +508,7 @@ function kbCheck(kb) {
 
 function stripePriorityFromRule(ruleString) {
     if (!ruleString.includes("|")) {
-        return {rule: ruleString, priority: undefined};
+        return { rule: ruleString, priority: undefined };
     }
     const splitRule = ruleString.split("|").filter(Boolean);
     return {
@@ -529,12 +538,12 @@ function parseConstraints(constraintsString) {
         if (constraints.has(item["key1"])) {
             constraints.get(item["key1"])["constraints"].push(item["constraint1"]);
         } else {
-            constraints.set(item["key1"], {constraints: [item["constraint1"]], keyObject: item["constraint2"]});
+            constraints.set(item["key1"], { constraints: [item["constraint1"]], keyObject: item["constraint2"] });
         }
         if (constraints.has(item["key2"])) {
             constraints.get(item["key2"])["constraints"].push(item["constraint2"]);
         } else {
-            constraints.set(item["key2"], {constraints: [item["constraint2"]], keyObject: item["constraint1"]});
+            constraints.set(item["key2"], { constraints: [item["constraint2"]], keyObject: item["constraint1"] });
         }
     }
     return constraints;
@@ -548,9 +557,9 @@ function parseConstraint(constraintString) {
     const leftPredicate = parseLiteral(predicates[0]);
     const rightPredicate = parseLiteral(predicates[1]);
     return {
-        key1: ((leftPredicate["sign"])? "" : "-") + leftPredicate["name"] + leftPredicate["arity"],
+        key1: ((leftPredicate["sign"]) ? "" : "-") + leftPredicate["name"] + leftPredicate["arity"],
         constraint1: rightPredicate,
-        key2: ((rightPredicate["sign"])? "" : "-") + rightPredicate["name"] + rightPredicate["arity"],
+        key2: ((rightPredicate["sign"]) ? "" : "-") + rightPredicate["name"] + rightPredicate["arity"],
         constraint2: leftPredicate,
     }
 }
@@ -588,11 +597,11 @@ function parseJsFunction(functionCode) {
     const functionName = functionHeaderArray[0];
     // console.log(functionHeaderArray);
     // debugger;
-    const argsArray = functionHeaderArray[1].trim().substring(0,functionHeaderArray[1].length - 1).split(",");
+    const argsArray = functionHeaderArray[1].trim().substring(0, functionHeaderArray[1].length - 1).split(",");
     // console.log(argsArray);
     argsArray[argsArray.length - 1] = argsArray[argsArray.length - 1].substring(0, argsArray[argsArray.length - 1].length - 1);
     // console.log(argsArray);
-    for (let i=0; i<argsArray.length; i++) {
+    for (let i = 0; i < argsArray.length; i++) {
         argsArray[i] = argsArray[i].trim();
     }
     let functionSource = functionCode.trim().substring(functionCode.indexOf("{") + 1, functionCode.length);
@@ -631,7 +640,7 @@ function literalToString(literal) {
         return literalString;
     }
     literalString += "(";
-    for (let i=0; i<args.length; i++) {
+    for (let i = 0; i < args.length; i++) {
         const arg = args[i];
         let val = arg["name"];
         if (arg["isAssigned"]) {
@@ -655,7 +664,7 @@ function ruleToString(rule) {
     // console.log(rule);
     // console.log(body);
     // debugger;
-    for (let i=0; i<body.length; i++) {
+    for (let i = 0; i < body.length; i++) {
         const literal = body[i];
         ruleString += literalToString(literal);
         // console.log(ruleString);
@@ -672,7 +681,7 @@ function kbToString(kb) {
         return undefined;
     }
     let kbString = "";
-    for (let i =0; i<kb.length; i++) {
+    for (let i = 0; i < kb.length; i++) {
         const rule = kb[i];
         kbString += ruleToString(rule);
         if (i < kb.length - 1) {
@@ -687,7 +696,7 @@ function contextToString(context) {
         return undefined;
     }
     let contextString = "";
-    for (let i=0; i<context.length; i++) {
+    for (let i = 0; i < context.length; i++) {
         const literal = context[i];
         contextString += literalToString(literal) + ";"
         if (i < context.length - 1) {
@@ -724,7 +733,7 @@ function graphToString(graph) {
     for (const key of Object.keys(graph)) {
         // console.log(key);
         graphString += key + ": [";
-        for (let i=0; i<graph[key].length; i++) {
+        for (let i = 0; i < graph[key].length; i++) {
             graphString += ruleToString(graph[key][i]);
             if (i < graph[key].length - 1) {
                 graphString += " ";
@@ -737,31 +746,31 @@ function graphToString(graph) {
 }
 
 function dilemmasToString(dilemmas) {
-	if (dilemmas === undefined) {
-		return "\{\}";
-	}
-	let dilemmasString = "\{\n";
-	let dilemma;
-	for (let i=0; i<dilemmas.length; i++) { // TODO define subToString!
-		dilemma = dilemmas[i];
-		dilemmasString += "[" + ruleToString(dilemma[0]) + ", " + ruleToString(dilemma[1]) + ", " + subToString(dilemma[2]) + "]\n";
-	}
-	return dilemmasString + "\}";
+    if (dilemmas === undefined) {
+        return "\{\}";
+    }
+    let dilemmasString = "\{\n";
+    let dilemma;
+    for (let i = 0; i < dilemmas.length; i++) { // TODO define subToString!
+        dilemma = dilemmas[i];
+        dilemmasString += "[" + ruleToString(dilemma[0]) + ", " + ruleToString(dilemma[1]) + ", " + subToString(dilemma[2]) + "]\n";
+    }
+    return dilemmasString + "\}";
 }
 
 function subToString(sub) {
     if (sub === undefined) {
         return "\{\}";
     }
-	let variable, subString = "\{";
-	for (let i=0; i<Object.keys(sub).length; i++) {
-		variable = Object.keys(sub)[i];
-		if (variable === "undefined") {
-			continue;
-		}	
-		subString += variable + " -> " + sub[variable] + ", ";
-	}
-	return subString.substring(0, subString.length - 2) + "}";
+    let variable, subString = "\{";
+    for (let i = 0; i < Object.keys(sub).length; i++) {
+        variable = Object.keys(sub)[i];
+        if (variable === "undefined") {
+            continue;
+        }
+        subString += variable + " -> " + sub[variable] + ", ";
+    }
+    return subString.substring(0, subString.length - 2) + "}";
 }
 
 function abductiveProofsToString(proofs) {

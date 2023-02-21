@@ -28,5 +28,1662 @@
       "isAction": false,
       "arity": 0
     }
+  ],
+  "context_BT": [
+    {
+      "name": "sequence",
+      "sign": true,
+      "isJS": false,
+      "isEquality": false,
+      "isInequality": false,
+      "isAction": false,
+      "args": [
+        {
+          "index": 0,
+          "isAssigned": true,
+          "value": "011",
+          "muted": false,
+          "isList": false,
+          "isExpression": false
+        }
+      ],
+      "arity": 1
+    },
+    {
+      "name": "sequence",
+      "sign": true,
+      "isJS": false,
+      "isEquality": false,
+      "isInequality": false,
+      "isAction": false,
+      "args": [
+        {
+          "index": 0,
+          "isAssigned": true,
+          "value": "1101",
+          "muted": false,
+          "isList": false,
+          "isExpression": false
+        }
+      ],
+      "arity": 1
+    },
+    {
+      "name": "f",
+      "sign": true,
+      "isJS": false,
+      "isEquality": false,
+      "isInequality": false,
+      "isAction": false,
+      "args": [
+        {
+          "index": 0,
+          "isAssigned": true,
+          "value": "111",
+          "muted": false,
+          "isList": false,
+          "isExpression": false
+        }
+      ],
+      "arity": 1
+    },
+    {
+      "name": "positive",
+      "sign": true,
+      "isJS": false,
+      "isEquality": false,
+      "isInequality": false,
+      "isAction": false,
+      "args": [
+        {
+          "index": 0,
+          "isAssigned": true,
+          "value": "011",
+          "muted": false,
+          "isList": false,
+          "isExpression": false
+        }
+      ],
+      "arity": 1
+    }
+  ],
+  "facts": [
+    {
+      "name": "sequence",
+      "sign": true,
+      "isJS": false,
+      "isEquality": false,
+      "isInequality": false,
+      "isAction": false,
+      "args": [
+        {
+          "index": 0,
+          "isAssigned": true,
+          "value": "011",
+          "muted": false,
+          "isList": false,
+          "isExpression": false
+        }
+      ],
+      "arity": 1
+    },
+    {
+      "name": "sequence",
+      "sign": true,
+      "isJS": false,
+      "isEquality": false,
+      "isInequality": false,
+      "isAction": false,
+      "args": [
+        {
+          "index": 0,
+          "isAssigned": true,
+          "value": "1101",
+          "muted": false,
+          "isList": false,
+          "isExpression": false
+        }
+      ],
+      "arity": 1
+    },
+    {
+      "name": "f",
+      "sign": true,
+      "isJS": false,
+      "isEquality": false,
+      "isInequality": false,
+      "isAction": false,
+      "args": [
+        {
+          "index": 0,
+          "isAssigned": true,
+          "value": "111",
+          "muted": false,
+          "isList": false,
+          "isExpression": false
+        }
+      ],
+      "arity": 1
+    },
+    {
+      "name": "positive",
+      "sign": true,
+      "isJS": false,
+      "isEquality": false,
+      "isInequality": false,
+      "isAction": false,
+      "args": [
+        {
+          "index": 0,
+          "isAssigned": true,
+          "value": "011",
+          "muted": false,
+          "isList": false,
+          "isExpression": false
+        }
+      ],
+      "arity": 1
+    },
+    {
+      "name": "true",
+      "sign": true,
+      "isJS": false,
+      "isEquality": false,
+      "isInequality": false,
+      "isAction": false,
+      "arity": 0
+    },
+    {
+      "name": "negative",
+      "sign": true,
+      "isJS": false,
+      "isEquality": false,
+      "isInequality": false,
+      "isAction": false,
+      "args": [
+        {
+          "index": 0,
+          "name": "Children",
+          "isAssigned": true,
+          "value": "011",
+          "muted": false
+        }
+      ],
+      "arity": 1
+    },
+    {
+      "name": "negative",
+      "sign": true,
+      "isJS": false,
+      "isEquality": false,
+      "isInequality": false,
+      "isAction": false,
+      "args": [
+        {
+          "index": 0,
+          "name": "Children",
+          "isAssigned": true,
+          "value": "1101",
+          "muted": false
+        }
+      ],
+      "arity": 1
+    },
+    {
+      "name": "wow",
+      "sign": true,
+      "isJS": false,
+      "isEquality": false,
+      "isInequality": false,
+      "isAction": false,
+      "args": [
+        {
+          "index": 0,
+          "name": "X",
+          "isAssigned": true,
+          "value": "011",
+          "muted": false
+        }
+      ],
+      "arity": 1
+    }
+  ],
+  "graph": {
+    "sequence(011)": [
+      {
+        "name": "$0",
+        "head": {
+          "name": "sequence",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "args": [
+            {
+              "index": 0,
+              "isAssigned": true,
+              "value": "011",
+              "muted": false,
+              "isList": false,
+              "isExpression": false
+            }
+          ],
+          "arity": 1
+        },
+        "body": {
+          "name": "true",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        }
+      }
+    ],
+    "sequence(1101)": [
+      {
+        "name": "$1",
+        "head": {
+          "name": "sequence",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "args": [
+            {
+              "index": 0,
+              "isAssigned": true,
+              "value": "1101",
+              "muted": false,
+              "isList": false,
+              "isExpression": false
+            }
+          ],
+          "arity": 1
+        },
+        "body": {
+          "name": "true",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        }
+      }
+    ],
+    "f(111)": [
+      {
+        "name": "$2",
+        "head": {
+          "name": "f",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "args": [
+            {
+              "index": 0,
+              "isAssigned": true,
+              "value": "111",
+              "muted": false,
+              "isList": false,
+              "isExpression": false
+            }
+          ],
+          "arity": 1
+        },
+        "body": {
+          "name": "true",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        }
+      }
+    ],
+    "positive(011)": [
+      {
+        "name": "$3",
+        "head": {
+          "name": "positive",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "args": [
+            {
+              "index": 0,
+              "isAssigned": true,
+              "value": "011",
+              "muted": false,
+              "isList": false,
+              "isExpression": false
+            }
+          ],
+          "arity": 1
+        },
+        "body": {
+          "name": "true",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        }
+      }
+    ],
+    "negative(011)": [
+      {
+        "name": "R2",
+        "body": [
+          {
+            "name": "sequence",
+            "sign": true,
+            "isJS": false,
+            "isEquality": false,
+            "isInequality": false,
+            "isAction": false,
+            "args": [
+              {
+                "index": 0,
+                "name": "Children",
+                "isAssigned": false,
+                "muted": false,
+                "isList": false,
+                "isExpression": false
+              }
+            ],
+            "arity": 1
+          },
+          {
+            "name": "?and",
+            "sign": false,
+            "isJS": true,
+            "isEquality": false,
+            "isInequality": false,
+            "isAction": false,
+            "args": [
+              {
+                "index": 0,
+                "name": "Children",
+                "isAssigned": false,
+                "muted": false,
+                "isList": false,
+                "isExpression": false
+              }
+            ],
+            "arity": 1
+          }
+        ],
+        "head": {
+          "name": "negative",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "args": [
+            {
+              "index": 0,
+              "name": "Children",
+              "isAssigned": false,
+              "muted": false,
+              "isList": false,
+              "isExpression": false
+            }
+          ],
+          "arity": 1
+        }
+      }
+    ],
+    "negative(1101)": [
+      {
+        "name": "R2",
+        "body": [
+          {
+            "name": "sequence",
+            "sign": true,
+            "isJS": false,
+            "isEquality": false,
+            "isInequality": false,
+            "isAction": false,
+            "args": [
+              {
+                "index": 0,
+                "name": "Children",
+                "isAssigned": false,
+                "muted": false,
+                "isList": false,
+                "isExpression": false
+              }
+            ],
+            "arity": 1
+          },
+          {
+            "name": "?and",
+            "sign": false,
+            "isJS": true,
+            "isEquality": false,
+            "isInequality": false,
+            "isAction": false,
+            "args": [
+              {
+                "index": 0,
+                "name": "Children",
+                "isAssigned": false,
+                "muted": false,
+                "isList": false,
+                "isExpression": false
+              }
+            ],
+            "arity": 1
+          }
+        ],
+        "head": {
+          "name": "negative",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "args": [
+            {
+              "index": 0,
+              "name": "Children",
+              "isAssigned": false,
+              "muted": false,
+              "isList": false,
+              "isExpression": false
+            }
+          ],
+          "arity": 1
+        }
+      }
+    ],
+    "wow(011)": [
+      {
+        "name": "R3",
+        "body": [
+          {
+            "name": "positive",
+            "sign": true,
+            "isJS": false,
+            "isEquality": false,
+            "isInequality": false,
+            "isAction": false,
+            "args": [
+              {
+                "index": 0,
+                "name": "X",
+                "isAssigned": false,
+                "muted": false,
+                "isList": false,
+                "isExpression": false
+              }
+            ],
+            "arity": 1
+          }
+        ],
+        "head": {
+          "name": "wow",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "args": [
+            {
+              "index": 0,
+              "name": "X",
+              "isAssigned": false,
+              "muted": false,
+              "isList": false,
+              "isExpression": false
+            }
+          ],
+          "arity": 1
+        }
+      }
+    ]
+  },
+  "dilemmas": [],
+  "defeatedRules": [],
+  "logs": [
+    {
+      "facts": [
+        {
+          "name": "sequence",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "args": [
+            {
+              "index": 0,
+              "isAssigned": true,
+              "value": "011",
+              "muted": false,
+              "isList": false,
+              "isExpression": false
+            }
+          ],
+          "arity": 1
+        },
+        {
+          "name": "sequence",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "args": [
+            {
+              "index": 0,
+              "isAssigned": true,
+              "value": "1101",
+              "muted": false,
+              "isList": false,
+              "isExpression": false
+            }
+          ],
+          "arity": 1
+        },
+        {
+          "name": "f",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "args": [
+            {
+              "index": 0,
+              "isAssigned": true,
+              "value": "111",
+              "muted": false,
+              "isList": false,
+              "isExpression": false
+            }
+          ],
+          "arity": 1
+        },
+        {
+          "name": "positive",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "args": [
+            {
+              "index": 0,
+              "isAssigned": true,
+              "value": "011",
+              "muted": false,
+              "isList": false,
+              "isExpression": false
+            }
+          ],
+          "arity": 1
+        },
+        {
+          "name": "true",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        }
+      ],
+      "graph": {
+        "sequence(011)": [
+          {
+            "name": "$0",
+            "head": {
+              "name": "sequence",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "args": [
+                {
+                  "index": 0,
+                  "isAssigned": true,
+                  "value": "011",
+                  "muted": false,
+                  "isList": false,
+                  "isExpression": false
+                }
+              ],
+              "arity": 1
+            },
+            "body": {
+              "name": "true",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            }
+          }
+        ],
+        "sequence(1101)": [
+          {
+            "name": "$1",
+            "head": {
+              "name": "sequence",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "args": [
+                {
+                  "index": 0,
+                  "isAssigned": true,
+                  "value": "1101",
+                  "muted": false,
+                  "isList": false,
+                  "isExpression": false
+                }
+              ],
+              "arity": 1
+            },
+            "body": {
+              "name": "true",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            }
+          }
+        ],
+        "f(111)": [
+          {
+            "name": "$2",
+            "head": {
+              "name": "f",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "args": [
+                {
+                  "index": 0,
+                  "isAssigned": true,
+                  "value": "111",
+                  "muted": false,
+                  "isList": false,
+                  "isExpression": false
+                }
+              ],
+              "arity": 1
+            },
+            "body": {
+              "name": "true",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            }
+          }
+        ],
+        "positive(011)": [
+          {
+            "name": "$3",
+            "head": {
+              "name": "positive",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "args": [
+                {
+                  "index": 0,
+                  "isAssigned": true,
+                  "value": "011",
+                  "muted": false,
+                  "isList": false,
+                  "isExpression": false
+                }
+              ],
+              "arity": 1
+            },
+            "body": {
+              "name": "true",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            }
+          }
+        ]
+      },
+      "dilemmas": [],
+      "defeatedRules": []
+    },
+    {
+      "facts": [
+        {
+          "name": "sequence",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "args": [
+            {
+              "index": 0,
+              "isAssigned": true,
+              "value": "011",
+              "muted": false,
+              "isList": false,
+              "isExpression": false
+            }
+          ],
+          "arity": 1
+        },
+        {
+          "name": "sequence",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "args": [
+            {
+              "index": 0,
+              "isAssigned": true,
+              "value": "1101",
+              "muted": false,
+              "isList": false,
+              "isExpression": false
+            }
+          ],
+          "arity": 1
+        },
+        {
+          "name": "f",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "args": [
+            {
+              "index": 0,
+              "isAssigned": true,
+              "value": "111",
+              "muted": false,
+              "isList": false,
+              "isExpression": false
+            }
+          ],
+          "arity": 1
+        },
+        {
+          "name": "positive",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "args": [
+            {
+              "index": 0,
+              "isAssigned": true,
+              "value": "011",
+              "muted": false,
+              "isList": false,
+              "isExpression": false
+            }
+          ],
+          "arity": 1
+        },
+        {
+          "name": "true",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        },
+        {
+          "name": "negative",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "args": [
+            {
+              "index": 0,
+              "name": "Children",
+              "isAssigned": true,
+              "value": "011",
+              "muted": false
+            }
+          ],
+          "arity": 1
+        },
+        {
+          "name": "negative",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "args": [
+            {
+              "index": 0,
+              "name": "Children",
+              "isAssigned": true,
+              "value": "1101",
+              "muted": false
+            }
+          ],
+          "arity": 1
+        },
+        {
+          "name": "wow",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "args": [
+            {
+              "index": 0,
+              "name": "X",
+              "isAssigned": true,
+              "value": "011",
+              "muted": false
+            }
+          ],
+          "arity": 1
+        }
+      ],
+      "graph": {
+        "sequence(011)": [
+          {
+            "name": "$0",
+            "head": {
+              "name": "sequence",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "args": [
+                {
+                  "index": 0,
+                  "isAssigned": true,
+                  "value": "011",
+                  "muted": false,
+                  "isList": false,
+                  "isExpression": false
+                }
+              ],
+              "arity": 1
+            },
+            "body": {
+              "name": "true",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            }
+          }
+        ],
+        "sequence(1101)": [
+          {
+            "name": "$1",
+            "head": {
+              "name": "sequence",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "args": [
+                {
+                  "index": 0,
+                  "isAssigned": true,
+                  "value": "1101",
+                  "muted": false,
+                  "isList": false,
+                  "isExpression": false
+                }
+              ],
+              "arity": 1
+            },
+            "body": {
+              "name": "true",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            }
+          }
+        ],
+        "f(111)": [
+          {
+            "name": "$2",
+            "head": {
+              "name": "f",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "args": [
+                {
+                  "index": 0,
+                  "isAssigned": true,
+                  "value": "111",
+                  "muted": false,
+                  "isList": false,
+                  "isExpression": false
+                }
+              ],
+              "arity": 1
+            },
+            "body": {
+              "name": "true",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            }
+          }
+        ],
+        "positive(011)": [
+          {
+            "name": "$3",
+            "head": {
+              "name": "positive",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "args": [
+                {
+                  "index": 0,
+                  "isAssigned": true,
+                  "value": "011",
+                  "muted": false,
+                  "isList": false,
+                  "isExpression": false
+                }
+              ],
+              "arity": 1
+            },
+            "body": {
+              "name": "true",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            }
+          }
+        ],
+        "negative(011)": [
+          {
+            "name": "R2",
+            "body": [
+              {
+                "name": "sequence",
+                "sign": true,
+                "isJS": false,
+                "isEquality": false,
+                "isInequality": false,
+                "isAction": false,
+                "args": [
+                  {
+                    "index": 0,
+                    "name": "Children",
+                    "isAssigned": false,
+                    "muted": false,
+                    "isList": false,
+                    "isExpression": false
+                  }
+                ],
+                "arity": 1
+              },
+              {
+                "name": "?and",
+                "sign": false,
+                "isJS": true,
+                "isEquality": false,
+                "isInequality": false,
+                "isAction": false,
+                "args": [
+                  {
+                    "index": 0,
+                    "name": "Children",
+                    "isAssigned": false,
+                    "muted": false,
+                    "isList": false,
+                    "isExpression": false
+                  }
+                ],
+                "arity": 1
+              }
+            ],
+            "head": {
+              "name": "negative",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "args": [
+                {
+                  "index": 0,
+                  "name": "Children",
+                  "isAssigned": false,
+                  "muted": false,
+                  "isList": false,
+                  "isExpression": false
+                }
+              ],
+              "arity": 1
+            }
+          }
+        ],
+        "negative(1101)": [
+          {
+            "name": "R2",
+            "body": [
+              {
+                "name": "sequence",
+                "sign": true,
+                "isJS": false,
+                "isEquality": false,
+                "isInequality": false,
+                "isAction": false,
+                "args": [
+                  {
+                    "index": 0,
+                    "name": "Children",
+                    "isAssigned": false,
+                    "muted": false,
+                    "isList": false,
+                    "isExpression": false
+                  }
+                ],
+                "arity": 1
+              },
+              {
+                "name": "?and",
+                "sign": false,
+                "isJS": true,
+                "isEquality": false,
+                "isInequality": false,
+                "isAction": false,
+                "args": [
+                  {
+                    "index": 0,
+                    "name": "Children",
+                    "isAssigned": false,
+                    "muted": false,
+                    "isList": false,
+                    "isExpression": false
+                  }
+                ],
+                "arity": 1
+              }
+            ],
+            "head": {
+              "name": "negative",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "args": [
+                {
+                  "index": 0,
+                  "name": "Children",
+                  "isAssigned": false,
+                  "muted": false,
+                  "isList": false,
+                  "isExpression": false
+                }
+              ],
+              "arity": 1
+            }
+          }
+        ],
+        "wow(011)": [
+          {
+            "name": "R3",
+            "body": [
+              {
+                "name": "positive",
+                "sign": true,
+                "isJS": false,
+                "isEquality": false,
+                "isInequality": false,
+                "isAction": false,
+                "args": [
+                  {
+                    "index": 0,
+                    "name": "X",
+                    "isAssigned": false,
+                    "muted": false,
+                    "isList": false,
+                    "isExpression": false
+                  }
+                ],
+                "arity": 1
+              }
+            ],
+            "head": {
+              "name": "wow",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "args": [
+                {
+                  "index": 0,
+                  "name": "X",
+                  "isAssigned": false,
+                  "muted": false,
+                  "isList": false,
+                  "isExpression": false
+                }
+              ],
+              "arity": 1
+            }
+          }
+        ]
+      },
+      "dilemmas": [],
+      "defeatedRules": []
+    },
+    {
+      "facts": [
+        {
+          "name": "sequence",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "args": [
+            {
+              "index": 0,
+              "isAssigned": true,
+              "value": "011",
+              "muted": false,
+              "isList": false,
+              "isExpression": false
+            }
+          ],
+          "arity": 1
+        },
+        {
+          "name": "sequence",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "args": [
+            {
+              "index": 0,
+              "isAssigned": true,
+              "value": "1101",
+              "muted": false,
+              "isList": false,
+              "isExpression": false
+            }
+          ],
+          "arity": 1
+        },
+        {
+          "name": "f",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "args": [
+            {
+              "index": 0,
+              "isAssigned": true,
+              "value": "111",
+              "muted": false,
+              "isList": false,
+              "isExpression": false
+            }
+          ],
+          "arity": 1
+        },
+        {
+          "name": "positive",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "args": [
+            {
+              "index": 0,
+              "isAssigned": true,
+              "value": "011",
+              "muted": false,
+              "isList": false,
+              "isExpression": false
+            }
+          ],
+          "arity": 1
+        },
+        {
+          "name": "true",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        },
+        {
+          "name": "negative",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "args": [
+            {
+              "index": 0,
+              "name": "Children",
+              "isAssigned": true,
+              "value": "011",
+              "muted": false
+            }
+          ],
+          "arity": 1
+        },
+        {
+          "name": "negative",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "args": [
+            {
+              "index": 0,
+              "name": "Children",
+              "isAssigned": true,
+              "value": "1101",
+              "muted": false
+            }
+          ],
+          "arity": 1
+        },
+        {
+          "name": "wow",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "args": [
+            {
+              "index": 0,
+              "name": "X",
+              "isAssigned": true,
+              "value": "011",
+              "muted": false
+            }
+          ],
+          "arity": 1
+        }
+      ],
+      "graph": {
+        "sequence(011)": [
+          {
+            "name": "$0",
+            "head": {
+              "name": "sequence",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "args": [
+                {
+                  "index": 0,
+                  "isAssigned": true,
+                  "value": "011",
+                  "muted": false,
+                  "isList": false,
+                  "isExpression": false
+                }
+              ],
+              "arity": 1
+            },
+            "body": {
+              "name": "true",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            }
+          }
+        ],
+        "sequence(1101)": [
+          {
+            "name": "$1",
+            "head": {
+              "name": "sequence",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "args": [
+                {
+                  "index": 0,
+                  "isAssigned": true,
+                  "value": "1101",
+                  "muted": false,
+                  "isList": false,
+                  "isExpression": false
+                }
+              ],
+              "arity": 1
+            },
+            "body": {
+              "name": "true",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            }
+          }
+        ],
+        "f(111)": [
+          {
+            "name": "$2",
+            "head": {
+              "name": "f",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "args": [
+                {
+                  "index": 0,
+                  "isAssigned": true,
+                  "value": "111",
+                  "muted": false,
+                  "isList": false,
+                  "isExpression": false
+                }
+              ],
+              "arity": 1
+            },
+            "body": {
+              "name": "true",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            }
+          }
+        ],
+        "positive(011)": [
+          {
+            "name": "$3",
+            "head": {
+              "name": "positive",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "args": [
+                {
+                  "index": 0,
+                  "isAssigned": true,
+                  "value": "011",
+                  "muted": false,
+                  "isList": false,
+                  "isExpression": false
+                }
+              ],
+              "arity": 1
+            },
+            "body": {
+              "name": "true",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "arity": 0
+            }
+          }
+        ],
+        "negative(011)": [
+          {
+            "name": "R2",
+            "body": [
+              {
+                "name": "sequence",
+                "sign": true,
+                "isJS": false,
+                "isEquality": false,
+                "isInequality": false,
+                "isAction": false,
+                "args": [
+                  {
+                    "index": 0,
+                    "name": "Children",
+                    "isAssigned": false,
+                    "muted": false,
+                    "isList": false,
+                    "isExpression": false
+                  }
+                ],
+                "arity": 1
+              },
+              {
+                "name": "?and",
+                "sign": false,
+                "isJS": true,
+                "isEquality": false,
+                "isInequality": false,
+                "isAction": false,
+                "args": [
+                  {
+                    "index": 0,
+                    "name": "Children",
+                    "isAssigned": false,
+                    "muted": false,
+                    "isList": false,
+                    "isExpression": false
+                  }
+                ],
+                "arity": 1
+              }
+            ],
+            "head": {
+              "name": "negative",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "args": [
+                {
+                  "index": 0,
+                  "name": "Children",
+                  "isAssigned": false,
+                  "muted": false,
+                  "isList": false,
+                  "isExpression": false
+                }
+              ],
+              "arity": 1
+            }
+          }
+        ],
+        "negative(1101)": [
+          {
+            "name": "R2",
+            "body": [
+              {
+                "name": "sequence",
+                "sign": true,
+                "isJS": false,
+                "isEquality": false,
+                "isInequality": false,
+                "isAction": false,
+                "args": [
+                  {
+                    "index": 0,
+                    "name": "Children",
+                    "isAssigned": false,
+                    "muted": false,
+                    "isList": false,
+                    "isExpression": false
+                  }
+                ],
+                "arity": 1
+              },
+              {
+                "name": "?and",
+                "sign": false,
+                "isJS": true,
+                "isEquality": false,
+                "isInequality": false,
+                "isAction": false,
+                "args": [
+                  {
+                    "index": 0,
+                    "name": "Children",
+                    "isAssigned": false,
+                    "muted": false,
+                    "isList": false,
+                    "isExpression": false
+                  }
+                ],
+                "arity": 1
+              }
+            ],
+            "head": {
+              "name": "negative",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "args": [
+                {
+                  "index": 0,
+                  "name": "Children",
+                  "isAssigned": false,
+                  "muted": false,
+                  "isList": false,
+                  "isExpression": false
+                }
+              ],
+              "arity": 1
+            }
+          }
+        ],
+        "wow(011)": [
+          {
+            "name": "R3",
+            "body": [
+              {
+                "name": "positive",
+                "sign": true,
+                "isJS": false,
+                "isEquality": false,
+                "isInequality": false,
+                "isAction": false,
+                "args": [
+                  {
+                    "index": 0,
+                    "name": "X",
+                    "isAssigned": false,
+                    "muted": false,
+                    "isList": false,
+                    "isExpression": false
+                  }
+                ],
+                "arity": 1
+              }
+            ],
+            "head": {
+              "name": "wow",
+              "sign": true,
+              "isJS": false,
+              "isEquality": false,
+              "isInequality": false,
+              "isAction": false,
+              "args": [
+                {
+                  "index": 0,
+                  "name": "X",
+                  "isAssigned": false,
+                  "muted": false,
+                  "isList": false,
+                  "isExpression": false
+                }
+              ],
+              "arity": 1
+            }
+          }
+        ]
+      }
+    }
   ]
 }

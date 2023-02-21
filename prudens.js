@@ -198,7 +198,7 @@ function apply(sub, args) { // FIXME Redefine apply so as to check whether a val
                     name: tempVal,
                     isAssigned: false,
                     value: undefined,
-                    muted: argument["muted"],    
+                    muted: argument["muted"],
                 });
             } else {
                 localArguments.push({
@@ -233,7 +233,7 @@ function listUnification(list1, list2, unifier) {
     return unifier;
 }
 
-function unify(x, y, sub=undefined) { // x, y are literals. Assymetric unification since y is assumed to be known/part of some set of inferred facts!
+function unify(x, y, sub = undefined) { // x, y are literals. Assymetric unification since y is assumed to be known/part of some set of inferred facts!
     if (x["name"] !== y["name"] || x["arity"] !== y["arity"] || x["sign"] !== y["sign"]) {
         return undefined;
     }
@@ -243,7 +243,7 @@ function unify(x, y, sub=undefined) { // x, y are literals. Assymetric unificati
     const expressionIndices = [];
     let xArg, yArg;
     // console.log("x:", x, "\ny:", y);
-    for (let i=0; i<x["arity"]; i++) {
+    for (let i = 0; i < x["arity"]; i++) {
         xArg = xArgs[i];
         yArg = yArgs[i];
         if (xArg["isExpression"] || yArg["isExpression"]) {
@@ -251,15 +251,15 @@ function unify(x, y, sub=undefined) { // x, y are literals. Assymetric unificati
             continue;
         }
         if (xArg["isAssigned"] && yArg["isAssigned"]) {
-			if (xArg["value"] !== yArg["value"]) {
-				// console.log("Here?");
-				// console.log(xArg);
-				// console.log(yArg);
-				// debugger;
-				return undefined;
-			} else {
-				continue;
-			}
+            if (xArg["value"] !== yArg["value"]) {
+                // console.log("Here?");
+                // console.log(xArg);
+                // console.log(yArg);
+                // debugger;
+                return undefined;
+            } else {
+                continue;
+            }
         }
         if (xArg["muted"] || yArg["muted"] || (xArg["name"] === undefined && yArg["name"] === undefined)) {
             // console.log("xArg:", xArg, "\nyArg:", yArg);
@@ -446,30 +446,30 @@ function specificityPriorities(rule1, rule2, kbObject, sub) { // true if rule1 i
     const body2 = rule2["body"];
     // console.log("body1:", body1, "body2:", body2, "sub:", sub);
     if (isMoreSpecific(body1, body2, sub)) {
-		return true;
-	}
+        return true;
+    }
     if (isMoreSpecific(body2, body1, sub)) {
-		return false;
-	}
-	return undefined;
+        return false;
+    }
+    return undefined;
 }
 
 function isMoreSpecific(body1, body2, sub) { // true if body1 is more specific than body2, false otherwise.
-	let included, unifiable;
-	for (const literal2 of body2) {
+    let included, unifiable;
+    for (const literal2 of body2) {
         included = false;
         for (const literal1 of body1) {
             unifiable = unify(applyToLiteral(sub, literal1), applyToLiteral(sub, literal2), sub);
             // console.log("unifier:", unifiable);
             if (unifiable) {
-				// console.log("Why here?");
+                // console.log("Why here?");
                 included = true;
                 break;
             }
         }
         if (!included) {
-			// console.log("false");
-			return false;
+            // console.log("false");
+            return false;
         }
     }
     return true;
@@ -500,10 +500,10 @@ Context: g(b); h(b);
 
 /*
  Dilemmas:
-	* Existing rule, r1, that infers z and new rule, r2, that infers -z;
-	* Current policy: Remove all rules that infer z and are of lower priority than r2;
-	* In case r2 beats every rule that infers z, then -z and r2 are added to the graph ONLY IF r2 is indeed of higher priority than
-		* all such rules. Otherwise, we merely keep track of the agent's dilemmas.
+    * Existing rule, r1, that infers z and new rule, r2, that infers -z;
+    * Current policy: Remove all rules that infer z and are of lower priority than r2;
+    * In case r2 beats every rule that infers z, then -z and r2 are added to the graph ONLY IF r2 is indeed of higher priority than
+        * all such rules. Otherwise, we merely keep track of the agent's dilemmas.
  * */
 
 function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded, factsToBeRemoved, priorityFunction, deletedRules, sub, constraints, kbObject, dilemmas, defeatedRules, context) { //TODO You may need to store the substitution alongside each rule, in case one needs to count how many time a rule has been triggered or so.
@@ -541,7 +541,7 @@ function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded
     casualConflict["sign"] = !casualConflict["sign"];
     const conflicts = [applyToLiteral(sub, casualConflict)];
     // console.log("constraints:", constraints);
-    const key = ((inferredHead["sign"])? "": "-") + inferredHead["name"] + inferredHead["arity"];
+    const key = ((inferredHead["sign"]) ? "" : "-") + inferredHead["name"] + inferredHead["arity"];
     if (constraints.has(key)) {
         const keyObject = constraints.get(key)["keyObject"];
         for (const conflict of constraints.get(key)["constraints"]) {
@@ -587,7 +587,7 @@ function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded
                 continue;
             }
             for (const rule of graph[literalToString(oppositeHead)]) {
-				isPrior = priorityFunction(newRule, rule, kbObject, sub);
+                isPrior = priorityFunction(newRule, rule, kbObject, sub);
                 // console.log(newRule, rule);
                 // console.log("isPrior:", isPrior);
                 // debugger;
@@ -605,12 +605,12 @@ function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded
                     // console.log("Includes opposite head and not rule.");
                     // debugger;
                     if (isPrior === undefined) {
-						if (!deepIncludes([rule, newRule, sub], dilemmas) && !deepIncludes([newRule, rule, sub])) {
-							dilemmas.push([rule, newRule, sub]);
-						}
-						beatsAll = false;
-						inferred = false;
-					}
+                        if (!deepIncludes([rule, newRule, sub], dilemmas) && !deepIncludes([newRule, rule, sub])) {
+                            dilemmas.push([rule, newRule, sub]);
+                        }
+                        beatsAll = false;
+                        inferred = false;
+                    }
                 } else { // TODO Check this again!
                     defeatedRules.push({
                         "defeated": newRule,
@@ -625,11 +625,11 @@ function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded
                 // console.log("graph:", graph);
                 // debugger;
                 if (beatsAll) {
-					graph[literalToString(inferredHead)] = [newRule];
-					// console.log("Facts prior to pushing: ", facts);
-					// debugger;
-					factsToBeAdded.push(inferredHead);
-				}
+                    graph[literalToString(inferredHead)] = [newRule];
+                    // console.log("Facts prior to pushing: ", facts);
+                    // debugger;
+                    factsToBeAdded.push(inferredHead);
+                }
                 // console.log("Facts prior to splicing: ", facts, "\nIndex of opposite head: " + deepIndexOf(facts, oppositeHead));
                 // debugger;
                 // facts = facts.splice(deepIndexOf(facts, oppositeHead), 1); // FIXME .indexOf() returns -1 because, guess what, it does not work with lists of objects... Create a deep alternative.
@@ -665,12 +665,12 @@ function isInDilemma(rule, dilemmas) {
     if (dilemmas === undefined) {
         return false;
     }
-	for (const dilemma of dilemmas) {
-		if (deepIncludes(rule, dilemma.slice(1))) {
-			return true;
-		}
-	}
-	return false;
+    for (const dilemma of dilemmas) {
+        if (deepIncludes(rule, dilemma.slice(1))) {
+            return true;
+        }
+    }
+    return false;
 }
 
 function initializeGraph(context) {
@@ -678,12 +678,12 @@ function initializeGraph(context) {
     let literal;
     for (let i = 0; i < context.length; i++) {
         literal = context[i]
-        graph[literalToString(literal)] = [{name: `\$${i}`, head: literal, body: TRUE_PREDICATE}];
+        graph[literalToString(literal)] = [{ name: `\$${i}`, head: literal, body: TRUE_PREDICATE }];
     }
     return graph;
 }
 
-function forwardChaining(kbObject, context, priorityFunction=linearPriorities, logging = true) { //FIXME Huge inconsistency with DOCS! You need to change that from [rule1, ...] to KBObject.
+function forwardChaining(kbObject, context, priorityFunction = linearPriorities, logging = true) { //FIXME Huge inconsistency with DOCS! You need to change that from [rule1, ...] to KBObject.
     let previousFacts = deepCopy(context);
     previousFacts.push(TRUE_PREDICATE);
     let factsToBeAdded = [], factsToBeRemoved = [];
@@ -711,7 +711,7 @@ function forwardChaining(kbObject, context, priorityFunction=linearPriorities, l
     }
     do {
         inferred = false;
-        for (let i=0; i<kb.length; i++) {
+        for (let i = 0; i < kb.length; i++) {
             const rule = kb[i];
             if (deepIncludes(rule, deletedRules)) {
                 continue;
@@ -719,7 +719,7 @@ function forwardChaining(kbObject, context, priorityFunction=linearPriorities, l
             const subs = getSubstitutions(rule["body"], previousFacts, code);
             // console.log("debug:", rule, subs, previousFacts);
             // debugger;
-            for (let i=0; i<subs.length; i++) {
+            for (let i = 0; i < subs.length; i++) {
                 const sub = subs[i];
                 const inferredHead = applyToLiteral(sub, rule["head"]);
                 const updatedGraph = updateGraph(inferredHead, rule, graph, previousFacts, factsToBeAdded, factsToBeRemoved, priorityFunction, deletedRules, sub, kbObject["constraints"], kbObject, dilemmas, defeatedRules);
@@ -771,7 +771,7 @@ function isConflicting(x, y) { // x and y are literals.
     }
     const xArgs = x["args"];
     const yArgs = y["args"];
-    for (let i=0; i<x["arity"]; i++) {
+    for (let i = 0; i < x["arity"]; i++) {
         if (!xArgs[i]["isAssigned"] || !yArgs[i]["isAssigned"] || xArgs[i]["value"] != yArgs[i]["value"]) {
             return false;
         }
@@ -925,7 +925,7 @@ function jsCheck(literal, sub, code) {
         return false;
     }
     let source = functionObject["source"];
-    for (let i=0; i<literal["args"].length; i++) {
+    for (let i = 0; i < literal["args"].length; i++) {
         const variable = literal["args"][i];
         // console.log(variable);
         // console.log(sub);

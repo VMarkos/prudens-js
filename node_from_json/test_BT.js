@@ -1,5 +1,6 @@
 const prudens = require("./prudensNode");
 const fs = require("fs");
+const toXML = require('xml-js');
 
 function parsing() { // Just to showcase how to merely parse a policy from a string (without deducing anything).
     const policy = `@Knowledge
@@ -16,8 +17,20 @@ function parsing() { // Just to showcase how to merely parse a policy from a str
 function deduce() { // Reading policy and context from local files and writing deductions to a file.
     const policy = JSON.parse(fs.readFileSync("policy.json")); // Sync or async used as per the app's needs.
     const context = JSON.parse(fs.readFileSync("context.json"));
-    const output = prudens.forwardChaining(policy, context["context"]);
-    fs.writeFileSync("output.json", JSON.stringify(output, null, 2));
+    const options = { compact: true, ignoreComment: true, spaces: 4 };
+    const output = prudens.forwardChainingBT(policy, context["context_BT"]);
+    //TODO: add functions in file json
+    const fallback = `function fallback(arr){
+        for(let i = 0; i<arr.lenght;i++){
+            if(arr[i] === true){
+                return true;
+            }
+            return false;
+        }
+    }`
+    console.log(prudens.codeToObject(fallback));
+    // TODO: any reason for using Sync instead of Async?
+    fs.writeFileSync("BT_test.xml", toXML.js2xml(output, options));
 }
 
 function main() {

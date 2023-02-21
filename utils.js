@@ -47,7 +47,7 @@ function abduce() {
         outputString += warning["name"] + ": " + warning["message"] + "\n";
     }
     // console.log(graph);
-    return outputString + "Missing Facts: " +  abductiveProofsToString(output);
+    return outputString + "Missing Facts: " + abductiveProofsToString(output);
 }
 
 function deduce() {
@@ -64,6 +64,11 @@ function deduce() {
     // console.log(kbObject);
     // console.log(contextObject); // TODO fix some context parsing issue (in propositional cases it includes the semicolon into the name of the prop)
     const output = forwardChaining(kbObject, contextObject["context"]);
+    //TODO: for BT usage call the pother function
+    /* TODO: modify this for interactying with BT checkbox 
+    if (document.getElementById("download-checkbox").checked) {
+        download("output.json", JSON.stringify(currentOutput, null, 2));
+    }*/
     currentOutput = output;
     // console.log(output);
     const inferences = output["facts"];
@@ -118,10 +123,10 @@ function beautifyTOC(title) {
     const delimeter = /\s+/;
     const titleArray = title.split(delimeter);
     let beautifulTitle = "";
-    for (let i=0; i<titleArray.length-1; i++) {
+    for (let i = 0; i < titleArray.length - 1; i++) {
         beautifulTitle += titleArray[i] + "-";
     }
-    beautifulTitle += titleArray[titleArray.length-1];
+    beautifulTitle += titleArray[titleArray.length - 1];
     return beautifulTitle;
 }
 
@@ -150,10 +155,10 @@ function updateLineNumber(id) {
     textArea.selectionEnd = cursorEnd;
     const lineHeight = secondLineLength - firstLineLength;
     // console.log(lineHeight);
-    const numLines = Math.floor(textHeight/lineHeight);
+    const numLines = Math.floor(textHeight / lineHeight);
     textArea.style.height = initHeight;
     let newLines = "";
-    for (let i=1; i<=numLines; i++) {
+    for (let i = 1; i <= numLines; i++) {
         newLines += "" + i + "\n";
     }
     // console.log(numLines);
@@ -166,12 +171,12 @@ function tabChanger(event, tabName) {
     tab = tabName;
     const tabsLeft = document.getElementsByClassName("tab-left");
     const tabsRight = document.getElementsByClassName("tab-right");
-    for (let i=0; i<tabsLeft.length; i++) {
+    for (let i = 0; i < tabsLeft.length; i++) {
         tabsLeft[i].style.display = "none";
         tabsRight[i].style.display = "none";
     }
     const tabLinks = document.getElementsByClassName("tablink");
-    for (let i=0; i<tabsLeft.length; i++) {
+    for (let i = 0; i < tabsLeft.length; i++) {
         tabLinks[i].className = tabLinks[i].className.replace(" selected", "");
     }
     // console.log(tabName);
