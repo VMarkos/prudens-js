@@ -1,0 +1,23 @@
+{
+  "name": "prudens",
+  "version": "1.0.0",
+  "description": "A full implementation of Prudens in Javascript alongside a simple UI and the corresponding documentation.",
+  "main": "abduction.js",
+  "dependencies": {
+    "xml-js": "^1.6.11"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/VMarkos/prudens-js.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/VMarkos/prudens-js/issues"
+  },
+  "homepage": "https://github.com/VMarkos/prudens-js#readme"
+}

@@ -1,0 +1,32 @@
+{
+  "type": "output",
+  "context": [
+    {
+      "name": "bird",
+      "sign": true,
+      "isJS": false,
+      "isEquality": false,
+      "isInequality": false,
+      "isAction": false,
+      "arity": 0
+    },
+    {
+      "name": "penguin",
+      "sign": true,
+      "isJS": false,
+      "isEquality": false,
+      "isInequality": false,
+      "isAction": false,
+      "arity": 0
+    },
+    {
+      "name": "super",
+      "sign": true,
+      "isJS": false,
+      "isEquality": false,
+      "isInequality": false,
+      "isAction": false,
+      "arity": 0
+    }
+  ]
+}

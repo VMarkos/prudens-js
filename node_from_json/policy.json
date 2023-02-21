@@ -1,0 +1,105 @@
+{
+  "type": "output",
+  "kb": [
+    {
+      "name": "R1",
+      "body": [
+        {
+          "name": "bird",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        }
+      ],
+      "head": {
+        "name": "flies",
+        "sign": true,
+        "isJS": false,
+        "isEquality": false,
+        "isInequality": false,
+        "isAction": false,
+        "arity": 0
+      }
+    },
+    {
+      "name": "R2",
+      "body": [
+        {
+          "name": "bird",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        },
+        {
+          "name": "penguin",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        }
+      ],
+      "head": {
+        "name": "flies",
+        "sign": false,
+        "isJS": false,
+        "isEquality": false,
+        "isInequality": false,
+        "isAction": false,
+        "arity": 0
+      }
+    },
+    {
+      "name": "R3",
+      "body": [
+        {
+          "name": "bird",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        },
+        {
+          "name": "penguin",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        },
+        {
+          "name": "super",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "arity": 0
+        }
+      ],
+      "head": {
+        "name": "flies",
+        "sign": true,
+        "isJS": false,
+        "isEquality": false,
+        "isInequality": false,
+        "isAction": false,
+        "arity": 0
+      }
+    }
+  ],
+  "constraints": {},
+  "customPriorities": {},
+  "imports": "",
+  "warnings": []
+}
