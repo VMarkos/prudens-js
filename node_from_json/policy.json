@@ -276,7 +276,7 @@
       "args": [
         "arr"
       ],
-      "source": "\n    for (const x of arr) {\n         console.log(x);\n         if (x === \"0\") {\n             return false;\n         }\n    }\n    return true;\n"
+      "source": "\n    for (const x of arr) {\n         if (x === \"0\") {\n             return false;\n         }\n    }\n    return true;\n"
     }
   }
 }

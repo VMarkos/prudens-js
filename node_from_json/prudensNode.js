@@ -757,12 +757,23 @@ function forwardChaining(kbObject, context, priorityFunction = linearPriorities,
     }
 }
 
-function forwardChainingBT(kbObject, context, priorityFunction = linearPriorities, logging = true) { //FIXME Huge inconsistency with DOCS! You need to change that from [rule1, ...] to KBObject.
+function forwardChainingBT(kbObject, context, priorityFunction = linearPriorities, logging = true) { // FIXME Huge inconsistency with DOCS! You need to change that from [rule1, ...] to KBObject.
     let previousFacts = deepCopy(context);
     previousFacts.push(TRUE_PREDICATE);
     let factsToBeAdded = [], factsToBeRemoved = [];
     const kb = kbObject["kb_BT"];
-    // console.log(facts);
+
+    let bt_rules = [];
+
+    for (let i = 0; i < kb.length; i++) {
+        console.log(kb[i].name);
+        for (let j = 0; j < kb[i].body.length; j++) {
+            console.log("  ", kb[i].body[j].name, "(", kb[i].body[j].args[0].name, ") - ", kb[i].head.name);
+        }
+        console.log();
+
+    }
+
     let inferred = false;
     let graph = initializeGraph(context);
     let deletedRules = [];
@@ -823,12 +834,14 @@ function forwardChainingBT(kbObject, context, priorityFunction = linearPrioritie
     } while (inferred);
     let BehaviorTree;
     Sequence = { "Sequence": {} };
-    BehaviorTree = { "BehaviorTree": { "_attributes": { "ID": "MainTree" }, context } };
+    BehaviorTree = { "BehaviorTree": { "_attributes": { "ID": "MainTree" }, bt_rules } };
 
     return {
         //        context: context,
         version: { "_declaration": { "_attributes": { "version": "1.0", "encoding": "utf-8" } } },
         root: BehaviorTree,
+        //    rules: kb,
+        //policyJSON: policyJSON,
         /*  facts: previousFacts,
           graph: graph,
           dilemmas: dilemmas,
