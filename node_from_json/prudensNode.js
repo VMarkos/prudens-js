@@ -763,23 +763,7 @@ function forwardChainingBT(kbObject, context, priorityFunction = linearPrioritie
     let factsToBeAdded = [], factsToBeRemoved = [];
     const kb = kbObject["kb_BT"];
 
-    const { create } = require('xmlbuilder2');
-
-    var doc = create({ version: '1.0' })
-        .ele('root', { main_tree_to_execute: 'MainTree' })
-        .ele('BehaviorTree', { 'ID': 'MainTree' })
-        .ele('bar').txt('foobar').up()
-        .up()
-        .ele('baz');
-
-
-    console.log(doc.end({ prettyPrint: true }));
-
-    console.log("**********");
-
-
-
-
+    const { create } = require('xmlbuilder2'); // https://oozcitak.github.io/xmlbuilder2/
 
     let BehaviorTree = [];
     //BehaviorTree = { "BehaviorTree": { "_attributes": { "ID": "MainTree" } } };
@@ -791,38 +775,59 @@ function forwardChainingBT(kbObject, context, priorityFunction = linearPrioritie
         .ele('BehaviorTree', { 'ID': 'MainTree' });
     /*
     root.com('f(x) = x^2');
+    TODO: use this example for blackboard
     for (var i = 1; i <= 5; i++) {
         var item = root.ele('data');
         item.att('x', i);
         item.att('y', i * i);
     } */
 
+
+    /*
+    TODO: use this for when you find the element to attach multi-layers
+    ins
+
+    Creates a new processing instruction node, appends it to the list of child nodes and returns the parent element node.
+    ins(target: string, content: string)
+    ins(obj: object)
+    ins(arr: string[])
+    */
     for (let i = 0; i < kb.length; i++) {
         console.log(kb[i].name);
         for (let j = 0; j < kb[i].body.length; j++) {
             console.log("  ", kb[i].body[j].name, "(", kb[i].body[j].args[0].name, ") - ", kb[i].head.name);
-            console.log("substring(0, 8): ", kb[i].body[0].name.substring(0, 8));
 
             if (kb[i].body[j].name.substring(0, 8) == "sequence") {
-                console.log("inside for (i,j): ", i, j);
                 var item = root.ele(kb[i].body[j].name.substring(0, 8));
-                console.log("after var");
                 for (let k = 0; k < kb[i].body[j].args.length; k++) {
                     item.ele(kb[i].body[j].args[k].name);
-
-                    //xml.ele("BehaviorTree").ele(kb[i].body[j].name).ele(kb[i].body[j].args[k].name);
-                    //BehaviorTree.push({ "seq": kb[i].body[j].args[k].name });
                 }
             } else {
                 //root.ele(kb[i].body[j].name);
                 console.log("no node... ");
             }
-            console.log();
         }
-        console.log();
         console.log();
 
     }
+    // TODO: put all the nodes not in root head in a container. 
+    // Create a while loop (lasting as long as the container has elements) 
+    // that, at each iteration, eliminate the nodes that append
+    let substitute = root.find(n => n.node.nodeName == "sequence03", true, true);
+    console.log("substitute = ", substitute);
+    let up_substitute = substitute.up()
+    console.log("up_substitute = ", up_substitute);
+    substitute.remove();
+    up_substitute.ele("right");
+
+    /* TODO: logic to substitute new values
+    root.ele("sequence03").ele("wrong");
+    let substitute = root.find(n => n.node.nodeName == "wrong", true, true);
+    console.log("substitute = ", substitute);
+    let up_substitute = substitute.up()
+    console.log("up_substitute = ", up_substitute);
+    substitute.remove();
+    up_substitute.ele("right"); */
     root.doc();
     console.log(root.end({ prettyPrint: true }));
 

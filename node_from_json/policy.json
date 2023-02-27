@@ -129,6 +129,14 @@
               "muted": false,
               "isList": false,
               "isExpression": false
+            },
+            {
+              "index": 2,
+              "name": "sequence03",
+              "isAssigned": false,
+              "muted": false,
+              "isList": false,
+              "isExpression": false
             }
           ],
           "arity": 1
@@ -154,7 +162,7 @@
         }
       ],
       "head": {
-        "name": "positive",
+        "name": "root",
         "sign": true,
         "isJS": false,
         "isEquality": false,
@@ -216,7 +224,7 @@
         }
       ],
       "head": {
-        "name": "negative",
+        "name": "root",
         "sign": true,
         "isJS": false,
         "isEquality": false,
@@ -236,10 +244,10 @@
       }
     },
     {
-      "name": "R3",
+      "name": "R4",
       "body": [
         {
-          "name": "positive",
+          "name": "sequence03",
           "sign": true,
           "isJS": false,
           "isEquality": false,
@@ -259,7 +267,7 @@
         }
       ],
       "head": {
-        "name": "wow",
+        "name": "sequence01",
         "sign": true,
         "isJS": false,
         "isEquality": false,
