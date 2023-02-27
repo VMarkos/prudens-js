@@ -4,7 +4,9 @@
   "description": "A full implementation of Prudens in Javascript alongside a simple UI and the corresponding documentation.",
   "main": "abduction.js",
   "dependencies": {
-    "xml-js": "^1.6.11"
+    "xml-js": "^1.6.11",
+    "xmlbuilder": "^15.1.1",
+    "xmlbuilder2": "^3.0.2"
   },
   "devDependencies": {},
   "scripts": {

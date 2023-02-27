@@ -763,16 +763,68 @@ function forwardChainingBT(kbObject, context, priorityFunction = linearPrioritie
     let factsToBeAdded = [], factsToBeRemoved = [];
     const kb = kbObject["kb_BT"];
 
-    let bt_rules = [];
+    const { create } = require('xmlbuilder2');
+
+    var doc = create({ version: '1.0' })
+        .ele('root', { main_tree_to_execute: 'MainTree' })
+        .ele('BehaviorTree', { 'ID': 'MainTree' })
+        .ele('bar').txt('foobar').up()
+        .up()
+        .ele('baz');
+
+
+    console.log(doc.end({ prettyPrint: true }));
+
+    console.log("**********");
+
+
+
+
+
+    let BehaviorTree = [];
+    //BehaviorTree = { "BehaviorTree": { "_attributes": { "ID": "MainTree" } } };
+    //BehaviorTree.push({ "BehaviorTree": { "_attributes": { "ID": "MainTree" } } });
+
+    // var builder = require('xmlbuilder');
+    var root = create({ version: '1.0' })
+        .ele('root', { main_tree_to_execute: 'MainTree' })
+        .ele('BehaviorTree', { 'ID': 'MainTree' });
+    /*
+    root.com('f(x) = x^2');
+    for (var i = 1; i <= 5; i++) {
+        var item = root.ele('data');
+        item.att('x', i);
+        item.att('y', i * i);
+    } */
 
     for (let i = 0; i < kb.length; i++) {
         console.log(kb[i].name);
         for (let j = 0; j < kb[i].body.length; j++) {
             console.log("  ", kb[i].body[j].name, "(", kb[i].body[j].args[0].name, ") - ", kb[i].head.name);
+            console.log("substring(0, 8): ", kb[i].body[0].name.substring(0, 8));
+
+            if (kb[i].body[j].name.substring(0, 8) == "sequence") {
+                console.log("inside for (i,j): ", i, j);
+                var item = root.ele(kb[i].body[j].name.substring(0, 8));
+                console.log("after var");
+                for (let k = 0; k < kb[i].body[j].args.length; k++) {
+                    item.ele(kb[i].body[j].args[k].name);
+
+                    //xml.ele("BehaviorTree").ele(kb[i].body[j].name).ele(kb[i].body[j].args[k].name);
+                    //BehaviorTree.push({ "seq": kb[i].body[j].args[k].name });
+                }
+            } else {
+                //root.ele(kb[i].body[j].name);
+                console.log("no node... ");
+            }
+            console.log();
         }
+        console.log();
         console.log();
 
     }
+    root.doc();
+    console.log(root.end({ prettyPrint: true }));
 
     let inferred = false;
     let graph = initializeGraph(context);
@@ -832,9 +884,9 @@ function forwardChainingBT(kbObject, context, priorityFunction = linearPrioritie
             });
         }
     } while (inferred);
-    let BehaviorTree;
-    Sequence = { "Sequence": {} };
-    BehaviorTree = { "BehaviorTree": { "_attributes": { "ID": "MainTree" }, bt_rules } };
+    //let BehaviorTree;
+    //Sequence = { "Sequence": {} };
+    //BehaviorTree = { "BehaviorTree": { "_attributes": { "ID": "MainTree" }, bt_rules } };
 
     return {
         //        context: context,

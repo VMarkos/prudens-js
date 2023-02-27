@@ -107,7 +107,7 @@
       "name": "R1",
       "body": [
         {
-          "name": "sequence",
+          "name": "sequence01",
           "sign": true,
           "isJS": false,
           "isEquality": false,
@@ -116,7 +116,15 @@
           "args": [
             {
               "index": 0,
-              "name": "Children",
+              "name": "Children0",
+              "isAssigned": false,
+              "muted": false,
+              "isList": false,
+              "isExpression": false
+            },
+            {
+              "index": 1,
+              "name": "Children1",
               "isAssigned": false,
               "muted": false,
               "isList": false,
@@ -169,7 +177,7 @@
       "name": "R2",
       "body": [
         {
-          "name": "sequence",
+          "name": "sequence02",
           "sign": true,
           "isJS": false,
           "isEquality": false,
