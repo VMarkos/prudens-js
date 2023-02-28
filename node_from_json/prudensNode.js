@@ -770,7 +770,7 @@ function forwardChainingBT(kbObject, context, priorityFunction = linearPrioritie
     //BehaviorTree.push({ "BehaviorTree": { "_attributes": { "ID": "MainTree" } } });
 
     // var builder = require('xmlbuilder');
-    var root = create({ version: '1.0' })
+    var root = create({ version: '1.0', encoding: 'utf-8' })
         .ele('root', { main_tree_to_execute: 'MainTree' })
         .ele('BehaviorTree', { 'ID': 'MainTree' });
     /*
@@ -863,15 +863,6 @@ function forwardChainingBT(kbObject, context, priorityFunction = linearPrioritie
     }
 
 
-    console.log(deepBT);
-    console.log(typeof deepBT);
-    console.log("size: ", Object.keys(deepBT).length);
-    delete deepBT.sequence03;
-    console.log("size: ", Object.keys(deepBT).length);
-    delete deepBT.sequence04;
-    console.log("size: ", Object.keys(deepBT).length);
-
-
     // TODO: put all the nodes not in root head in a container. 
     // Create a while loop (lasting as long as the container has elements) 
     // that, at each iteration, eliminate the nodes that append
@@ -892,7 +883,11 @@ function forwardChainingBT(kbObject, context, priorityFunction = linearPrioritie
     substitute.remove();
     up_substitute.ele("right"); */
     root.doc();
-    console.log(root.end({ prettyPrint: true }));
+    let result = root.end({ prettyPrint: true });
+    console.log(result);
+
+    const fs = require("fs");
+    fs.writeFileSync("BT_test_from_prudensNode.xml", result);
 
     let inferred = false;
     let graph = initializeGraph(context);
