@@ -792,33 +792,96 @@ function forwardChainingBT(kbObject, context, priorityFunction = linearPrioritie
     ins(obj: object)
     ins(arr: string[])
     */
+    let deepBT = [];
     for (let i = 0; i < kb.length; i++) {
         console.log(kb[i].name);
         for (let j = 0; j < kb[i].body.length; j++) {
             console.log("  ", kb[i].body[j].name, "(", kb[i].body[j].args[0].name, ") - ", kb[i].head.name);
-
-            if (kb[i].body[j].name.substring(0, 8) == "sequence") {
-                var item = root.ele(kb[i].body[j].name.substring(0, 8));
-                for (let k = 0; k < kb[i].body[j].args.length; k++) {
-                    item.ele(kb[i].body[j].args[k].name);
+            // Fill the BT object
+            if (kb[i].head.name == "root") {
+                if (kb[i].body[j].name.substring(0, 8) == "sequence") {
+                    var item = root.ele(kb[i].body[j].name.substring(0, 8));
+                    for (let k = 0; k < kb[i].body[j].args.length; k++) {
+                        item.ele(kb[i].body[j].args[k].name);
+                    }
+                } else {
+                    //root.ele(kb[i].body[j].name);
+                    console.log("no node... ");
                 }
+
             } else {
-                //root.ele(kb[i].body[j].name);
-                console.log("no node... ");
+                deepBT[kb[i].body[j].name] = new Array();
+                for (let k = 0; k < kb[i].body[j].args.length; k++) {
+                    deepBT[kb[i].body[j].name].push(kb[i].body[j].args[k].name);
+                }
+
             }
         }
         console.log();
 
     }
+
+    while (Object.keys(deepBT).length > 0) {
+        for (const key in deepBT) {
+            if (deepBT.hasOwnProperty(key)) {
+                let substitute = root.find(n => n.node.nodeName == key, true, true);
+                if (substitute) {
+                    // there is a control node to be elaborated
+                    console.log(`${key}: ${deepBT[key]}`);
+
+                    let values_BT = Object.values(deepBT[key]);
+                    let up_substitute = substitute.up()
+                    substitute.remove();
+
+                    // define the control node to be elaborated (TODO: elaborate also other nodes)
+                    if (key.substring(0, 8) == "sequence") {
+                        var item = up_substitute.ele(key.substring(0, 8));
+                    } else {
+                        var item = up_substitute.ele(key);
+                        console.log("WARNING - node not defined")
+                    }
+
+                    // for each argument, append the new values
+                    values_BT.forEach((valBT) => {
+                        item.ele(valBT)
+                        console.log("values_BT: ", valBT);
+                    });
+
+                    // let's delete this rule to not take care of it anymore
+                    delete deepBT[key];
+                    console.log("size: ", Object.keys(deepBT).length);
+
+
+                }
+
+                console.log(`${key}: ${deepBT[key]}`);
+
+
+            }
+        }
+
+    }
+
+
+    console.log(deepBT);
+    console.log(typeof deepBT);
+    console.log("size: ", Object.keys(deepBT).length);
+    delete deepBT.sequence03;
+    console.log("size: ", Object.keys(deepBT).length);
+    delete deepBT.sequence04;
+    console.log("size: ", Object.keys(deepBT).length);
+
+
     // TODO: put all the nodes not in root head in a container. 
     // Create a while loop (lasting as long as the container has elements) 
     // that, at each iteration, eliminate the nodes that append
+    /*
     let substitute = root.find(n => n.node.nodeName == "sequence03", true, true);
     console.log("substitute = ", substitute);
     let up_substitute = substitute.up()
     console.log("up_substitute = ", up_substitute);
     substitute.remove();
-    up_substitute.ele("right");
+    up_substitute.ele("right"); */
 
     /* TODO: logic to substitute new values
     root.ele("sequence03").ele("wrong");

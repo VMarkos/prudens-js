@@ -199,6 +199,14 @@
               "muted": false,
               "isList": false,
               "isExpression": false
+            },
+            {
+              "index": 1,
+              "name": "sequence04",
+              "isAssigned": false,
+              "muted": false,
+              "isList": false,
+              "isExpression": false
             }
           ],
           "arity": 1
@@ -261,6 +269,14 @@
               "muted": false,
               "isList": false,
               "isExpression": false
+            },
+            {
+              "index": 1,
+              "name": "Y",
+              "isAssigned": false,
+              "muted": false,
+              "isList": false,
+              "isExpression": false
             }
           ],
           "arity": 1
@@ -277,6 +293,73 @@
           {
             "index": 0,
             "name": "X",
+            "isAssigned": false,
+            "muted": false,
+            "isList": false,
+            "isExpression": false
+          },
+          {
+            "index": 1,
+            "name": "Y",
+            "isAssigned": false,
+            "muted": false,
+            "isList": false,
+            "isExpression": false
+          }
+        ],
+        "arity": 1
+      }
+    },
+    {
+      "name": "R5",
+      "body": [
+        {
+          "name": "sequence04",
+          "sign": true,
+          "isJS": false,
+          "isEquality": false,
+          "isInequality": false,
+          "isAction": false,
+          "args": [
+            {
+              "index": 0,
+              "name": "Z",
+              "isAssigned": false,
+              "muted": false,
+              "isList": false,
+              "isExpression": false
+            },
+            {
+              "index": 1,
+              "name": "K",
+              "isAssigned": false,
+              "muted": false,
+              "isList": false,
+              "isExpression": false
+            }
+          ],
+          "arity": 1
+        }
+      ],
+      "head": {
+        "name": "sequence01",
+        "sign": true,
+        "isJS": false,
+        "isEquality": false,
+        "isInequality": false,
+        "isAction": false,
+        "args": [
+          {
+            "index": 0,
+            "name": "Z",
+            "isAssigned": false,
+            "muted": false,
+            "isList": false,
+            "isExpression": false
+          },
+          {
+            "index": 1,
+            "name": "K",
             "isAssigned": false,
             "muted": false,
             "isList": false,
