@@ -387,15 +387,6 @@ function parseKB(kbAll) {
             message: `You have provided at least two rules with the same name (${duplicate}).`,
         };
     }
-    download("policy.json", JSON.stringify({
-        type: "output",
-        kb: kbToObject(kbTest["rules"]),
-        constraints: parseConstraints(kbTest["constraints"]),
-        code: codeToObject(code),
-        customPriorities: kbTest["customPriorities"],
-        imports: imports,
-        warnings: warnings,
-    }, null, 2));
     return {
         type: "output",
         kb: kbToObject(kbTest["rules"]),

@@ -64,11 +64,6 @@ function deduce() {
     // console.log(kbObject);
     // console.log(contextObject); // TODO fix some context parsing issue (in propositional cases it includes the semicolon into the name of the prop)
     const output = forwardChaining(kbObject, contextObject["context"]);
-    //TODO: for BT usage call the pother function
-    /* TODO: modify this for interactying with BT checkbox 
-    if (document.getElementById("download-checkbox").checked) {
-        download("output.json", JSON.stringify(currentOutput, null, 2));
-    }*/
     currentOutput = output;
     // console.log(output);
     const inferences = output["facts"];
