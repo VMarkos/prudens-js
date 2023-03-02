@@ -1,0 +1,460 @@
+html, body {
+    height: 100%;
+    padding: 0px;
+    margin: 0px;
+    background-color: whitesmoke;
+}
+
+a {
+    text-decoration: none;
+}
+
+.label {
+    font-family: Ubuntu, Arial, Helvetica, sans-serif;
+    font-weight: 600;
+    max-height: fit-content;
+}
+
+label {
+    font-family: Ubuntu, Arial, Helvetica, sans-serif;
+    font-weight: 600;
+    max-height: fit-content;
+}
+
+h1, h2, h3 {
+    font-family: Ubuntu, Arial, Helvetica, sans-serif;
+    font-weight: 800;
+    margin-top: 32px;
+    margin-bottom: 4px;
+}
+
+h1 {
+    font-size: 36pt;
+}
+
+h2 {
+    font-size: 28pt;
+}
+
+h3 {
+    font-size: 20pt;
+}
+
+p {
+    font-family: Ubuntu, Arial, Helvetica, sans-serif;
+    font-size: 14pt;
+    margin-top: 0px;
+    line-height: 140%;
+}
+
+ul {
+    font-family: Ubuntu, Arial, Helvetica, sans-serif;
+    font-size: 14pt;
+}
+
+li { 
+    margin-bottom: 5px;  
+}
+
+textarea {
+    height: 100%;
+    width: 100%;
+    overflow: auto;
+    resize: none;
+    font-family: 'Ubuntu mono', 'Courier New', Courier, monospace;
+    border: 2px solid blueviolet;
+    border-left: none;
+    border-bottom-right-radius: 5px;
+    border-top-right-radius: 5px;
+    box-sizing: border-box;
+}
+
+textarea.console {
+    border-left: 2px solid blueviolet;
+    border-bottom-left-radius: 5px;
+    border-top-left-radius: 5px;
+}
+
+textarea:focus {
+    outline: none !important;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+}
+
+.toc-ul {
+    color: cornflowerblue;
+}
+
+.code-container {
+    height: 100%;
+    width: 100%;
+    padding: 4px;
+}
+
+.header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    background-color: blueviolet;
+    width: 100%;
+    height: auto;
+    min-height: 6%;
+    max-height: 8%;
+    padding-top: 1%;
+    padding-bottom: 1%;
+    box-shadow: 0 0 5 rgba(0,0,0,.15);
+}
+
+.header-left {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-menu {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin: 5px;
+    margin-left: 10px;
+    padding: 5px;
+}
+
+.header-menu-item {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: large;
+    font-weight: 500;
+    color: white;
+    margin: 5px;
+    margin-left: 10px;
+}
+
+.header-title {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: xx-large;
+    font-weight: 700;
+    color: white;
+    margin-left: 10px;
+}
+
+.execute-button {
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: large;
+    font-weight: 600;
+    background-color: orange;
+    color: white;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2), 0 4px 8px 0 rgba(0,0,0,0.19);
+    cursor: pointer;
+    margin: 5px;
+    margin-right: 10px;
+    padding: 5px;
+    border: 2px solid orange;
+    max-width: fit-content;
+    transition-duration: 0.4s;
+}
+
+.execute-button:hover {
+    opacity: 0.95;
+}
+
+.execute-button:active {
+    box-shadow: 0 0px 4px 0 rgba(0,0,0,0.2), 0 4px 8px 0 rgba(0,0,0,0.19);
+    transform: translateY(4px);
+}
+
+.body-container {
+    display: flex;
+    background-color: blueviolet;
+    width: 100%;
+    height: 90%;
+}
+
+.body-container.docs {
+    background-color: white;
+}
+
+.body-container.contact {
+    justify-content: center;
+    background-color: white;
+    justify-content: start;
+}
+
+.main-body {
+    display: grid;
+    background-color: whitesmoke;
+    width: fit-content;
+    height: 100%;
+    width: 100%;
+    column-gap: 25px;
+    grid-template-columns:0.1fr 1fr 1fr;
+    padding-right: 10px;
+}
+
+.flex-container {
+    margin: 10px;
+    /* width: 100%; */
+}
+
+.tab-menu {
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    display: flex;
+    flex-direction: column;
+    background-color: blueviolet;
+    justify-content: top;
+    align-items: center;
+    height: 100%;
+    box-sizing: border-box;
+}
+
+.tab-button {
+    background-color: inherit;
+    padding-top: 10px;
+    padding-bottom: 10px;
+    color: white;
+    font-family: Arial, Helvetica, sans-serif;
+    font-size: large;
+    font-weight: 800;
+    margin-left: 5px;
+    margin-right: 5px;
+    transition-duration: 0.4s;
+    text-align: center;
+    width: 100%;
+    cursor: pointer;
+}
+
+.tab-button.selected {
+    background-color: whitesmoke;
+    color: blueviolet;
+}
+
+.tab-button:hover {
+    opacity: 0.5;
+    background-color: whitesmoke;
+    color: blueviolet
+}
+
+.tab-button:active {
+    opacity: 1;
+    background-color: whitesmoke;
+    color: blueviolet
+}
+
+.tab-button:focus {
+    opacity: 1;
+    background-color: whitesmoke;
+    color: blueviolet
+}
+
+.item-21 {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+    margin: 10px;
+}
+
+.toc-column {
+    grid-column: 1 / 2;
+    grid-row: 1 / 2;
+    margin: 10px;
+}
+
+.item-22 {
+    grid-column: 2 / 3;
+    grid-row: 1 / 2;
+    margin: 10px;
+    max-width: 1000px;
+    justify-content: center;
+    margin: auto;
+}
+
+.item-23 {
+    grid-column: 3 / 4;
+    grid-row: 1 / 2;
+    margin: 10px;
+}
+
+.sub-grid {
+    grid-column: 3 / 4;
+    grid-row: 1 / 2;
+    display: grid;
+    background-color: whitesmoke;
+    width: 100%;
+    height: 90%;
+    row-gap: 28px;
+    column-gap: 25px;
+    grid-template-rows: 1fr 1fr;
+    grid-template-columns: 1fr;
+    padding-right: 10px;
+}
+
+.sub-grid.abduce {
+    grid-template-rows: 1fr 1fr 1fr 2fr;
+}
+
+.hidden {
+    display: none;
+}
+
+.label-container {
+    padding-top: 8px;
+    padding-bottom: 8px;
+}
+
+.console-header {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.console-options {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+}
+
+.console-option {
+    margin-left: 10px;
+}
+
+.clear-button {
+    font-family: 'Courier New', Courier, monospace;
+    color: blueviolet;
+    transition-duration: 0.6s;
+    cursor: pointer;
+}
+
+.clear-button:hover {
+    font-weight: 600;
+}
+
+.clear-button:active {
+    transform: scale(0.9);
+}
+
+.docs-body {
+    display: grid;
+    background-color: inherit;
+    width: fit-content;
+    height: 90%;
+    row-gap: 10px;
+    column-gap: 25px;
+    grid-template-columns: 1fr 4fr 1.5fr;
+}
+
+.text-link {
+    display: inline-block;
+    color: cornflowerblue;
+    cursor: pointer;
+}
+
+.header-link {
+    color: white;
+    transition-duration: 0.4s;
+}
+
+.header-link:hover {
+    opacity: 0.4;
+}
+
+.text-link:hover {
+    color: orange;
+    text-decoration: underline;
+}
+
+.code {
+    font-family: 'Courier New', Courier, monospace;
+    color: darkorchid;
+    background-color: whitesmoke;
+}
+
+.code-editor-container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 90%;
+}
+
+.line-numbers {
+    padding: 0px;
+    margin: 0px;
+    border-right: 0px;
+    height: 100%;
+    width: 100%;
+    max-width: 3em;
+}
+
+.line-numbers-textarea {
+    text-align: right;
+    height: 100%;
+    border-left: 2px solid blueviolet;
+    border-right: none;
+    border-bottom-left-radius: 5px;
+    border-top-left-radius: 5px;
+    border-bottom-right-radius: 0px;
+    border-top-right-radius: 0px;
+    box-sizing: border-box;
+    font-family: 'Ubuntu mono', 'Courier New', Courier, monospace;
+    background-color: rgba(0,0,0,.05);
+    overflow: hidden;
+}
+
+.contact {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.toc {
+    font-family: Arial, Helvetica, sans-serif;
+    /* padding-left: 1em; */
+}
+
+.toc-entry {
+    margin-top: 4px;
+}
+
+.toc-link {
+    color: cornflowerblue;
+}
+
+.toc-link:hover {
+    opacity: 0.6;
+    color: orange;
+}
+
+.center-text {
+    text-align: center;
+}
+
+.code-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+
+.code-block {
+    font-family: 'Courier New', Courier, monospace;
+    font-size: 14pt;
+    background-color: whitesmoke;
+    color: blueviolet;
+    text-align: left;
+    padding: 4px;
+}
+
+.changelog {
+    display: flex;
+    flex-direction: column;
+    justify-items: center;
+    align-items: center;
+}
+
+.changelog-body {
+    width: 100%;
+    height: 100%;
+    max-width: 1000px;
+}

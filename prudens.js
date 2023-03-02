@@ -746,6 +746,131 @@ function forwardChaining(kbObject, context, priorityFunction = linearPriorities,
             });
         }
     } while (inferred);
+    //const fs = require("fs");
+    //const { create } = require('xmlbuilder2'); // https://oozcitak.github.io/xmlbuilder2/
+
+    /*
+    
+    var root = create({ version: '1.0', encoding: 'utf-8' })
+        .ele('root', { main_tree_to_execute: 'MainTree' })
+        .ele('BehaviorTree', { 'ID': 'MainTree' });*/
+    /*
+    root.com('f(x) = x^2');
+    TODO: use this example for blackboard
+    for (var i = 1; i <= 5; i++) {
+        var item = root.ele('data');
+        item.att('x', i);
+        item.att('y', i * i);
+    } */
+
+
+    /*
+    TODO: use this for when you find the element to attach multi-layers
+    ins
+
+    Creates a new processing instruction node, appends it to the list of child nodes and returns the parent element node.
+    ins(target: string, content: string)
+    ins(obj: object)
+    ins(arr: string[])
+    */
+    /*
+    let deepBT = [];
+    for (let i = 0; i < kb.length; i++) {
+        console.log(kb[i].name);
+        for (let j = 0; j < kb[i].body.length; j++) {
+            console.log("  ", kb[i].body[j].name, "(", kb[i].body[j].args[0].name, ") - ", kb[i].head.name);
+            // Fill the BT object
+            if (kb[i].head.name == "root") {
+                if (kb[i].body[j].name.substring(0, 8) == "sequence") {
+                    var item = root.ele(kb[i].body[j].name.substring(0, 8));
+                    for (let k = 0; k < kb[i].body[j].args.length; k++) {
+                        item.ele(kb[i].body[j].args[k].name);
+                    }
+                } else {
+                    //root.ele(kb[i].body[j].name);
+                    console.log("no node... ");
+                }
+
+            } else {
+                deepBT[kb[i].body[j].name] = new Array();
+                for (let k = 0; k < kb[i].body[j].args.length; k++) {
+                    deepBT[kb[i].body[j].name].push(kb[i].body[j].args[k].name);
+                }
+
+            }
+        }
+        console.log();
+
+    }*/
+    /*
+    while (Object.keys(deepBT).length > 0) {
+        for (const key in deepBT) {
+            if (deepBT.hasOwnProperty(key)) {
+                let substitute = root.find(n => n.node.nodeName == key, true, true);
+                if (substitute) {
+                    // there is a control node to be elaborated
+                    console.log(`${key}: ${deepBT[key]}`);
+
+                    let values_BT = Object.values(deepBT[key]);
+                    let up_substitute = substitute.up()
+                    substitute.remove();
+
+                    // define the control node to be elaborated (TODO: elaborate also other nodes)
+                    if (key.substring(0, 8) == "sequence") {
+                        var item = up_substitute.ele(key.substring(0, 8));
+                    } else {
+                        var item = up_substitute.ele(key);
+                        console.log("WARNING - node not defined")
+                    }
+
+                    // for each argument, append the new values
+                    values_BT.forEach((valBT) => {
+                        item.ele(valBT)
+                        console.log("values_BT: ", valBT);
+                    });
+
+                    // let's delete this rule to not take care of it anymore
+                    delete deepBT[key];
+                    console.log("size: ", Object.keys(deepBT).length);
+
+
+                }
+
+                console.log(`${key}: ${deepBT[key]}`);
+
+
+            }
+        }
+
+    }
+
+*/
+    // TODO: put all the nodes not in root head in a container. 
+    // Create a while loop (lasting as long as the container has elements) 
+    // that, at each iteration, eliminate the nodes that append
+    /*
+    let substitute = root.find(n => n.node.nodeName == "sequence03", true, true);
+    console.log("substitute = ", substitute);
+    let up_substitute = substitute.up()
+    console.log("up_substitute = ", up_substitute);
+    substitute.remove();
+    up_substitute.ele("right"); */
+
+    /* TODO: logic to substitute new values
+    root.ele("sequence03").ele("wrong");
+    let substitute = root.find(n => n.node.nodeName == "wrong", true, true);
+    console.log("substitute = ", substitute);
+    let up_substitute = substitute.up()
+    console.log("up_substitute = ", up_substitute);
+    substitute.remove();
+    up_substitute.ele("right"); */
+    /*
+    root.doc();
+    let result = root.end({ prettyPrint: true });
+    console.log(result);
+
+    const fs = require("fs");*/
+    //fs.writeFileSync("BT_test_from_prudensNode.xml", result);
     return {
         context: context,
         facts: previousFacts,
@@ -755,6 +880,212 @@ function forwardChaining(kbObject, context, priorityFunction = linearPriorities,
         logs: logs,
     }
 }
+
+function forwardChainingBT(kbObject, context, priorityFunction = linearPriorities, logging = true) { // FIXME Huge inconsistency with DOCS! You need to change that from [rule1, ...] to KBObject.
+    let previousFacts = deepCopy(context);
+    previousFacts.push(TRUE_PREDICATE);
+    let factsToBeAdded = [], factsToBeRemoved = [];
+    const kb = kbObject["kb_BT"];
+
+    const { create } = require('xmlbuilder2'); // https://oozcitak.github.io/xmlbuilder2/
+
+    let BehaviorTree = [];
+    //BehaviorTree = { "BehaviorTree": { "_attributes": { "ID": "MainTree" } } };
+    //BehaviorTree.push({ "BehaviorTree": { "_attributes": { "ID": "MainTree" } } });
+
+    // var builder = require('xmlbuilder');
+    var root = create({ version: '1.0', encoding: 'utf-8' })
+        .ele('root', { main_tree_to_execute: 'MainTree' })
+        .ele('BehaviorTree', { 'ID': 'MainTree' });
+    /*
+    root.com('f(x) = x^2');
+    TODO: use this example for blackboard
+    for (var i = 1; i <= 5; i++) {
+        var item = root.ele('data');
+        item.att('x', i);
+        item.att('y', i * i);
+    } */
+
+
+    /*
+    TODO: use this for when you find the element to attach multi-layers
+    ins
+
+    Creates a new processing instruction node, appends it to the list of child nodes and returns the parent element node.
+    ins(target: string, content: string)
+    ins(obj: object)
+    ins(arr: string[])
+    */
+    let deepBT = [];
+    for (let i = 0; i < kb.length; i++) {
+        console.log(kb[i].name);
+        for (let j = 0; j < kb[i].body.length; j++) {
+            console.log("  ", kb[i].body[j].name, "(", kb[i].body[j].args[0].name, ") - ", kb[i].head.name);
+            // Fill the BT object
+            if (kb[i].head.name == "root") {
+                if (kb[i].body[j].name.substring(0, 8) == "sequence") {
+                    var item = root.ele(kb[i].body[j].name.substring(0, 8));
+                    for (let k = 0; k < kb[i].body[j].args.length; k++) {
+                        item.ele(kb[i].body[j].args[k].name);
+                    }
+                } else {
+                    //root.ele(kb[i].body[j].name);
+                    console.log("no node... ");
+                }
+
+            } else {
+                deepBT[kb[i].body[j].name] = new Array();
+                for (let k = 0; k < kb[i].body[j].args.length; k++) {
+                    deepBT[kb[i].body[j].name].push(kb[i].body[j].args[k].name);
+                }
+
+            }
+        }
+        console.log();
+
+    }
+
+    while (Object.keys(deepBT).length > 0) {
+        for (const key in deepBT) {
+            if (deepBT.hasOwnProperty(key)) {
+                let substitute = root.find(n => n.node.nodeName == key, true, true);
+                if (substitute) {
+                    // there is a control node to be elaborated
+                    console.log(`${key}: ${deepBT[key]}`);
+
+                    let values_BT = Object.values(deepBT[key]);
+                    let up_substitute = substitute.up()
+                    substitute.remove();
+
+                    // define the control node to be elaborated (TODO: elaborate also other nodes)
+                    if (key.substring(0, 8) == "sequence") {
+                        var item = up_substitute.ele(key.substring(0, 8));
+                    } else {
+                        var item = up_substitute.ele(key);
+                        console.log("WARNING - node not defined")
+                    }
+
+                    // for each argument, append the new values
+                    values_BT.forEach((valBT) => {
+                        item.ele(valBT)
+                        console.log("values_BT: ", valBT);
+                    });
+
+                    // let's delete this rule to not take care of it anymore
+                    delete deepBT[key];
+                    console.log("size: ", Object.keys(deepBT).length);
+
+
+                }
+
+                console.log(`${key}: ${deepBT[key]}`);
+
+
+            }
+        }
+
+    }
+
+
+    // TODO: put all the nodes not in root head in a container. 
+    // Create a while loop (lasting as long as the container has elements) 
+    // that, at each iteration, eliminate the nodes that append
+    /*
+    let substitute = root.find(n => n.node.nodeName == "sequence03", true, true);
+    console.log("substitute = ", substitute);
+    let up_substitute = substitute.up()
+    console.log("up_substitute = ", up_substitute);
+    substitute.remove();
+    up_substitute.ele("right"); */
+
+    /* TODO: logic to substitute new values
+    root.ele("sequence03").ele("wrong");
+    let substitute = root.find(n => n.node.nodeName == "wrong", true, true);
+    console.log("substitute = ", substitute);
+    let up_substitute = substitute.up()
+    console.log("up_substitute = ", up_substitute);
+    substitute.remove();
+    up_substitute.ele("right"); */
+    root.doc();
+    let result = root.end({ prettyPrint: true });
+    console.log(result);
+
+    const fs = require("fs");
+    fs.writeFileSync("BT_test_from_prudensNode.xml", result);
+
+    let inferred = false;
+    let graph = initializeGraph(context);
+    let deletedRules = [];
+    let defeatedRules = [];
+    let dilemmas = [];
+    // console.log(kbObject);
+    const code = kbObject["code"];
+    const customPriorities = kbObject["customPriorities"];
+    kbObject["constraints"] = new Map(Object.entries(kbObject["constraints"]));
+    const logs = [];
+    if (logging) {
+        logs.push({
+            facts: deepCopy(previousFacts),
+            graph: deepCopy(graph),
+            dilemmas: deepCopy(dilemmas),
+            defeatedRules: deepCopy(defeatedRules),
+        });
+    }
+    if (Object.keys(customPriorities).length > 0) {
+        priorityFunction = customPrioritiesFunction;
+    }
+    do {
+        inferred = false;
+        for (let i = 0; i < kb.length; i++) {
+            const rule = kb[i];
+            if (deepIncludes(rule, deletedRules)) {
+                continue;
+            }
+            const subs = getSubstitutions(rule["body"], previousFacts, code);
+            // console.log("debug:", rule, subs, previousFacts);
+            // debugger;
+            for (let i = 0; i < subs.length; i++) {
+                const sub = subs[i];
+                const inferredHead = applyToLiteral(sub, rule["head"]);
+                const updatedGraph = updateGraph(inferredHead, rule, graph, previousFacts, factsToBeAdded, factsToBeRemoved, priorityFunction, deletedRules, sub, kbObject["constraints"], kbObject, dilemmas, defeatedRules);
+                graph = updatedGraph["graph"]; // You could probably push the entire graph Object!
+                // previousFacts = updatedGraph["previousFacts"];
+                factsToBeAdded = updatedGraph["factsToBeAdded"];
+                factsToBeRemoved = updatedGraph["factsToBeRemoved"];
+                dilemmas = updatedGraph["dilemmas"];
+                deletedRules = updatedGraph["deletedRules"];
+                defeatedRules = updatedGraph["defeatedRules"];
+                if (!inferred) {
+                    inferred = updatedGraph["inferred"];
+                }
+            }
+        }
+        previousFacts = removeAll(previousFacts, factsToBeRemoved);
+        previousFacts = setConcat(previousFacts, factsToBeAdded);
+        if (logging) {
+            logs.push({
+                facts: deepCopy(previousFacts),
+                graph: deepCopy(graph),
+                dilemmas: deepCopy(dilemmas),
+                defeatedRules: deepCopy(defeatedRules),
+            });
+        }
+    } while (inferred);
+    //let BehaviorTree;
+    //Sequence = { "Sequence": {} };
+    //BehaviorTree = { "BehaviorTree": { "_attributes": { "ID": "MainTree" }, bt_rules } };
+
+    return result; //{
+    //    rules: kb,
+    //policyJSON: policyJSON,
+    /*  facts: previousFacts,
+      graph: graph,
+      dilemmas: dilemmas,
+      defeatedRules: defeatedRules,
+      logs: logs,*/
+    //}
+}
+
 
 function isConfictingWithList(x, facts) { // x is literal, facts is a list of literals.
     for (const fact of facts) {

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="style_1.css" media="screen" />
+    <script type="text/javascript" src="parsers.js"></script>
+    <script type="text/javascript" src="utils.js"></script>
+    <script type="text/javascript" src="prudensUtils.js"></script>
+    <script type="text/javascript" src="prudens.js"></script>
+    <script type="text/javascript" src="abduction.js"></script>
+    <title>
+        Prudens JS
+    </title>
+</head>
+
+<body>
+    <div class="header">
+        <div class="header-left">
+            <div class="header-title">
+                <a href="index.html"><span class="header-link">Prudens JS</span></a>
+            </div>
+            <div class="header-menu">
+                <div class="header-menu-item">
+                    <a href="docs.html"><span class="header-link">Docs</span></a>
+                </div>
+                <div class="header-menu-item">
+                    <a href="contact.html"><span class="header-link">Contact</span></a>
+                </div>
+                <div class="header-menu-item">
+                    <a href="changelog.html"><span class="header-link">Changelog</span></a>
+                </div>
+                <div class="header-menu-item">
+                    <a href="kb_generator/index.html"><span class="header-link">KB Generator</span></a>
+                </div>
+            </div>
+        </div>
+        <div id="exec-button" class="execute-button" onclick="consoleOutput()">Execute!</div>
+    </div>
+    <div class="body-container">
+        <div class="main-body">
+            <div class="tab-menu">
+                <div href="javascript:void(0)" id="deduce-tab" class="tablink tab-button selected"
+                    onclick="tabChanger(event, 'deduce-tab')">Deduce</div>
+                <div id="abduce-tab" class="tablink tab-button" onclick="tabChanger(event, 'abduce-tab')">Abduce</div>
+            </div>
+            <div id="deduce-left" class="item-21 tab-left">
+                <div class="label-container">
+                    <div class="label">Knowledge Base</div>
+                </div>
+                <div id="kb-container" class="code-editor-container">
+                    <div class="line-numbers">
+                        <textarea id="deduce-tab-kb-lines" class="line-numbers-textarea" readonly>1</textarea>
+                    </div>
+                    <textarea id="deduce-tab-kb" placeholder="Enter your knowledge base here..."></textarea>
+                </div>
+            </div>
+            <div id="deduce-right" class="sub-grid tab-right">
+                <div class="flex-container">
+                    <div class="label-container">
+                        <div id="context-label" class="label">Context</div>
+                    </div>
+                    <div class="code-editor-container">
+                        <div class="line-numbers">
+                            <textarea id="deduce-tab-context-lines" class="line-numbers-textarea" readonly>1</textarea>
+                        </div>
+                        <textarea id="deduce-tab-context" placeholder="Enter your context here..."></textarea>
+                    </div>
+                </div>
+                <div class="flex-container">
+                    <div class="label-container">
+                        <div class="console-header">
+                            <div class="label">Console</div>
+                            <div class="console-options">
+                                <div class="console-option">
+                                    <input id="download-checkbox" type="checkbox" name="download"></input>
+                                    <label for="download">Download Output</label>
+                                </div>
+                                <div class="console-option">
+                                    <div class="clear-button" onclick="clearConsole()">Clear</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <textarea id="deduce-tab-console" class="textarea console" readonly>~$ </textarea>
+                </div>
+            </div>
+            <div id="abduce-left" class="item-21 tab-left hidden">
+                <div class="label-container">
+                    <div class="label">Knowledge Base</div>
+                </div>
+                <div id="kb-container" class="code-editor-container">
+                    <div class="line-numbers">
+                        <textarea id="abduce-tab-kb-lines" class="line-numbers-textarea" readonly>1</textarea>
+                    </div>
+                    <textarea id="abduce-tab-kb" placeholder="Enter your knowledge base here..."></textarea>
+                </div>
+            </div>
+            <div id="abduce-right" class="sub-grid abduce tab-right hidden">
+                <div class="flex-container">
+                    <div class="label-container">
+                        <div id="context-label" class="label">Context</div>
+                    </div>
+                    <div class="code-editor-container">
+                        <div class="line-numbers">
+                            <textarea id="abduce-tab-context-lines" class="line-numbers-textarea" readonly>1</textarea>
+                        </div>
+                        <textarea id="abduce-tab-context" placeholder="Enter your context here..."></textarea>
+                    </div>
+                </div>
+                <div class="flex-container">
+                    <div class="label-container">
+                        <div class="label">Target</div>
+                    </div>
+                    <div class="code-editor-container">
+                        <div class="line-numbers">
+                            <textarea id="abduce-tab-targets-lines" class="line-numbers-textarea" readonly>1</textarea>
+                        </div>
+                        <textarea id="abduce-tab-targets" placeholder="Enter your target inference here..."></textarea>
+                    </div>
+                </div>
+                <div class="flex-container">
+                    <div class="label-container">
+                        <div class="label">Predicate Domains</div>
+                    </div>
+                    <div class="code-editor-container">
+                        <div class="line-numbers">
+                            <textarea id="abduce-tab-domains-lines" class="line-numbers-textarea" readonly>1</textarea>
+                        </div>
+                        <textarea id="abduce-tab-domains"
+                            placeholder="Enter predicate domains here (optional)..."></textarea>
+                    </div>
+                </div>
+                <div class="flex-container">
+                    <div class="label-container">
+                        <div class="console-header">
+                            <div class="label">Console</div>
+                            <div class="console-options">
+                                <div class="console-option">
+                                    <input id="download-checkbox" type="checkbox" name="download"></input>
+                                    <label for="download">Download Output</label>
+                                </div>
+                                <div class="console-option">
+                                    <div class="clear-button" onclick="clearConsole()">Clear</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <textarea id="abduce-tab-console" class="textarea console" readonly>~$ </textarea>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="eventHandling.js"></script>
+</body>
+
+</html>

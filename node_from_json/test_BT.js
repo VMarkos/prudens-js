@@ -18,7 +18,7 @@ function deduce() { // Reading policy and context from local files and writing d
     const policy = JSON.parse(fs.readFileSync("policy.json")); // Sync or async used as per the app's needs.
     const context = JSON.parse(fs.readFileSync("context.json"));
     const options = { compact: true, ignoreComment: true, spaces: 4 };
-    const output = prudens.forwardChainingBT(policy, context["context_BT"]);
+    const output = prudens.forwardChainingBT(policy, context["context"]);
     //TODO: this is to add functions in file json: move it to prudensNode.js
     const fallback = `function fallback(arr){
         for(let i = 0; i<arr.lenght;i++){
@@ -30,7 +30,7 @@ function deduce() { // Reading policy and context from local files and writing d
     }`
     //console.log(prudens.codeToObject(fallback));
     // TODO: any reason for using Sync instead of Async?
-    fs.writeFileSync("BT_test.xml", toXML.js2xml(output, options));
+    fs.writeFileSync("BT_test.xml", output);
 }
 
 function main() {

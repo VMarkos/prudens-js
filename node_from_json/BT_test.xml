@@ -1,2 +1,23 @@
-<version><?xml version="1.0" encoding="utf-8"?>
-</version>
+<?xml version="1.0" encoding="utf-8"?>
+<root main_tree_to_execute="MainTree">
+  <BehaviorTree ID="MainTree">
+    <sequence>
+      <Children0/>
+      <Children1/>
+      <sequence>
+        <X/>
+        <Y/>
+      </sequence>
+    </sequence>
+    <sequence>
+      <Children/>
+      <sequence>
+        <Z/>
+        <sequence>
+          <Z/>
+          <K/>
+        </sequence>
+      </sequence>
+    </sequence>
+  </BehaviorTree>
+</root>
