@@ -335,7 +335,7 @@ Context: g(b); h(b);
 		* all such rules. Otherwise, we merely keep track of the agent's dilemmas.
  * */
 
-function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded, factsToBeRemoved, priorityFunction, deletedRules, sub, constraints, kbObject, dilemmas, defeatedRules, context) { //TODO You may need to store the substitution alongside each rule, in case one needs to count how many time a rule has been triggered or so.
+function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded, factsToBeRemoved, priorityFunction, deletedRules, sub, constraints, kbObject, dilemmas, defeatedRules, context) { //TODO You may need to store the substitution alongside each rule, in case one needs to count how many times a rule has been triggered or so.
     let inferred = false;
     // console.log("inferredHead:", inferredHead);
     // console.log("facts:", facts);
@@ -421,7 +421,7 @@ function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded
                 // console.log("isPrior:", isPrior);
                 // debugger;
                 if (isPrior === undefined || isPrior) {
-                    console.log("Here");
+                    // console.log("Here");
                     toBeRemoved.push(rule);
                     if (!utils.deepIncludes({
                         "defeated": rule,
@@ -465,6 +465,7 @@ function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded
             if (graph[parsers.literalToString(oppositeHead)].length === toBeRemoved.length) {
                 // console.log("Delete opp");
                 delete graph[parsers.literalToString(oppositeHead)];
+		inferred = inferred && deleteConsequences(oppositeHead, graph, defeatedRules);
                 // console.log("graph:", graph);
                 // debugger;
                 if (beatsAll) {
@@ -504,16 +505,40 @@ function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded
     };
 }
 
+function deleteConsequences(fact, graph, defeatedRules) {
+    // Remove any defated rules using `fact` in their body and, if needed, their inferences
+    let inferred = false;
+    Object.keys(graph).forEach(function(literal) {
+	const inferringRules = graph[literal];
+	const toBeRemoved = [];
+	for (const rule of inferringRules) {
+	    // console.log("\t", JSON.stringify(rule["body"]));
+	    if (utils.deepIncludes(fact, rule["body"])) {
+		inferred = true;
+		toBeRemoved.push(rule);
+		defeatedRules.push(rule);
+	    }
+	}
+	if (graph[literal].length === toBeRemoved.length) {
+	    delete graph[literal];
+	    // factsToBeRemoved.push(parsers.parseLiteral(literal)); // Maybe a bad idea?
+	} else {
+	    graph[literal] = utils.removeAll(graph[literal], toBeRemoved);
+	}
+    });
+    return inferred;
+}
+
 function isInDilemma(rule, dilemmas) {
     if (dilemmas === undefined) {
         return false;
     }
-	for (const dilemma of dilemmas) {
-		if (utils.deepIncludes(rule, dilemma.slice(1))) {
-			return true;
-		}
+    for (const dilemma of dilemmas) {
+	if (utils.deepIncludes(rule, dilemma.slice(1))) {
+		return true;
 	}
-	return false;
+    }
+    return false;
 }
 
 function initializeGraph(context) {
@@ -521,7 +546,7 @@ function initializeGraph(context) {
     let literal;
     for (let i = 0; i < context.length; i++) {
         literal = context[i]
-        graph[parsers.literalToString(literal)] = [{name: `\$${i}`, head: literal, body: TRUE_PREDICATE}];
+        graph[parsers.literalToString(literal)] = [{name: `\$${i}`, head: literal, body: [TRUE_PREDICATE]}];
     }
     return graph;
 }
@@ -578,6 +603,13 @@ function forwardChaining(kbObject, context, priorityFunction=linearPriorities, l
                 }
             }
         }
+	// const moreFactsToBeRemoved = [];
+	factsToBeRemoved.forEach(function (fact) {
+	    // console.log("Fact:", fact);
+	    inferred = inferred && deleteConsequences(fact, graph, defeatedRules);
+	    // console.log("\tGraph:", Object.keys(graph).join(", "));
+	});
+	// factsToBeRemoved.push(...moreFactsToBeRemoved);
         previousFacts = utils.removeAll(previousFacts, factsToBeRemoved);
         previousFacts = utils.setConcat(previousFacts, factsToBeAdded);
         if (logging) {
@@ -589,9 +621,11 @@ function forwardChaining(kbObject, context, priorityFunction=linearPriorities, l
             });
         }
     } while (inferred);
+    const finalFacts = Object.keys(graph).map(parsers.parseLiteral); // FIXME May not the best idea...
     return {
         context: context,
-        facts: previousFacts,
+        // facts: previousFacts,
+	facts: finalFacts,
         graph: graph,
         dilemmas: dilemmas,
         defeatedRules: defeatedRules,

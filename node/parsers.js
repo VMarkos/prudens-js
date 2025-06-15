@@ -37,7 +37,7 @@ function parseValues(values) {
     return argumentValues;
 }
 
-function parseContext(context) { // FIXME There is some issue here, parsing seems to be way to lenient.
+function parseContext(context) { // FIXME There is some issue here, parsing seems to be way too lenient.
     "use strict";
     if (context === undefined || context === "") {
         return {
@@ -767,6 +767,7 @@ function proofToString(proof) {
 module.exports = {
     parseKB,
     parseContext,
+    parseLiteral,
     literalToString,
     kbToString,
     listOfLiteralsToString,

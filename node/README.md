@@ -53,7 +53,7 @@ function main() {
 main();
 ```
 
-Assuming that the above is named `test.js` then `node test.js` would print on the terminal the followin:
+Assuming that the above is named `test.js` then `node test.js` would print on the terminal the following:
 
 ```javascript
 {
