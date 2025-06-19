@@ -462,10 +462,11 @@ function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded
                     }
                 }
             }
+	    const cache = [];
             if (graph[parsers.literalToString(oppositeHead)].length === toBeRemoved.length) {
                 // console.log("Delete opp");
                 delete graph[parsers.literalToString(oppositeHead)];
-		inferred = inferred && deleteConsequences(oppositeHead, graph, defeatedRules);
+		inferred = inferred || deleteConsequences(oppositeHead, graph, defeatedRules, cache);
                 // console.log("graph:", graph);
                 // debugger;
                 if (beatsAll) {
@@ -479,6 +480,7 @@ function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded
                 // facts = facts.splice(deepIndexOf(facts, oppositeHead), 1); // FIXME .indexOf() returns -1 because, guess what, it does not work with lists of objects... Create a deep alternative.
                 factsToBeAdded = utils.removeAll(factsToBeAdded, [oppositeHead]);
                 factsToBeRemoved.push(oppositeHead);
+		factsToBeRemoved.push(...cache);
                 // console.log("Facts post splicing: ", facts);
                 // debugger;
             } else {
@@ -505,8 +507,8 @@ function updateGraph(inferredHead, newRule, graph, previousFacts, factsToBeAdded
     };
 }
 
-function deleteConsequences(fact, graph, defeatedRules) {
-    // Remove any defated rules using `fact` in their body and, if needed, their inferences
+function deleteConsequences(fact, graph, defeatedRules, ftbr = []) {
+    // Remove any defeated rules using `fact` in their body and, if needed, their inferences
     let inferred = false;
     Object.keys(graph).forEach(function(literal) {
 	const inferringRules = graph[literal];
@@ -521,6 +523,7 @@ function deleteConsequences(fact, graph, defeatedRules) {
 	}
 	if (graph[literal].length === toBeRemoved.length) {
 	    delete graph[literal];
+	    ftbr.push(parsers.parseLiteral(literal));
 	    // factsToBeRemoved.push(parsers.parseLiteral(literal)); // Maybe a bad idea?
 	} else {
 	    graph[literal] = utils.removeAll(graph[literal], toBeRemoved);
@@ -554,7 +557,7 @@ function initializeGraph(context) {
 function forwardChaining(kbObject, context, priorityFunction=linearPriorities, logging = true) { //FIXME Huge inconsistency with DOCS! You need to change that from [rule1, ...] to KBObject.
     let previousFacts = utils.deepCopy(context);
     previousFacts.push(TRUE_PREDICATE);
-    let factsToBeAdded = [], factsToBeRemoved = [];
+    let factsToBeAdded = [], factsToBeRemoved = [], rejectedFacts = [];
     const kb = kbObject["kb"];
     // console.log(facts);
     let inferred = false;
@@ -577,20 +580,21 @@ function forwardChaining(kbObject, context, priorityFunction=linearPriorities, l
     if (Object.keys(customPriorities).length > 0) {
         priorityFunction = customPrioritiesFunction;
     }
+    let failCheck = 0;
     do {
-        inferred = false;
+        inferred = false;	
         for (let i=0; i<kb.length; i++) {
             const rule = kb[i];
             if (utils.deepIncludes(rule, deletedRules)) {
                 continue;
             }
-            const subs = getSubstitutions(rule["body"], previousFacts, code);
+            const subs = getSubstitutions(rule["body"], previousFacts.filter((x) => !utils.deepIncludes(x, factsToBeRemoved)), code);
             // console.log(rule, subs, previousFacts);
             // debugger;
             for (let i=0; i<subs.length; i++) {
                 const sub = subs[i];
                 const inferredHead = applyToLiteral(sub, rule["head"]);
-                const updatedGraph = updateGraph(inferredHead, rule, graph, previousFacts, factsToBeAdded, factsToBeRemoved, priorityFunction, deletedRules, sub, kbObject["constraints"], kbObject, dilemmas, defeatedRules);
+                const updatedGraph = updateGraph(inferredHead, rule, graph, previousFacts, factsToBeAdded, factsToBeRemoved, priorityFunction, deletedRules, sub, kbObject["constraints"], kbObject, dilemmas, defeatedRules, context, rejectedFacts);
                 graph = updatedGraph["graph"]; // You could probably push the entire graph Object!
                 // previousFacts = updatedGraph["previousFacts"];
                 factsToBeAdded = updatedGraph["factsToBeAdded"];
@@ -603,13 +607,21 @@ function forwardChaining(kbObject, context, priorityFunction=linearPriorities, l
                 }
             }
         }
-	// const moreFactsToBeRemoved = [];
-	factsToBeRemoved.forEach(function (fact) {
-	    // console.log("Fact:", fact);
-	    inferred = inferred && deleteConsequences(fact, graph, defeatedRules);
-	    // console.log("\tGraph:", Object.keys(graph).join(", "));
-	});
-	// factsToBeRemoved.push(...moreFactsToBeRemoved);
+	let moreFactsToBeRemoved = [...factsToBeRemoved];
+	let cache = moreFactsToBeRemoved;
+	let dc;
+	do  {
+	    trimmed = false;
+	    moreFactsToBeRemoved.forEach(function (fact) {
+		// console.log("Fact:", fact);
+		dc = deleteConsequences(fact, graph, defeatedRules, cache);
+		inferred = inferred || dc;
+		// console.log("\tGraph:", Object.keys(graph).join(", "));
+	    });
+	    moreFactsToBeRemoved = [...cache];
+	    cache = [];
+	} while (moreFactsToBeRemoved.length > 0);
+	factsToBeRemoved.push(...moreFactsToBeRemoved);
         previousFacts = utils.removeAll(previousFacts, factsToBeRemoved);
         previousFacts = utils.setConcat(previousFacts, factsToBeAdded);
         if (logging) {
@@ -620,8 +632,11 @@ function forwardChaining(kbObject, context, priorityFunction=linearPriorities, l
                 defeatedRules: utils.deepCopy(defeatedRules),
             });
         }
+	if (!inferred) {
+	    failCheck++;
+	}
     } while (inferred);
-    const finalFacts = Object.keys(graph).map(parsers.parseLiteral); // FIXME May not the best idea...
+    const finalFacts = Object.keys(graph).map(parsers.parseLiteral); // FIXME Maybe not the best idea...
     return {
         context: context,
         // facts: previousFacts,
