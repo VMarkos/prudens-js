@@ -582,14 +582,15 @@ function forwardChaining(kbObject, context, priorityFunction=linearPriorities, l
     }
     let failCheck = 0;
     do {
-        inferred = false;	
+        inferred = false;
+		factsToBeRemoved = [];
         for (let i=0; i<kb.length; i++) {
             const rule = kb[i];
             if (utils.deepIncludes(rule, deletedRules)) {
                 continue;
             }
             const subs = getSubstitutions(rule["body"], previousFacts.filter((x) => !utils.deepIncludes(x, factsToBeRemoved)), code);
-            // console.log(rule, subs, previousFacts);
+            // console.log(rule['name'], subs);
             // debugger;
             for (let i=0; i<subs.length; i++) {
                 const sub = subs[i];
@@ -607,40 +608,41 @@ function forwardChaining(kbObject, context, priorityFunction=linearPriorities, l
                 }
             }
         }
-	let moreFactsToBeRemoved = [...factsToBeRemoved];
-	let cache = moreFactsToBeRemoved;
-	let dc;
-	do  {
-	    trimmed = false;
-	    moreFactsToBeRemoved.forEach(function (fact) {
-		// console.log("Fact:", fact);
-		dc = deleteConsequences(fact, graph, defeatedRules, cache);
-		inferred = inferred || dc;
-		// console.log("\tGraph:", Object.keys(graph).join(", "));
-	    });
-	    moreFactsToBeRemoved = [...cache];
-	    cache = [];
-	} while (moreFactsToBeRemoved.length > 0);
-	factsToBeRemoved.push(...moreFactsToBeRemoved);
-        previousFacts = utils.removeAll(previousFacts, factsToBeRemoved);
-        previousFacts = utils.setConcat(previousFacts, factsToBeAdded);
-        if (logging) {
-            logs.push({
-                facts: utils.deepCopy(previousFacts),
-                graph: utils.deepCopy(graph),
-                dilemmas: utils.deepCopy(dilemmas),
-                defeatedRules: utils.deepCopy(defeatedRules),
-            });
-        }
-	if (!inferred) {
-	    failCheck++;
-	}
+		let moreFactsToBeRemoved = [...factsToBeRemoved];
+		let cache = moreFactsToBeRemoved;
+		let dc;
+		do  {
+			trimmed = false;
+			moreFactsToBeRemoved.forEach(function (fact) {
+				// console.log("Fact:", fact);
+				dc = deleteConsequences(fact, graph, defeatedRules, cache);
+				inferred = inferred || dc;
+				// console.log("\tGraph:", Object.keys(graph).join(", "));
+			});
+			moreFactsToBeRemoved = [...cache];
+			cache = [];
+		} while (moreFactsToBeRemoved.length > 0);
+		factsToBeRemoved.push(...moreFactsToBeRemoved);
+			previousFacts = utils.removeAll(previousFacts, factsToBeRemoved);
+			previousFacts = utils.setConcat(previousFacts, factsToBeAdded);
+			if (logging) {
+				logs.push({
+					facts: utils.deepCopy(previousFacts),
+					graph: utils.deepCopy(graph),
+					dilemmas: utils.deepCopy(dilemmas),
+					defeatedRules: utils.deepCopy(defeatedRules),
+				});
+			}
+		if (!inferred) {
+			failCheck++;
+		}
+		// console.log(graph);
     } while (inferred);
     const finalFacts = Object.keys(graph).map(parsers.parseLiteral); // FIXME Maybe not the best idea...
     return {
         context: context,
         // facts: previousFacts,
-	facts: finalFacts,
+		facts: finalFacts,
         graph: graph,
         dilemmas: dilemmas,
         defeatedRules: defeatedRules,
